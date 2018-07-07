@@ -1,0 +1,4 @@
+dist
+.tmp
+.sonarlint
+node_modules

@@ -1,0 +1,16 @@
+{
+  "name": "custom-elements-decorators",
+  "version": "1.0.0",
+  "description": "Typescript Decorators for creating Custom Elements",
+  "main": "index.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.js"
+  },
+  "author": "Aivan Monceller",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "^0.62.0",
+    "rollup-plugin-terser": "^1.0.1",
+    "rollup-plugin-typescript2": "^0.15.1"
+  }
+}
