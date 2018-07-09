@@ -21,7 +21,7 @@ import { CustomElement } from './custom-element';
     }
   `
 })
-class CounterElement extends HTMLElement {
+export class CounterElement extends HTMLElement {
 
 
   static get observedAttributes() {
@@ -75,4 +75,3 @@ class CounterElement extends HTMLElement {
     }
   }
 }
-customElements.define('counter-element', CounterElement);
