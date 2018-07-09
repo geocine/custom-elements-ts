@@ -4,13 +4,16 @@
   "description": "Typescript Decorators for creating Custom Elements",
   "main": "index.js",
   "scripts": {
-    "build": "rollup -c rollup.config.js"
+    "start": "node start"
   },
   "author": "Aivan Monceller",
   "license": "MIT",
   "devDependencies": {
-    "rollup": "^0.62.0",
-    "rollup-plugin-terser": "^1.0.1",
-    "rollup-plugin-typescript2": "^0.15.1"
+    "@ngx-devtools/server": "1.9.2",
+    "@webcomponents/custom-elements": "1.1.2",
+    "node-sass": "4.9.2",
+    "rollup": "0.62.0",
+    "rollup-plugin-typescript2": "0.15.1",
+    "terser": "3.7.7"
   }
 }

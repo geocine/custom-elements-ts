@@ -1,7 +1,9 @@
-interface CustomElementMetadata {
+export interface CustomElementMetadata {
   tag?: string;
   template?: string;
-  styles?: string;
+  templateUrl?: string;
+  styleUrls?: Array<string>;
+  styles?: Array<string>;
 }
 
 export const CustomElement = (args: CustomElementMetadata) => {
@@ -25,14 +27,13 @@ export const CustomElement = (args: CustomElementMetadata) => {
       render() {
         const template = document.createElement('template');
         template.innerHTML = `
-          <style>${args.styles ? args.styles : ''}</style>
+          <style>${args.styles ? args.styles.join(',') : ''}</style>
           ${args.template ? args.template : ''}`;
 
           this.shadowRoot.appendChild(document.importNode(template.content, true));
       }
     };
 
-    // Define element in customElements registry
     if(!customElements.get(tag)){
       customElements.define(tag, customElement);
     }
