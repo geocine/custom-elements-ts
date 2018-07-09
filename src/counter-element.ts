@@ -1,36 +1,16 @@
 import { CustomElement } from './custom-element';
 
 @CustomElement({
-  template: `
-    <button id="count"></button>
-  `,
-  styles: `
-    :host {
-      display: inline-block;
-    }
-    :host button {
-      width: 50px;
-      height: 50px;
-      color: #FFF;
-      background-color: #000;
-      border: 0;
-      border-radius: 5px;
-      font-size: 20px;
-      outline: none;
-      cursor: pointer;
-    }
-  `
+  tag: 'custom-counter',
+  templateUrl: './counter-element.html',
+  styleUrls: [ './counter-element.scss' ]
 })
-class CounterElement extends HTMLElement {
-
+export class CounterElement extends HTMLElement {
 
   static get observedAttributes() {
     return ['count'];
   }
 
-  /**
-   *
-   */
   constructor() {
     super();
     this.addEventListener('click', () => {
@@ -75,4 +55,3 @@ class CounterElement extends HTMLElement {
     }
   }
 }
-customElements.define('counter-element', CounterElement);
