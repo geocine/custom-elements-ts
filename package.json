@@ -14,6 +14,6 @@
     "node-sass": "4.9.2",
     "rollup": "0.62.0",
     "rollup-plugin-typescript2": "0.15.1",
-    "uglify-es": "3.3.9"
+    "terser": "3.7.7"
   }
 }

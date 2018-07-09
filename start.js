@@ -6,7 +6,7 @@ const { basename, dirname, join, resolve, sep } = require('path');
 const { serverStart } = require('@ngx-devtools/server');
 
 const typescript = require('rollup-plugin-typescript2');
-const { minify } = require('uglify-es');
+const { minify } = require('terser');
 
 const { inlineSources } = require('./inline-sources');
 
