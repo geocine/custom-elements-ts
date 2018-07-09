@@ -43,7 +43,7 @@ const uglify = (userOptions, minifier = minify) => {
 const config = {
   inputOptions: {
     treeshake: true,
-    input: `.tmp/${ELEMEMT_NAME}.ts`,
+    input: `.tmp/index.ts`,
     plugins: [
       typescript({ 
         useTsconfigDeclarationDir: true,
