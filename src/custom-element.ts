@@ -2,8 +2,8 @@ export interface CustomElementMetadata {
   tag?: string;
   template?: string;
   templateUrl?: string;
-  styleUrls?: Array<string>;
-  styles?: Array<string>;
+  styleUrl?: string;
+  style?: string;
 }
 
 export const CustomElement = (args: CustomElementMetadata) => {
@@ -27,7 +27,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
       render() {
         const template = document.createElement('template');
         template.innerHTML = `
-          <style>${args.styles ? args.styles.join(',') : ''}</style>
+          <style>${args.style ? args.style : ''}</style>
           ${args.template ? args.template : ''}`;
 
           this.shadowRoot.appendChild(document.importNode(template.content, true));

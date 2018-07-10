@@ -5,8 +5,8 @@
   "main": "index.js",
   "module": "dist/custom-element.js",
   "scripts": {
-    "build": "rm -rf dist && tsc -p src/tsconfig.json",
-    "start": "node ./scripts/start.js"
+    "build": "node tools/build.js",
+    "start": "node tools/start.js"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -14,11 +14,13 @@
   },
   "devDependencies": {
     "@ngx-devtools/server": "1.9.2",
-    "@webcomponents/custom-elements": "1.1.2",
+    "chalk": "2.4.1",
     "node-sass": "4.9.2",
     "rollup": "0.62.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-typescript2": "0.15.1",
-    "terser": "3.7.7"
+    "terser": "3.7.7",
+    "typescript": "2.9.2"
   },
   "typings": "dist/index.d.ts",
   "contributors": [
