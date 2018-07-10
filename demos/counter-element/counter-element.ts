@@ -1,4 +1,4 @@
-import { CustomElement } from 'custom-elements-ts';
+import { CustomElement, Watch } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'counter-element',
@@ -7,15 +7,11 @@ import { CustomElement } from 'custom-elements-ts';
 })
 export class CounterElement extends HTMLElement {
 
-  static get observedAttributes() {
-    return ['count'];
-  }
-
   constructor() {
     super();
     this.addEventListener('click', () => {
       const incrementCount = parseInt(this.count)+1;
-      this.changeCount(incrementCount.toString());
+      this.count = incrementCount.toString();
     });
   }
 
@@ -31,18 +27,9 @@ export class CounterElement extends HTMLElement {
     this.showCount();
   }
 
-  attributeChangedCallback(
-    name: string,
-    oldValue: string,
-    newValue: string
-  ): void {
-    if (name == 'count' && oldValue != newValue) {
-      this.changeCount(newValue);
-    }
-  }
-
-  changeCount(count: string) {
-    this.count = count;
+  @Watch('count')
+  changeCount(_: string, newCount: string) {
+    this.count = newCount;
     this.showCount();
   }
 
