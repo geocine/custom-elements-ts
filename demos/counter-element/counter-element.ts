@@ -1,4 +1,4 @@
-import { CustomElement } from './custom-element';
+import { CustomElement } from 'custom-elements-ts';
 
 @CustomElement({
   templateUrl: './counter-element.html',

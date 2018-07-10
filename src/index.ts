@@ -1,1 +1,1 @@
-export * from './counter-element';
+export * from './custom-element';
