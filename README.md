@@ -1,5 +1,7 @@
 # custom-elements-ts
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/geocine/custom-elements-ts.svg)](https://greenkeeper.io/)
+
 Create native custom elements using Typescript without using any third party libraries.
 
 ```

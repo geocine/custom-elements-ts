@@ -17,6 +17,7 @@ branches:
   only:
   - master
   - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  - /^greenkeeper/.*$/
 
 before_install:
   - "[[ $(node -v) =~ ^v9.*$ ]] || npm install -g npm@latest"
