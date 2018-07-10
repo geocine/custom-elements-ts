@@ -1,10 +1,11 @@
 import { CustomElement } from 'custom-elements-ts';
 
 @CustomElement({
+  tag: 'counter-element',
   templateUrl: './counter-element.html',
   styleUrl: './counter-element.scss'
 })
-export class CustomCounter extends HTMLElement {
+export class CounterElement extends HTMLElement {
 
   static get observedAttributes() {
     return ['count'];

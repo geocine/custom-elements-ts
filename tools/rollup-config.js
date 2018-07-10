@@ -5,12 +5,31 @@ const resolve = require('rollup-plugin-node-resolve');
 
 const { uglify } = require('./rollup-plugin-uglify');
 const { isProcess } = require('./check-args');
+const { existsSync } = require('fs');
 
-const ELEMEMT_NAME = 'counter-element';
+const ELEMENT_NAME = process.argv[2];
 const DEST_PATH = 'dist';
-const INPUT_PATH =  path.join('.tmp', 'index.ts');
 
 const prodModeParams = [ '--prod',  '--prod=true',  '--prod true'  ];
+
+const ELEMENT_PATH = `${ELEMENT_NAME}/index.ts`;
+const INPUT_PATH =  path.join('.tmp', ELEMENT_PATH);
+
+if(ELEMENT_NAME == undefined){
+  console.log('specify which element to start');
+  console.log(' ↳  eg. npm start element-name');
+  process.exit();
+}
+
+if(!existsSync(`demos/${ELEMENT_PATH}`)){
+  console.log('element does not exist');
+  process.exit();
+}
+
+const toPascalCase = (text) => {
+  return text.replace(/-\w/g, m => m[1].toUpperCase())
+    .replace(/^\w/, c => c.toUpperCase());
+}
 
 const config = {
   inputOptions: {
@@ -32,8 +51,8 @@ const config = {
   outputOptions: {
     sourcemap: true,
     exports: 'named',
-    name: ELEMEMT_NAME,
-    file: `${DEST_PATH}/${ELEMEMT_NAME}.umd.js`,
+    name: toPascalCase(ELEMENT_NAME),
+    file: `${DEST_PATH}/${ELEMENT_NAME}.umd.js`,
     format: 'umd'
   }
 };
@@ -46,3 +65,4 @@ if (isProcess(prodModeParams)) {
 }
 
 exports.config = config;
+exports.ELEMENT_NAME = ELEMENT_NAME;
