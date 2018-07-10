@@ -8,13 +8,13 @@ npm install custom-elements-ts
 
 ### Usage
 
-```
+```ts
 import { CustomElement } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'counter-element',
   templateUrl: 'counter-element.html',
-  styleUrls: ['counter-element.scss']
+  styleUrl: 'counter-element.scss'
 })
 export class CounterElement extends HTMLElement {
   // code as you would when creating a native HTMLElement
