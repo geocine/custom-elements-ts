@@ -3,17 +3,16 @@
   "version": "0.0.2",
   "description": "Create native Custom Elements using Typescript without using any third party libraries",
   "main": "index.js",
-  "module": "dist/custom-element.js",
+  "module": "custom-element.js",
   "scripts": {
     "build": "node tools/build.js",
-    "start": "node tools/start.js"
+    "start": "node tools/start.js",
+    "pack": "node tools/publish.js && tsc -p src/tsconfig.json"
   },
   "license": "MIT",
-  "peerDependencies": {
-    "@webcomponents/custom-elements": "1.1.2"
-  },
   "devDependencies": {
     "@ngx-devtools/server": "1.9.2",
+    "@webcomponents/custom-elements": "1.1.2",
     "chalk": "2.4.1",
     "node-sass": "4.9.2",
     "rollup": "0.62.0",
@@ -22,7 +21,7 @@
     "terser": "3.7.7",
     "typescript": "2.9.2"
   },
-  "typings": "dist/index.d.ts",
+  "typings": "index.d.ts",
   "contributors": [
     "Aivan Monceller",
     "Arjay Elbore",
