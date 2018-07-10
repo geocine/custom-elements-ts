@@ -1,23 +1,10 @@
 const sass = require('node-sass');
 
-const { promisify } = require('util');
-const { readFileSync, writeFile, readFile, existsSync, mkdirSync } = require('fs');
-const { dirname, join, sep, resolve } = require('path');
+const { readFileSync } = require('fs');
+const { dirname, join } = require('path');
 
-const { getFiles } = require('./files');
-
-const writeFileAsync = promisify(writeFile);
-const readFileAsync = promisify(readFile);
-
-const mkdirp = (directory) => {
-  const dirPath = resolve(directory).replace(/\/$/, '').split(sep);
-  for (let i = 1; i <= dirPath.length; i++) {
-    const segment = dirPath.slice(0, i).join(sep);
-    if (!existsSync(segment) && segment.length > 0) {
-      mkdirSync(segment);
-    }
-  }
-};
+const { getFiles, writeFileAsync, readFileAsync } = require('./files');
+const { mkdirp } = require('./mkdrip');
 
 const inlineTemplate = () => {
   return (content, urlResolver) => {
@@ -54,11 +41,8 @@ const getContent = (styleUrl, urlResolver) => {
 };
 
 const inlineStyle = (content, urlResolver) => {
-  return content.replace(/styleUrls\s*:\s*(\[[\s\S]*?\])/gm,  (m, styleUrls) => {
-    const urls = eval(styleUrls);
-    m = m.replace('styleUrls', 'styles');
-    urls.forEach(styleUrl => m = m.replace(styleUrl, getContent(styleUrl, urlResolver)));
-    return m;
+  return content.replace(/styleUrl\s*:\s*'([^']+?\.*css)'/g,  (m, styleUrl) => {
+    return m.replace('styleUrl', 'style').replace(styleUrl, getContent(styleUrl, urlResolver))
   });
 };
 

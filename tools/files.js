@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const promisify = require('util').promisify;
+
 const walk = ({ dir, isRecursive = true, includes = [] }) => {
   let results = [];
   const rootDir = path.resolve(dir);
@@ -47,4 +49,19 @@ const getFiles = src => {
   }));
 };
 
+const writeFileAsync = promisify(fs.writeFile);
+const readFileAsync = promisify(fs.readFile);
+const copyFileAsync = promisify(fs.copyFile);
+const rmdirAsync = promisify(fs.rmdir);
+const lstatAsync = promisify(fs.lstat);
+const unlinkAsync = promisify(fs.unlink);
+const readdirAsync = promisify(fs.readdir);
+
 exports.getFiles = getFiles;
+exports.rmdirAsync = rmdirAsync;
+exports.lstatAsync = lstatAsync;
+exports.unlinkAsync = unlinkAsync;
+exports.readdirAsync = readdirAsync;
+exports.writeFileAsync = writeFileAsync;
+exports.readFileAsync = readFileAsync;
+exports.copyFileAsync = copyFileAsync;
