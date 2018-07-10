@@ -69,7 +69,7 @@ const inlineResourcesFromString = (content, urlResolver) => {
 const inlineSources = (src, dest) => {
   const files = getFiles(src).join(',').split(',');
   return Promise.all(files.map(file => {
-    const destPath = file.replace('src', dest);
+    const destPath = file.replace('demos', dest);
     return readFileAsync(file, 'utf8')
       .then(content => inlineResourcesFromString(content, url => join(dirname(file), url)))
       .then(content => {

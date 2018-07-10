@@ -2,28 +2,18 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
-    "baseUrl": ".",
     "declaration": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "importHelpers": true,
     "lib": ["es5", "es6", "dom"],
     "module": "es2015",
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "dist",
-    "paths": {
-      "custom-elements-ts": ["src/index"]
-    },
+    "outDir": "../dist",
     "removeComments": true,
-    "rootDir": "src",
-    "sourceMap": true,
-    "target": "es5"
+    "target": "es2015"
   },
-  "include": [
-    ".tmp/**/*",
-    "demos/**/*.ts",
-    "src/**/*.ts"
-  ]
+  "include": ["./*.ts"],
+  "exclude": ["node_modules"],
+  "compileOnSave": false
 }

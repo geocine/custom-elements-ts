@@ -13,8 +13,19 @@ const { inlineSources } = require('./inline-sources');
 const writeFileAsync = promisify(writeFile);
 const copyFileAsync = promisify(copyFile);
 
-const ELEMEMT_NAME = 'counter-element';
+const ELEMENT_NAME = process.argv[2];
 const DEST_PATH = 'dist';
+
+if(ELEMENT_NAME == undefined){
+  console.log('specify which element to start');
+  console.log(' ↳  eg. npm start element-name');
+  return;
+}
+
+if(!existsSync(`demos/${ELEMENT_NAME}/${ELEMENT_NAME}.ts`)){
+  console.log('element does not exist');
+  return; 
+}
 
 const mkdirp = (directory) => {
   const dirPath = resolve(directory).replace(/\/$/, '').split(sep);
@@ -40,17 +51,22 @@ const uglify = (userOptions, minifier = minify) => {
   };
 };
 
+const toPascalCase = (text) => {
+  return text.replace(/-\w/g, m => m[1].toUpperCase())
+    .replace(/^\w/, c => c.toUpperCase());
+}
+
 const config = {
   inputOptions: {
     treeshake: true,
-    input: `.tmp/index.ts`,
+    input: `.tmp/${ELEMENT_NAME}/index.ts`,
     plugins: [
       typescript({ 
         useTsconfigDeclarationDir: true,
         check: false,
         cacheRoot: join(resolve(), 'node_modules/.tmp/.rts2_cache')
       }),
-      uglify()
+      //uglify()
     ],
     onwarn (warning) {
       if (warning.code === 'THIS_IS_UNDEFINED') { return; }
@@ -60,8 +76,8 @@ const config = {
   outputOptions: {
     sourcemap: true,
     exports: 'named',
-    name: ELEMEMT_NAME,
-    file: `${DEST_PATH}/${ELEMEMT_NAME}.umd.js`,
+    name: toPascalCase(ELEMENT_NAME),
+    file: `${DEST_PATH}/${ELEMENT_NAME}.umd.js`,
     format: 'umd'
   }
 };
@@ -80,8 +96,8 @@ const rollupBuild = ({ inputOptions, outputOptions }) => {
 
 const copy = () => {
   mkdirp(DEST_PATH);
-  return copyFileAsync('src/index.html', join(DEST_PATH, 'index.html'));
+  return copyFileAsync(`demos/${ELEMENT_NAME}/index.html`, join(DEST_PATH, 'index.html'));
 };
 
-inlineSources('src/**/*.ts', '.tmp')
+inlineSources('demos/**/*.ts', '.tmp')
   .then(() => Promise.all([ copy(), rollupBuild(config), serverStart() ]));

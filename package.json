@@ -1,13 +1,17 @@
 {
-  "name": "custom-elements-decorators",
-  "version": "1.0.0",
-  "description": "Typescript Decorators for creating Custom Elements",
+  "name": "custom-elements-ts",
+  "version": "0.0.2",
+  "description": "Create native Custom Elements using Typescript without using any third party libraries",
   "main": "index.js",
+  "module": "dist/custom-element.js",
   "scripts": {
-    "start": "node start"
+    "build": "rm -rf dist && tsc -p src/tsconfig.json",
+    "start": "node ./scripts/start.js"
   },
-  "author": "Aivan Monceller",
   "license": "MIT",
+  "peerDependencies": {
+    "@webcomponents/custom-elements": "1.1.2"
+  },
   "devDependencies": {
     "@ngx-devtools/server": "1.9.2",
     "@webcomponents/custom-elements": "1.1.2",
@@ -15,5 +19,11 @@
     "rollup": "0.62.0",
     "rollup-plugin-typescript2": "0.15.1",
     "terser": "3.7.7"
-  }
+  },
+  "typings": "dist/index.d.ts",
+  "contributors": [
+    "Aivan Monceller",
+    "Arjay Elbore",
+    "Martin Llaneza"
+  ]
 }
