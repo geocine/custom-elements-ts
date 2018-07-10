@@ -6,12 +6,12 @@ const resolve = require('rollup-plugin-node-resolve');
 const { uglify } = require('./rollup-plugin-uglify');
 const { isProcess } = require('./check-args');
 const { existsSync } = require('fs');
-const ELEMEMT_NAME = process.argv[2];
+
+const ELEMENT_NAME = process.argv[2];
 const DEST_PATH = 'dist';
 
 const prodModeParams = [ '--prod',  '--prod=true',  '--prod true'  ];
 
-const ELEMENT_NAME = process.argv[2];
 const ELEMENT_PATH = `${ELEMENT_NAME}/index.ts`;
 const INPUT_PATH =  path.join('.tmp', ELEMENT_PATH);
 
@@ -51,8 +51,8 @@ const config = {
   outputOptions: {
     sourcemap: true,
     exports: 'named',
-    name: toPascalCase(ELEMEMT_NAME),
-    file: `${DEST_PATH}/${ELEMEMT_NAME}.umd.js`,
+    name: toPascalCase(ELEMENT_NAME),
+    file: `${DEST_PATH}/${ELEMENT_NAME}.umd.js`,
     format: 'umd'
   }
 };
@@ -65,4 +65,4 @@ if (isProcess(prodModeParams)) {
 }
 
 exports.config = config;
-exports.ELEMENT_NAME = ELEMEMT_NAME;
+exports.ELEMENT_NAME = ELEMENT_NAME;

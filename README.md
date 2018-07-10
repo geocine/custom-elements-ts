@@ -35,10 +35,14 @@ npm start counter-element
 ### Building the demo
 
 ```
-npm build <element-name>
+npm run build <element-name>
 ```
 eg. If you want to build the `counter-element` demo
 
 ```
-npm build counter-element
+npm run build counter-element
+```
+If you want to create a minified bundle
+```
+npm run build -- counter-element --prod
 ```
