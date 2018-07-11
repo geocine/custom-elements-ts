@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node tools/build.js",
     "start": "node tools/start.js",
+    "bundle": "node tools/bundle.js",
     "pack": "node tools/publish.js && tsc -p src/tsconfig.json"
   },
   "license": "MIT",
@@ -14,6 +15,7 @@
     "@ngx-devtools/server": "1.9.2",
     "@webcomponents/custom-elements": "1.1.2",
     "chalk": "2.4.1",
+    "magic-string": "0.25.0",
     "node-sass": "4.9.2",
     "rollup": "0.62.0",
     "rollup-plugin-node-resolve": "3.3.0",
