@@ -1,6 +1,6 @@
 {
   "name": "custom-elements-ts",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "Create native Custom Elements using Typescript without using any third party libraries",
   "main": "index.js",
   "module": "custom-element.js",
@@ -10,6 +10,14 @@
     "bundle": "node tools/bundle.js",
     "pack": "node tools/publish.js && tsc -p src/tsconfig.json"
   },
+  "keywords": [
+    "components",
+    "custom",
+    "dom",
+    "elements",
+    "web",
+    "typescript"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@ngx-devtools/server": "1.9.2",
@@ -20,7 +28,7 @@
     "rollup": "0.62.0",
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-plugin-typescript2": "0.15.1",
-    "terser": "3.7.7",
+    "terser": "3.7.8",
     "typescript": "2.9.2"
   },
   "typings": "index.d.ts",

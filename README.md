@@ -2,7 +2,7 @@
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/geocine/custom-elements-ts.svg)](https://greenkeeper.io/) 
 [![Build Status](https://travis-ci.org/geocine/custom-elements-ts.svg?branch=master)](https://travis-ci.org/geocine/custom-elements-ts)
-[![npm (scoped)](https://img.shields.io/npm/v/custom-elements-ts.svg)](https://www.npmjs.com/package/custom-elements-ts)
+[![npm version](https://badge.fury.io/js/custom-elements-ts.svg)](https://www.npmjs.com/package/custom-elements-ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
