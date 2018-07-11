@@ -24,6 +24,7 @@
   "include": [
     ".tmp/**/*",
     "demos/**/*.ts",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ]
 }
