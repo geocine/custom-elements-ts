@@ -12,10 +12,28 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const tag: string = args.tag || toKebabCase(target.prototype.constructor.name);
     const customElement: any = class extends (target as { new (): any }) {
 
+      static watchAttributes: {[key: string]: string};
+
+      static get observedAttributes() {
+        return Object.keys(this.watchAttributes || {});
+      }
+
       constructor() {
         super();
         if(!this.shadowRoot){
           this.attachShadow({ mode: 'open' });
+        }
+      }
+
+      attributeChangedCallback(
+        name: string,
+        oldValue: string,
+        newValue: string
+      ): void {
+        const watchAttributes: {[key: string]: string} = (this.constructor as any).watchAttributes;
+        if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
+          const methodToCall: string = watchAttributes[name];
+          this[methodToCall](oldValue, newValue);
         }
       }
 

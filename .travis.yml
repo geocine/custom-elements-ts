@@ -1,0 +1,72 @@
+
+
+sudo: required
+
+dist: trusty
+
+addons:
+  chrome: stable
+
+language: node_js
+
+
+node_js:
+  - node
+
+branches:
+  only:
+  - master
+  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  - /^greenkeeper/.*$/
+
+before_install:
+  - "[[ $(node -v) =~ ^v9.*$ ]] || npm install -g npm@latest"
+  - npm install -g --slient greenkeeper-lockfile@1
+
+install: npm install
+
+before_script:
+  - sudo chown root /opt/google/chrome/chrome-sandbox
+  - sudo chmod 4755 /opt/google/chrome/chrome-sandbox
+  - greenkeeper-lockfile-update
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3
+
+script:
+  - npm run pack
+
+after_script:
+  - greenkeeper-lockfile-upload
+
+before_deploy: 
+  - |
+    function npm_dist_tag() {
+      if [[ "$TRAVIS_TAG" = *"-"* ]]; then
+        echo "next"
+      else
+        echo "latest"
+      fi
+    }
+  - cd dist
+
+deploy:
+  provider: npm
+  email: geocipher@gmail.com
+  skip_cleanup: true
+  tag: $(npm_dist_tag)
+  api_key:
+    secure: $NPM_TOKEN
+  on:
+    all_branches: true
+    tags: true
+    repo: geocine/custom-elements-ts
+
+after_deploy: |
+  if [ "$(npm_dist_tag)" == "latest" ]; then
+    npm dist-tag rm flexure next || true
+  fi
+notifications:
+  email:
+    on_failure: change
+    on_success: never
