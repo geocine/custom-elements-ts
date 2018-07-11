@@ -2,7 +2,7 @@ const path = require('path');
 
 const { rollup } = require('rollup');
 const { clean } = require('./clean');
-const { renameAsync, readFileAsync, writeFileAsync, getFiles } = require('./files');
+const { copyFileAsync, renameAsync, readFileAsync, writeFileAsync, getFiles } = require('./files');
 const { stripCode } = require('./rollup-plugin-strip-comments');
 
 const resolve = require('rollup-plugin-node-resolve');
@@ -64,13 +64,21 @@ const copyDtsFiles = () => {
   }));
 };
 
+const copyReadme = () => {
+  const destPath = path.join(path.dirname('README.md'), 'dist', 'README.md')
+  return copyFileAsync('README.md', destPath);
+};
+
 const copyPkgFile = () => {
   const pkgFile = path.join(path.resolve(), 'package.json');
   return readFileAsync(pkgFile, 'utf8')
     .then(content => {
       const destPath = path.join(path.dirname(pkgFile), 'dist', 'package.json');
+      let pkgContent = JSON.parse(content);
+      delete(pkgContent.scripts);
+      delete(pkgContent.devDependencies);
       const pkg = { 
-        ...JSON.parse(content),  
+        ...pkgContent,  
         ...{ main: `./bundles/${LIB_NAME}.umd.js` }, 
         ...{ esm5: `./esm5/${LIB_NAME}.js` },
         ...{ module: `./esm5/${LIB_NAME}.js` },
@@ -87,4 +95,4 @@ const rollupBuild = ({ inputOptions, outputOptions  }) => {
 
 Promise.all([ clean('dist'), clean('.tmp') ])
   .then(() => Promise.all(createConfig().map(config => rollupBuild(config))))
-  .then(() => Promise.all([ copyDtsFiles(), copyPkgFile() ]));
+  .then(() => Promise.all([ copyDtsFiles(), copyPkgFile(), copyReadme() ]));

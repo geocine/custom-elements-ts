@@ -1,6 +1,6 @@
 # custom-elements-ts
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/geocine/custom-elements-ts.svg)](https://greenkeeper.io/) 
+[![Coverage Status](https://coveralls.io/repos/github/geocine/custom-elements-ts/badge.svg?branch=master)](https://coveralls.io/github/geocine/custom-elements-ts?branch=master) 
 [![Build Status](https://travis-ci.org/geocine/custom-elements-ts.svg?branch=master)](https://travis-ci.org/geocine/custom-elements-ts)
 [![npm version](https://badge.fury.io/js/custom-elements-ts.svg)](https://www.npmjs.com/package/custom-elements-ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)

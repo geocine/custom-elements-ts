@@ -22,6 +22,7 @@ branches:
 before_install:
   - "[[ $(node -v) =~ ^v9.*$ ]] || npm install -g npm@latest"
   - npm install -g --slient greenkeeper-lockfile@1
+  - npm install -g --slient karma
 
 install: npm install
 
@@ -34,10 +35,13 @@ before_script:
   - sleep 3
 
 script:
-  - npm run pack
+  - npm run test
 
 after_script:
   - greenkeeper-lockfile-upload
+
+after_success:
+  - npm run coveralls
 
 before_deploy: 
   - |
@@ -48,7 +52,7 @@ before_deploy:
         echo "latest"
       fi
     }
-  - cd dist
+  - npm run bundle && cd dist
 
 deploy:
   provider: npm
