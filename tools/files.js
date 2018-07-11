@@ -56,6 +56,7 @@ const rmdirAsync = promisify(fs.rmdir);
 const lstatAsync = promisify(fs.lstat);
 const unlinkAsync = promisify(fs.unlink);
 const readdirAsync = promisify(fs.readdir);
+const renameAsync = promisify(fs.rename);
 
 exports.getFiles = getFiles;
 exports.rmdirAsync = rmdirAsync;
@@ -65,3 +66,4 @@ exports.readdirAsync = readdirAsync;
 exports.writeFileAsync = writeFileAsync;
 exports.readFileAsync = readFileAsync;
 exports.copyFileAsync = copyFileAsync;
+exports.renameAsync = renameAsync;
