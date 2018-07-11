@@ -64,7 +64,7 @@ deploy:
 
 after_deploy: |
   if [ "$(npm_dist_tag)" == "latest" ]; then
-    npm dist-tag rm flexure next || true
+    npm dist-tag rm custom-elements-ts next || true
   fi
 notifications:
   email:
