@@ -11,9 +11,9 @@
     "noUnusedParameters": true,
     "outDir": "../dist",
     "removeComments": true,
-    "target": "es2015"
+    "target": "es5"
   },
-  "include": ["./*.ts"],
-  "exclude": ["node_modules"],
-  "compileOnSave": false
+  "include": [
+    "./*.ts"
+  ]
 }
