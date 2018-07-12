@@ -1,7 +1,7 @@
 import { CustomElement, Watch } from 'custom-elements-ts';
 
 @CustomElement({
-  tag: 'counter-element',
+  tag: 'cts-counter',
   templateUrl: './counter.element.html',
   styleUrl: './counter.element.scss'
 })
