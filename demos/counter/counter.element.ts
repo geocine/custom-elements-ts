@@ -2,8 +2,8 @@ import { CustomElement, Watch } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'counter-element',
-  templateUrl: './counter-element.html',
-  styleUrl: './counter-element.scss'
+  templateUrl: './counter.element.html',
+  styleUrl: './counter.element.scss'
 })
 export class CounterElement extends HTMLElement {
 
