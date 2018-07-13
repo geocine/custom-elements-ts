@@ -45,5 +45,10 @@
     "Aivan Monceller",
     "Arjay Elbore",
     "Martin Llaneza"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geocine/custom-elements-ts.git"
+  },
+  "homepage": "https://geocine.github.io/custom-elements-ts/"
 }
