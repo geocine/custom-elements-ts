@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Custom Elements TS</title>
+  </head>
+  <link rel="stylesheet" href="//unpkg.com/tailwindcss@0.6.0/dist/tailwind.min.css">
+  <body>
+    <section class="h-screen font-sans antialiased w-full bg-black py-8">
+      <div class="container mx-auto">
+        <div class="py-8 w-full mx-auto">
+          <h1 class="text-blue text-5xl text-center font-normal">Custom Elements TS</h1> 
+          <h2 class="text-white text-2xl text-center font-normal leading-normal px-32 my-5">Create native custom elements using Typescript without using any third party libraries</h2> 
+          <div class="my-16 flex flex-wrap md:items-center w-full">
+            <div class="shadow rounded w-full md:w-2/3 z-10" style="background-color: #1e1e1f;">
+              <cts-code-example></cts-code-example>
+            </div>
+            <div class="bg-white rounded shadow w-5/6 md:w-1/3 z-0 mx-auto -mt-1 md:-mt-0 md:-ml-1">
+              <div class="py-8 text-center text-green font-semibold uppercase">Get Started</div>
+              <hr class="py-0 my-0 border border-grey-lighter">
+              <cts-message message="npm install custom-elements-ts"></cts-message>
+              <div class="py-8">
+                <div class="mt-5 mx-auto w-2/3">
+                  <div class="flex items-center mb-4"><span class="inline-flex bg-green-lighter rounded-full mr-4 p-1 text-green text-xs"><i class="fas fa-check"></i></span>  <span class="text-grey-darker">zero dependencies</span>
+                  </div>
+                  <div class="flex items-center mb-4"><span class="inline-flex bg-green-lighter rounded-full mr-4 p-1 text-green text-xs"><i class="fas fa-check"></i></span>  <span class="text-grey-darker">no framework - future proof</span>
+                  </div>
+                  <div class="flex items-center mb-4"><span class="inline-flex bg-green-lighter rounded-full mr-4 p-1 text-green text-xs"><i class="fas fa-check"></i></span>  <span class="text-grey-darker">small bundle size</span>
+                  </div>
+                </div>
+              </div>
+              <a href="http://github.com/geocine/custom-elements-ts" class="no-underline">
+                <div class="py-8 bg-grey-lighter hover:bg-grey-light text-indigo-darker rounded rounded-t-none text-center uppercase font-bold flex items-center justify-center"><span>Go to github</span> 
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon fill-current w-4 h-4 ml-2">
+                    <path d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z" class="heroicon-ui"></path>
+                  </svg>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="//unpkg.com/prismjs@1.15.0/prism.js"></script>
+    <script src="//unpkg.com/@webcomponents/custom-elements/src/native-shim.js"></script>
+    <script src="//unpkg.com/@webcomponents/custom-elements/custom-elements.min.js"></script>
+    <script defer src="//use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="site.umd.js"></script>
+  </body>
+</html>
