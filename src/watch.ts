@@ -1,10 +1,8 @@
 export const Watch = (attrName: string) => {
-  return (target: any, propertyName: string, descriptor: PropertyDescriptor) => {
+  return (target: any, propertyName: string) => {
     if (!target.constructor.watchAttributes) {
       target.constructor.watchAttributes = {};
     }
-    let watchAttributes: {[key: string]: string} = target.constructor.watchAttributes;
-    watchAttributes[attrName] = propertyName;
-    return descriptor;
+    target.constructor.watchAttributes[attrName] = propertyName;
   };
 };
