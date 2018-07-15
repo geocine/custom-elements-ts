@@ -38,11 +38,11 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       connectedCallback() {
-        this.render();
+        this.__render();
         super.connectedCallback && super.connectedCallback();
       }
 
-      render() {
+      __render() {
         const template = document.createElement('template');
         template.innerHTML = `
           <style>${args.style ? args.style : ''}</style>
