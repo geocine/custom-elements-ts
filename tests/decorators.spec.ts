@@ -59,3 +59,32 @@ describe('decorators', () => {
     expect(myElementInstance.shadowRoot).toBeTruthy();
   });
 });
+
+
+@CustomElement({})
+export class BasicElement extends HTMLElement {
+
+  constructor(){
+    super();
+  }
+
+  connectedCallback() {}
+}
+
+describe('decorators basic', () => {
+  let myElementInstance;
+
+  beforeEach(() => {
+    const myElement = document.createElement('basic-element');
+    myElementInstance = document.body.appendChild(myElement);
+  });
+
+  it('should have shadowroot', () => {
+    expect(myElementInstance.shadowRoot).toBeTruthy();
+  });
+
+  xit('should call connected callback', () => {
+    const connectedCallbackSpy = spyOn(myElementInstance,'connectedCallback');
+    expect(connectedCallbackSpy).toHaveBeenCalled();
+  });
+});
