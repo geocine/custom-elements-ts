@@ -1,4 +1,4 @@
-import { CustomElement, Watch } from 'custom-elements-ts';
+import { CustomElement, Watch, Prop } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'my-element',
@@ -7,13 +7,7 @@ import { CustomElement, Watch } from 'custom-elements-ts';
 })
 export class MyElement extends HTMLElement {
 
-  get name(){
-    return this.getAttribute('name');
-  }
-
-  set name(value){
-    this.setAttribute('name',value);
-  }
+  @Prop() name;
 
   @Watch('name')
   setSpan(_: string, newValue: string){
@@ -43,16 +37,25 @@ describe('decorators', () => {
     expect(myElementInstance.shadowRoot.querySelector('span').innerHTML).toEqual('Aivan');
   });
 
-  it('should call method decorated with @Watch', () => {
+  it('should call method decorated with @Watch on prop change', () => {
     const watchSpy = spyOn(myElementInstance,'setSpan');
     myElementInstance.name = 'Aivan';
     expect(watchSpy).toHaveBeenCalled();
   });
 
+  it('should reflect as property', () => {
+    myElementInstance.setAttribute('name', 'Mario');
+    expect(myElementInstance.name).toEqual('Mario');
+  });
 
   it('should reflect as dom attribute', () => {
     myElementInstance.name = 'Aivan';
     expect(myElementInstance.getAttribute('name')).toEqual('Aivan');
+  });
+
+  it('should not reflect as dom attribute', () => {
+    myElementInstance.name = {};
+    expect(myElementInstance.getAttribute('name')).toBeFalsy();
   });
 
   it('should have shadowroot', () => {

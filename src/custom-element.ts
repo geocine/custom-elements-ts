@@ -13,6 +13,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const customElement: any = class extends (target as { new (): any }) {
 
       static watchAttributes: {[key: string]: string};
+      props = {};
 
       static get observedAttributes() {
         return Object.keys(this.watchAttributes || {});
@@ -25,14 +26,11 @@ export const CustomElement = (args: CustomElementMetadata) => {
         }
       }
 
-      attributeChangedCallback(
-        name: string,
-        oldValue: string,
-        newValue: string
-      ): void {
-        const watchAttributes: {[key: string]: string} = (this.constructor as any).watchAttributes;
+      attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        const watchAttributes: { [key: string]: string } = (this.constructor as any).watchAttributes;
         if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
           const methodToCall: string = watchAttributes[name];
+          this.props[name] = newValue;
           this[methodToCall](oldValue, newValue);
         }
       }
