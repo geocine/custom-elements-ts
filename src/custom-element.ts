@@ -13,7 +13,8 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const customElement: any = class extends (target as { new (): any }) {
 
       static watchAttributes: {[key: string]: string};
-      props = {};
+      props: {[key: string]: any} = {};
+      __connected: boolean = false;
 
       static get observedAttributes() {
         return Object.keys(this.watchAttributes || {});
@@ -35,6 +36,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       connectedCallback() {
+        this.__connected = true;
         this.__render();
         super.connectedCallback && super.connectedCallback();
       }

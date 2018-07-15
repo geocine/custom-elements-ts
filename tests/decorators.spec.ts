@@ -7,7 +7,7 @@ import { CustomElement, Watch, Prop } from 'custom-elements-ts';
 })
 export class MyElement extends HTMLElement {
 
-  @Prop() name;
+  @Prop() name = 'my element';
 
   @Watch('name')
   setSpan(_: string, newValue: string){
