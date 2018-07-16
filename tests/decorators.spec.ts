@@ -10,9 +10,9 @@ export class MyElement extends HTMLElement {
   @Prop() name = 'my element';
 
   @Watch('name')
-  setSpan(_: string, newValue: string){
+  setSpan(value){
     const span = this.shadowRoot.querySelector('span');
-    span.innerHTML = newValue;
+    span.innerHTML = value.new;
   }
 }
 
@@ -29,7 +29,7 @@ describe('decorators', () => {
   });
 
   it('should load css', () => {
-    expect(myElementInstance.shadowRoot.innerHTML).toContain('<style>:host{border:0}</style>');
+    expect(myElementInstance.shadowRoot.querySelector('style').innerText).toContain(':host{border:0}');
   });
 
   it('should re-render setting property', () => {
@@ -41,6 +41,13 @@ describe('decorators', () => {
     const watchSpy = spyOn(myElementInstance,'setSpan');
     myElementInstance.name = 'Aivan';
     expect(watchSpy).toHaveBeenCalled();
+  });
+
+  it('should call method decorated with @Watch on prop change', () => {
+    const watchSpy = spyOn(myElementInstance,'setSpan');
+    myElementInstance.setAttribute('name', 'Mario');
+    expect(watchSpy).toHaveBeenCalledWith(...[{ old: null, new: 'Mario'}]);
+    expect(myElementInstance.name).toEqual('Mario');
   });
 
   it('should reflect as property', () => {
@@ -67,6 +74,8 @@ describe('decorators', () => {
 @CustomElement({})
 export class BasicElement extends HTMLElement {
 
+  @Prop() disabled;
+
   constructor(){
     super();
   }
@@ -86,8 +95,18 @@ describe('decorators basic', () => {
     expect(myElementInstance.shadowRoot).toBeTruthy();
   });
 
-  xit('should call connected callback', () => {
-    const connectedCallbackSpy = spyOn(myElementInstance,'connectedCallback');
-    expect(connectedCallbackSpy).toHaveBeenCalled();
+  it('should return false on no attribute set', () => {
+    expect(myElementInstance.disabled).toBe(false);
   });
+
+  it('should return true on empty attribute set', () => {
+    myElementInstance.setAttribute('disabled','');
+    expect(myElementInstance.disabled).toBe(true);
+  });
+
+  it('should return value on attribute set', () => {
+    myElementInstance.setAttribute('disabled','true');
+    expect(myElementInstance.disabled).toBe('true');
+  });
+
 });

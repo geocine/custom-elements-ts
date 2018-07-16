@@ -1,10 +1,17 @@
 export const Prop = (): any => {
   return (target: any, propName: any) => {
     function get() {
+      const getAttribute = (propName) => {
+        if(this.hasAttribute(propName)){
+          const attrValue = this.getAttribute(propName);
+          return attrValue == '' ? true : attrValue;
+        }
+        return false;
+      };
       if (!this.props) {
         this.props = {};
       }
-      return this.props[propName] || this.getAttribute(propName);
+      return this.props[propName] || getAttribute(propName);
     }
     function set(value: any) {
       const oldValue = this[propName];

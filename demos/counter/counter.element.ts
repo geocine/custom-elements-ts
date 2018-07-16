@@ -1,4 +1,4 @@
-import { CustomElement, Watch } from 'custom-elements-ts';
+import { CustomElement, Watch, Prop } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-counter',
@@ -15,13 +15,7 @@ export class CounterElement extends HTMLElement {
     });
   }
 
-  get count() {
-    return this.getAttribute('count') ? this.getAttribute('count') : '0';
-  }
-
-  set count(value: string) {
-    this.setAttribute('count', value);
-  }
+  @Prop() count = '';
 
   connectedCallback() {
     this.showCount();
@@ -34,7 +28,7 @@ export class CounterElement extends HTMLElement {
   }
 
   showCount() {
-    const count = this.shadowRoot!.querySelector('#count');
+    const count = this.shadowRoot.querySelector('#count');
     if (count) {
       count.innerHTML = this.count;
     }

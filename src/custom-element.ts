@@ -31,7 +31,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
         const watchAttributes: { [key: string]: string } = (this.constructor as any).watchAttributes;
         if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
           const methodToCall: string = watchAttributes[name];
-          this[methodToCall](oldValue, newValue);
+          this[methodToCall]({old: oldValue, new: newValue});
         }
       }
 

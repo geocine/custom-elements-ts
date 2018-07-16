@@ -39,10 +39,8 @@ before_script:
 script:
   - npm run test
 
-after_script:
-  - greenkeeper-lockfile-upload
-
 after_success:
+  - greenkeeper-lockfile-upload
   - npm run coveralls
   - npm run build site
   - test $TRAVIS_BRANCH = "master" && test $TRAVIS_PULL_REQUEST = "false" && 
