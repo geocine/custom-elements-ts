@@ -21,7 +21,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@ngx-devtools/server": "1.9.2",
+    "@ngx-devtools/server": "1.10.0",
     "@types/jasmine": "^2.8.8",
     "@webcomponents/custom-elements": "1.1.2",
     "chalk": "2.4.1",
