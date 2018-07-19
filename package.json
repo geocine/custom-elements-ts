@@ -23,7 +23,7 @@
   "devDependencies": {
     "@ngx-devtools/server": "1.10.0",
     "@types/jasmine": "^2.8.8",
-    "@webcomponents/custom-elements": "1.1.2",
+    "@webcomponents/custom-elements": "1.1.3",
     "chalk": "2.4.1",
     "coveralls": "^3.0.2",
     "jasmine-core": "^3.1.0",
