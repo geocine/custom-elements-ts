@@ -36,12 +36,13 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       connectedCallback() {
-        this.__connected = true;
         this.__render();
         super.connectedCallback && super.connectedCallback();
+        this.__connected = true;
       }
 
       __render() {
+        if(this.__connected) return;
         const template = document.createElement('template');
         template.innerHTML = `
           <style>${args.style ? args.style : ''}</style>
