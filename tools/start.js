@@ -11,8 +11,8 @@ const { config, ELEMENT_NAME } = require('./rollup-config');
 const { clean } = require('./clean');
 
 const DEST_PATH = 'dist';
-const SRC_PATH = 'demos/**/*.ts';
-const SRC_TMP_PATH = '.tmp';
+const SRC_PATH = `demos/${ELEMENT_NAME}/**/*.ts`;
+const SRC_TMP_PATH = `.tmp`;
 
 const copy = () => {
   mkdirp(DEST_PATH);
