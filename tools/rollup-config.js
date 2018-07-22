@@ -3,8 +3,7 @@ const path = require('path');
 const typescript = require('rollup-plugin-typescript2');
 const resolve = require('rollup-plugin-node-resolve');
 
-const { uglify } = require('./rollup-plugin-uglify');
-const { isProcess } = require('./check-args');
+const { isProcess, rollupPluginUglify } = require('@ngx-devtools/common');
 const { existsSync } = require('fs');
 
 const ELEMENT_NAME = process.argv[2];
@@ -61,7 +60,7 @@ if (isProcess(prodModeParams)) {
   const options = {
     mangle: { keep_fnames: true }
   };
-  config.inputOptions.plugins.push(uglify(options));
+  config.inputOptions.plugins.push(rollupPluginUglify(options));
 }
 
 exports.config = config;

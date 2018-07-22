@@ -22,9 +22,9 @@
   "license": "MIT",
   "devDependencies": {
     "@ngx-devtools/server": "1.9.2",
-    "@types/jasmine": "^2.8.8",
+    "@ngx-devtools/common": "beta",
+    "@types/jasmine": "2.8.8",
     "@webcomponents/custom-elements": "1.1.2",
-    "chalk": "2.4.1",
     "coveralls": "^3.0.2",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.4",
@@ -33,11 +33,6 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^3.0.12",
     "magic-string": "0.25.0",
-    "node-sass": "4.9.2",
-    "rollup": "0.62.0",
-    "rollup-plugin-node-resolve": "3.3.0",
-    "rollup-plugin-typescript2": "0.15.1",
-    "terser": "3.7.8",
     "typescript": "2.9.2"
   },
   "typings": "index.d.ts",
