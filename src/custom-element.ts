@@ -13,6 +13,8 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const customElement: any = class extends (target as { new (): any }) {
 
       static watchAttributes: {[key: string]: string};
+      props: {[key: string]: any} = {};
+      __connected: boolean = false;
 
       static get observedAttributes() {
         return Object.keys(this.watchAttributes || {});
@@ -25,24 +27,22 @@ export const CustomElement = (args: CustomElementMetadata) => {
         }
       }
 
-      attributeChangedCallback(
-        name: string,
-        oldValue: string,
-        newValue: string
-      ): void {
-        const watchAttributes: {[key: string]: string} = (this.constructor as any).watchAttributes;
+      attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        const watchAttributes: { [key: string]: string } = (this.constructor as any).watchAttributes;
         if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
           const methodToCall: string = watchAttributes[name];
-          this[methodToCall](oldValue, newValue);
+          this[methodToCall]({old: oldValue, new: newValue});
         }
       }
 
       connectedCallback() {
-        this.render();
+        this.__render();
         super.connectedCallback && super.connectedCallback();
+        this.__connected = true;
       }
 
-      render() {
+      __render() {
+        if(this.__connected) return;
         const template = document.createElement('template');
         template.innerHTML = `
           <style>${args.style ? args.style : ''}</style>

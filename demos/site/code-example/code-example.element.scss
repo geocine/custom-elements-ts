@@ -1,0 +1,163 @@
+
+:host {
+  font-size: 15px;
+  padding: 24px;
+  display: block;
+  @media screen and (min-width: 1000px) {
+    font-size: 17px;
+    padding: 32px;
+  }
+  overflow-x: auto;
+  color: rgb(187,187,187);
+  max-height: 500px;
+}
+
+code[class*="language-"] {
+  color: #c5c8c6;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+  font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  line-height: 1.5;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre {
+  margin: 0;
+}
+
+pre[class*="language-"] {
+  color: #c5c8c6;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
+  font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  line-height: 1.5;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  padding: 1em;
+  overflow: auto;
+  border-radius: 0.3em;
+}
+
+/* Code blocks */
+
+:not(pre)>code[class*="language-"],
+pre[class*="language-"] {
+  background: #1d1f21;
+}
+
+/* Inline code */
+
+:not(pre)>code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+}
+
+.token {
+  &.comment,
+  &.prolog,
+  &.doctype,
+  &.cdata {
+    color: #7C7C7C;
+  }
+  &.punctuation {
+    color: #c5c8c6;
+  }
+}
+
+.namespace {
+  opacity: .7;
+}
+
+.token {
+  &.property,
+  &.keyword,
+  &.tag {
+    color: rgb(224, 108, 117);
+  }
+  &.class-name {
+    color: #FFFFB6;
+    text-decoration: underline;
+  }
+  &.boolean,
+  &.constant {
+    color: #99CC99;
+  }
+  &.symbol,
+  &.deleted {
+    color: #f92672;
+  }
+  &.number {
+    color: #FF73FD;
+  }
+  &.selector,
+  &.attr-name,
+  &.string,
+  &.char,
+  &.builtin,
+  &.inserted {
+    color: #A8FF60;
+  }
+  &.variable {
+    color: #C6C5FE;
+  }
+  &.operator {
+    color: #EDEDED;
+  }
+  &.entity {
+    color: #FFFFB6;
+    /* text-decoration: underline; */
+  }
+  &.url {
+    color: #96CBFE;
+  }
+}
+
+.language-css .token.string,
+.style .token.string {
+  color: #87C38A;
+}
+
+.token {
+  &.atrule,
+  &.attr-value {
+    color: #F9EE98;
+  }
+  &.function {
+    color: #DAD085;
+  }
+  &.regex {
+    color: #E9C062;
+  }
+  &.important {
+    color: #fd971f;
+    font-weight: bold;
+  }
+  &.bold {
+    font-weight: bold;
+  }
+  &.italic {
+    font-style: italic;
+  }
+  &.entity {
+    cursor: help;
+  }
+}

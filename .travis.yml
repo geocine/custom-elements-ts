@@ -21,10 +21,12 @@ branches:
 
 before_install:
   - "[[ $(node -v) =~ ^v9.*$ ]] || npm install -g npm@latest"
-  - npm install -g --slient greenkeeper-lockfile@1
-  - npm install -g --slient karma
+  - npm install -g --silent greenkeeper-lockfile@1
+  - npm install -g --silent karma
 
-install: npm install
+install: 
+  - npm install
+  - npm install -g --silent gh-pages
 
 before_script:
   - sudo chown root /opt/google/chrome/chrome-sandbox
@@ -37,11 +39,14 @@ before_script:
 script:
   - npm run test
 
-after_script:
-  - greenkeeper-lockfile-upload
-
 after_success:
+  - greenkeeper-lockfile-upload
   - npm run coveralls
+  - npm run build site
+  - test $TRAVIS_BRANCH = "master" && test $TRAVIS_PULL_REQUEST = "false" && 
+    cp demos/site/index.html dist/index.html &&
+    sed -i 's/site.umd.js/\/custom-elements-ts\/site.umd.js/g' dist/index.html &&
+    gh-pages -d dist --repo=https://$GH_TOKEN@github.com/geocine/custom-elements-ts.git
 
 before_deploy: 
   - |

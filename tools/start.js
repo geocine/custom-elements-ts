@@ -7,8 +7,8 @@ const { inlineSources, mkdirp, rollupGenerate, copyFileAsync, clean } = require(
 const { config, ELEMENT_NAME } = require('./rollup-config');
 
 const DEST_PATH = 'dist';
-const SRC_PATH = 'demos/**/*.ts';
-const SRC_TMP_PATH = '.tmp';
+const SRC_PATH = `demos/${ELEMENT_NAME}/**/*.ts`;
+const SRC_TMP_PATH = `.tmp`;
 
 const copy = () => {
   mkdirp(DEST_PATH);

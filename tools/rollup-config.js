@@ -9,6 +9,8 @@ const { existsSync } = require('fs');
 const ELEMENT_NAME = process.argv[2];
 const DEST_PATH = 'dist';
 
+console.log(process.argv)
+
 const prodModeParams = [ '--prod',  '--prod=true',  '--prod true'  ];
 
 const ELEMENT_PATH = `${ELEMENT_NAME}/index.ts`;

@@ -1,6 +1,6 @@
 {
   "name": "custom-elements-ts",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Create native Custom Elements using Typescript without using any third party libraries",
   "main": "index.js",
   "module": "custom-element.js",
@@ -40,5 +40,10 @@
     "Aivan Monceller",
     "Arjay Elbore",
     "Martin Llaneza"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geocine/custom-elements-ts.git"
+  },
+  "homepage": "https://geocine.github.io/custom-elements-ts/"
 }

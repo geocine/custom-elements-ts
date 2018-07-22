@@ -4,9 +4,9 @@ const { config } = require('./rollup-config');
 const { clean, rollupGenerate, inlineSources, } = require('@ngx-devtools/common');
 
 const DEST_PATH = 'dist';
-const TMP_PATH = '.tmp';
-const SRC_PATH = 'demos/**/*.ts';
+const SRC_PATH = `demos/${ELEMENT_NAME}/**/*.ts`;
+const SRC_TMP_PATH = `.tmp`;
 
-Promise.all([ clean(DEST_PATH), clean(TMP_PATH) ])
-  .then(() => inlineSources(SRC_PATH, TMP_PATH))
+Promise.all([ clean(DEST_PATH), clean(SRC_TMP_PATH) ])
+  .then(() => inlineSources(SRC_PATH, SRC_TMP_PATH))
   .then(() => rollupGenerate(config));
