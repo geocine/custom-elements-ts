@@ -1,3 +1,4 @@
+
 export interface CustomElementMetadata {
   tag?: string;
   template?: string;
@@ -11,10 +12,12 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const toKebabCase = string => string.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-').toLowerCase();
     const tag: string = args.tag || toKebabCase(target.prototype.constructor.name);
     const customElement: any = class extends (target as { new (): any }) {
+      private __connected: boolean = false;
 
-      static watchAttributes: {[key: string]: string};
-      props: {[key: string]: any} = {};
-      __connected: boolean = false;
+      protected props: {[key: string]: any} = {};
+     
+      protected static watchAttributes: {[key: string]: string};
+      protected static listeners: Array<any>;
 
       static get observedAttributes() {
         return Object.keys(this.watchAttributes || {});
@@ -39,6 +42,11 @@ export const CustomElement = (args: CustomElementMetadata) => {
         this.__render();
         super.connectedCallback && super.connectedCallback();
         this.__connected = true;
+
+        for (const listener of (this.constructor as any).listeners as Array<any>) {
+          this.addEventListener(listener.eventName, listener.handler.bind(this));
+        }
+ 
       }
 
       __render() {
