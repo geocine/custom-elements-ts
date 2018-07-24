@@ -1,3 +1,4 @@
+import { addEventListeners } from './listen';
 
 export interface CustomElementMetadata {
   tag?: string;
@@ -7,6 +8,16 @@ export interface CustomElementMetadata {
   style?: string;
 }
 
+export interface ListenerMetadata {
+  eventName: string;
+  handler: Function;
+  selector?: string;
+}
+
+export interface KeyValue {
+  [key: string ]: any;
+}
+
 export const CustomElement = (args: CustomElementMetadata) => {
   return (target: any) => {
     const toKebabCase = string => string.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-').toLowerCase();
@@ -14,10 +25,10 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const customElement: any = class extends (target as { new (): any }) {
       private __connected: boolean = false;
 
-      protected props: {[key: string]: any} = {};
+      protected props: KeyValue = {};
      
-      protected static watchAttributes: {[key: string]: string};
-      protected static listeners: Array<any>;
+      protected static watchAttributes: KeyValue;
+      protected static listeners: ListenerMetadata[];
 
       static get observedAttributes() {
         return Object.keys(this.watchAttributes || {});
@@ -31,22 +42,19 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        const watchAttributes: { [key: string]: string } = (this.constructor as any).watchAttributes;
+        const watchAttributes: KeyValue = (this.constructor as any).watchAttributes;
         if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
           const methodToCall: string = watchAttributes[name];
           this[methodToCall]({old: oldValue, new: newValue});
         }
-      }
+      } 
 
       connectedCallback() {
         this.__render();
         super.connectedCallback && super.connectedCallback();
         this.__connected = true;
 
-        for (const listener of (this.constructor as any).listeners as Array<any>) {
-          this.addEventListener(listener.eventName, listener.handler.bind(this));
-        }
- 
+        addEventListeners(this);
       }
 
       __render() {
@@ -65,4 +73,4 @@ export const CustomElement = (args: CustomElementMetadata) => {
     }
     return customElement;
   };
-};
+}
