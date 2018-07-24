@@ -1,4 +1,4 @@
-import { CustomElement, Watch, Prop, Listen } from 'custom-elements-ts';
+import { CustomElement, Watch, Prop, Listen, Dispatch, DispatchEvent } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-counter',
@@ -12,6 +12,7 @@ export class CounterElement extends HTMLElement {
   }
 
   @Prop() count = '';
+  @Dispatch('click') tpClick: DispatchEvent;
 
   connectedCallback() {
     this.showCount();

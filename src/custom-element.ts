@@ -1,4 +1,4 @@
-import { addEventListeners } from './listen';
+import { addEventListeners, ListenerMetadata } from './listen';
 
 export interface CustomElementMetadata {
   tag?: string;
@@ -6,12 +6,6 @@ export interface CustomElementMetadata {
   templateUrl?: string;
   styleUrl?: string;
   style?: string;
-}
-
-export interface ListenerMetadata {
-  eventName: string;
-  handler: Function;
-  selector?: string;
 }
 
 export interface KeyValue {
