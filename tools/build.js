@@ -1,6 +1,6 @@
 
 
-const { config } = require('./rollup-config');
+const { config, ELEMENT_NAME } = require('./rollup-config');
 const { clean, rollupGenerate, inlineSources, } = require('@ngx-devtools/common');
 
 const DEST_PATH = 'dist';
