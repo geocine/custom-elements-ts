@@ -1,14 +1,24 @@
+const { buildCopyPackageFile, rollupBuild, clean, copyReadMe, renameAsync, globFiles } =  require('@ngx-devtools/common');
 const path = require('path');
 
-const { rollup } = require('rollup');
-const { clean } = require('./clean');
-const { copyFileAsync, renameAsync, readFileAsync, writeFileAsync, getFiles } = require('./files');
-const { stripCode } = require('./rollup-plugin-strip-comments');
+const LIB_NAME = 'custom-elements-ts';
 
 const resolve = require('rollup-plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
 
-const LIB_NAME = 'custom-elements-ts';
+const MagicString = require('magic-string');
+
+function stripCode () {
+  return {
+    name: 'stripCode',
+    transform (source, id) {
+      let code = source.replace(/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g, '')
+      const magicString = new MagicString(code)
+      let map = magicString.generateMap({hires: true})
+      return {code, map}
+    }
+  }
+}
 
 const createConfig = () => {
   return [ 'umd', 'esm5', 'esm2015' ].map(format => {
@@ -56,43 +66,22 @@ const createConfig = () => {
   });
 };
 
-const copyDtsFiles = () => {
-  const files = getFiles('dist/esm5/**/*.d.ts').join(',').split(',');
+const copyDtsFiles = async () => {
+  const files = await globFiles('dist/esm5/**/*.d.ts');
   return Promise.all(files.map(file => {
     const destPath = file.replace('esm5' + path.sep, '');
     return renameAsync(file, destPath); 
   }));
 };
 
-const copyReadme = () => {
-  const destPath = path.join(path.dirname('README.md'), 'dist', 'README.md')
-  return copyFileAsync('README.md', destPath);
-};
-
-const copyPkgFile = () => {
-  const pkgFile = path.join(path.resolve(), 'package.json');
-  return readFileAsync(pkgFile, 'utf8')
-    .then(content => {
-      const destPath = path.join(path.dirname(pkgFile), 'dist', 'package.json');
-      let pkgContent = JSON.parse(content);
-      delete(pkgContent.scripts);
-      delete(pkgContent.devDependencies);
-      const pkg = { 
-        ...pkgContent,  
-        ...{ main: `./bundles/${LIB_NAME}.umd.js` }, 
-        ...{ esm5: `./esm5/${LIB_NAME}.js` },
-        ...{ module: `./esm5/${LIB_NAME}.js` },
-        ...{ esm2015: `./esm2015/${LIB_NAME}.js` },
-        ...{ typings: 'index.d.ts' } 
-      };
-      return writeFileAsync(destPath, JSON.stringify(pkg, '\t', 2));
-    });
-};
-
-const rollupBuild = ({ inputOptions, outputOptions  }) => {
-  return rollup(inputOptions).then(bundle => bundle.write(outputOptions));
-};
+const copyPkgFile = () => buildCopyPackageFile(LIB_NAME, { 
+  main: `./bundles/${LIB_NAME}.umd.js`,
+  esm5: `./esm5/${LIB_NAME}.js`,
+  module: `./esm5/${LIB_NAME}.js`,
+  esm2015: `./esm2015/${LIB_NAME}.js`,
+  typings: 'index.d.ts'
+});
 
 Promise.all([ clean('dist'), clean('.tmp') ])
   .then(() => Promise.all(createConfig().map(config => rollupBuild(config))))
-  .then(() => Promise.all([ copyDtsFiles(), copyPkgFile(), copyReadme() ]));
+  .then(() => Promise.all([ copyPkgFile(), copyReadMe(), copyDtsFiles() ]))

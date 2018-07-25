@@ -1,4 +1,4 @@
-import { CustomElement, Watch, Prop } from 'custom-elements-ts';
+import { CustomElement, Watch, Prop, Listen, Dispatch, DispatchEmitter } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-counter',
@@ -9,21 +9,30 @@ export class CounterElement extends HTMLElement {
 
   constructor() {
     super();
-    this.addEventListener('click', () => {
-      const incrementCount = parseInt(this.count)+1;
-      this.count = incrementCount.toString();
-    });
   }
 
   @Prop() count = '';
+  @Dispatch() ctsClick: DispatchEmitter;
 
   connectedCallback() {
     this.showCount();
   }
+ 
+  @Listen('click')
+  incrementHandler() {
+    this.ctsClick.emit({
+      detail: { count: parseInt(this.count) + 1 }
+    })
+  }
+
+  @Listen('cts.click')
+  countIncrement(e: CustomEvent){
+    this.count = e.detail.count;
+  }
 
   @Watch('count')
-  changeCount(_: string, newCount: string) {
-    this.count = newCount;
+  changeCount(value: any) {
+    this.count = value.new;
     this.showCount();
   }
 
