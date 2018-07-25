@@ -145,9 +145,9 @@ describe('event listen', () => {
   });
 
   it('should call method decorated @Listen', () => {
-    const btnHandlerSpsy = spyOn(element.btnHandler,'call');
+    const btnHandlerSpy = spyOn(element.btnHandler,'call');
     element.click();
-    expect(btnHandlerSpsy).toHaveBeenCalled();
+    expect(btnHandlerSpy).toHaveBeenCalled();
   });
 
   it('should trigger a btn.click DispatchEmitter', (done) => {
@@ -168,15 +168,15 @@ describe('event listen', () => {
 
 
   it('should call method decorated @Listen on children element click', () => {
-    const btnHandlerSpsy = spyOn(element.btnHandler,'call');
+    const btnHandlerSpy = spyOn(element.btnHandler,'call');
     element.shadowRoot.querySelector('button').click();
-    expect(btnHandlerSpsy).toHaveBeenCalled();
+    expect(btnHandlerSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated @Listen on selector click', () => {
-    const btnInnerSpsy = spyOn(element.btnInnerClick,'call');
+    const btnInnerSpy = spyOn(element.btnInnerClick,'call');
     element.shadowRoot.querySelector('button').click();
-    expect(btnInnerSpsy).toHaveBeenCalled();
+    expect(btnInnerSpy).toHaveBeenCalled();
   });
 
   it('should execute inner method decorated @Listen', () => {
