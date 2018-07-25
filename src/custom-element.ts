@@ -20,7 +20,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
       private __connected: boolean = false;
 
       protected props: KeyValue = {};
-     
+
       protected static watchAttributes: KeyValue;
       protected static listeners: ListenerMetadata[];
 
@@ -41,7 +41,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
           const methodToCall: string = watchAttributes[name];
           this[methodToCall]({old: oldValue, new: newValue});
         }
-      } 
+      }
 
       connectedCallback() {
         this.__render();
@@ -67,4 +67,4 @@ export const CustomElement = (args: CustomElementMetadata) => {
     }
     return customElement;
   };
-}
+};
