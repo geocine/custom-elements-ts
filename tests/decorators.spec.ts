@@ -136,7 +136,7 @@ export class ButtonElement extends HTMLElement {
 
 }
 
-describe('Event Listen.', () => {
+describe('event listen', () => {
   let element: any;
 
   beforeEach(() => {
