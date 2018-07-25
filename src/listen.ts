@@ -4,8 +4,13 @@ interface ListenerMetadata {
   selector?: string;
 }
 
-interface DispatchEvent {
-  emit(): void;
+interface CustomEventOptions {
+  bubbles?: true;
+  detail?: any;
+}
+
+interface DispatchEmitter {
+  emit(options?: CustomEventOptions): void;
 }
 
 const Listen = (eventName: string, selector?: string) => {
@@ -23,7 +28,7 @@ const addEventListeners = (target: any) => {
       const eventTarget = (listener.selector) 
         ? target.shadowRoot.querySelector(listener.selector) 
           ? target.shadowRoot.querySelector(listener.selector): null  
-        : this;
+        : target;
       if (eventTarget) {
         eventTarget.addEventListener(listener.eventName, function(e: CustomEvent){
           listener.handler.call(target, e);
@@ -33,13 +38,19 @@ const addEventListeners = (target: any) => {
   }
 }
 
-function Dispatch(eventName: string){
-  return function(target: any, propertyName: string){
+function Dispatch(eventName?: string){
+  function toDotCase(str: string){
+    return str.replace(/(?!^)([A-Z])/g, ' $1')
+      .replace(/[_\s]+(?=[a-zA-Z])/g, '.')
+      .toLowerCase();  
+  }  
+  return function(target: HTMLElement, propertyName: string){
     function get(){
-      const self = (this as EventTarget);
+      const self: EventTarget = this as EventTarget;
       return {
-        emit() {
-          self.dispatchEvent(new CustomEvent(eventName));
+        emit(options?: CustomEventOptions) {
+          const evtName = (eventName) ? eventName: toDotCase(propertyName);
+          self.dispatchEvent(new CustomEvent(evtName, options));
         }
       }
     }
@@ -47,4 +58,4 @@ function Dispatch(eventName: string){
   }
 }
 
-export { Listen,  addEventListeners, DispatchEvent, Dispatch, ListenerMetadata }
+export { Listen,  addEventListeners, DispatchEmitter, Dispatch, CustomEventOptions, ListenerMetadata }

@@ -1,4 +1,4 @@
-import { CustomElement, Watch, Prop } from 'custom-elements-ts';
+import { CustomElement, Watch, Prop, Dispatch, DispatchEmitter, Listen } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'my-element',
@@ -108,5 +108,39 @@ describe('decorators basic', () => {
     myElementInstance.setAttribute('disabled','true');
     expect(myElementInstance.disabled).toBe('true');
   });
+
+});
+
+@CustomElement({
+  tag: 'btn-listen-dispatch',
+  template: `<button></button>`
+})
+export class ButtonElement extends HTMLElement {
+
+  @Dispatch() btnClick: DispatchEmitter;
+
+  constructor() {
+    super();
+  }
+  
+  @Listen('click')
+  btnHandler(){
+    this.shadowRoot.querySelector('button').innerHTML = 'Hello';
+  }
+
+}
+
+describe('Event Listen.', () => {
+  let element: any;
+
+  beforeEach(() => {
+    const BtnElement = document.createElement('btn-listen-dispatch');
+    element = document.body.appendChild(BtnElement);
+  });
+
+  it('should call method decorated @Listen', () => {
+    element.click();
+    expect(element.shadowRoot.querySelector('button').innerHTML).toEqual('Hello');
+  })
 
 });

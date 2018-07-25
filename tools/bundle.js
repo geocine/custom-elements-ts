@@ -3,10 +3,22 @@ const path = require('path');
 
 const LIB_NAME = 'custom-elements-ts';
 
-const { stripCode } = require('./rollup-plugin-strip-comments');
-
 const resolve = require('rollup-plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
+
+const MagicString = require('magic-string');
+
+function stripCode () {
+  return {
+    name: 'stripCode',
+    transform (source, id) {
+      let code = source.replace(/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g, '')
+      const magicString = new MagicString(code)
+      let map = magicString.generateMap({hires: true})
+      return {code, map}
+    }
+  }
+}
 
 const createConfig = () => {
   return [ 'umd', 'esm5', 'esm2015' ].map(format => {
