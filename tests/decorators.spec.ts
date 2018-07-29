@@ -2,17 +2,24 @@ import { CustomElement, Watch, Prop, Dispatch, DispatchEmitter, Listen } from 'c
 
 @CustomElement({
   tag: 'my-element',
-  template: '<span>my element</span>',
+  template: '<h1>page title</h1><span>my element</span>',
   style: ':host{border:0}'
 })
 export class MyElement extends HTMLElement {
 
   @Prop() name = 'my element';
+  @Prop() pageTitle = 'page title';
 
   @Watch('name')
   setSpan(value){
     const span = this.shadowRoot.querySelector('span');
     span.innerHTML = value.new;
+  }
+
+  @Watch('page-title')
+  setPageTitle(value){
+    const h1 = this.shadowRoot.querySelector('h1');
+    h1.innerHTML = value.new;
   }
 }
 
@@ -25,7 +32,7 @@ describe('decorators', () => {
   });
 
   it('should load html template', () => {
-      expect(myElementInstance.shadowRoot.innerHTML).toContain('<span>my element</span>');
+    expect(myElementInstance.shadowRoot.innerHTML).toContain('<span>my element</span>');
   });
 
   it('should load css', () => {
@@ -34,13 +41,19 @@ describe('decorators', () => {
 
   it('should re-render setting property', () => {
     myElementInstance.name = 'Aivan';
+    myElementInstance.pageTitle = 'Custom Element Rocks';
     expect(myElementInstance.shadowRoot.querySelector('span').innerHTML).toEqual('Aivan');
+    expect(myElementInstance.shadowRoot.querySelector('h1').innerHTML).toEqual('Custom Element Rocks');
   });
 
   it('should call method decorated with @Watch on prop change', () => {
     const watchSpy = spyOn(myElementInstance,'setSpan');
     myElementInstance.name = 'Aivan';
     expect(watchSpy).toHaveBeenCalled();
+
+    const pageTitleSpy = spyOn(myElementInstance,'setPageTitle');
+    myElementInstance.pageTitle = 'Custom Element Rocks';
+    expect(pageTitleSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated with @Watch on prop change', () => {
@@ -53,11 +66,17 @@ describe('decorators', () => {
   it('should reflect as property', () => {
     myElementInstance.setAttribute('name', 'Mario');
     expect(myElementInstance.name).toEqual('Mario');
+
+    myElementInstance.setAttribute('page-title', 'Web Components');
+    expect(myElementInstance.pageTitle).toEqual('Web Components');
   });
 
   it('should reflect as dom attribute', () => {
     myElementInstance.name = 'Aivan';
     expect(myElementInstance.getAttribute('name')).toEqual('Aivan');
+
+    myElementInstance.pageTitle = 'Custom Element';
+    expect(myElementInstance.getAttribute('page-title')).toEqual('Custom Element');
   });
 
   it('should not reflect as dom attribute', () => {
