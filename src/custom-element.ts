@@ -1,4 +1,5 @@
 import { addEventListeners, ListenerMetadata } from './listen';
+import { initializeProps } from './prop';
 
 export interface CustomElementMetadata {
   tag?: string;
@@ -17,9 +18,10 @@ export const CustomElement = (args: CustomElementMetadata) => {
     const toKebabCase = string => string.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-').toLowerCase();
     const tag: string = args.tag || toKebabCase(target.prototype.constructor.name);
     const customElement: any = class extends (target as { new (): any }) {
-      private __connected: boolean = false;
+      protected static __connected: boolean = false;
 
-      protected props: KeyValue = {};
+      protected static props: KeyValue = {};
+      protected static propsInit: KeyValue = {};
 
       protected static watchAttributes: KeyValue;
       protected static listeners: ListenerMetadata[];
@@ -39,7 +41,10 @@ export const CustomElement = (args: CustomElementMetadata) => {
         const watchAttributes: KeyValue = (this.constructor as any).watchAttributes;
         if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
           const methodToCall: string = watchAttributes[name];
-          this[methodToCall]({old: oldValue, new: newValue});
+          if(this.__connected){
+            this[methodToCall]({old: oldValue, new: newValue});
+          }
+          this[name] = newValue;
         }
       }
 
@@ -49,6 +54,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
         this.__connected = true;
 
         addEventListeners(this);
+        initializeProps(this);
       }
 
       __render() {

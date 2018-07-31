@@ -17,12 +17,12 @@ export class CounterElement extends HTMLElement {
   connectedCallback() {
     this.showCount();
   }
- 
+
   @Listen('click')
   incrementHandler() {
     this.ctsClick.emit({
       detail: { count: parseInt(this.count) + 1 }
-    })
+    });
   }
 
   @Listen('cts.click')
