@@ -1,5 +1,12 @@
 export const Prop = (): any => {
   return (target: any, propName: any) => {
+    const toKebabCase = str => {
+      return str
+        .replace(/([a-z])([A-Z])/g, '$1-$2')
+        .replace(/[\s_]+/g, '-')
+        .toLowerCase();
+    };
+    const attrName = toKebabCase(propName);
     function get() {
       return this.getAttribute(propName);
     }
@@ -7,9 +14,9 @@ export const Prop = (): any => {
       const oldValue = this[propName];
       if(this.__connected){
         if(typeof value != 'object'){
-          this.setAttribute(propName, value);
+          this.setAttribute(attrName, value);
         } else {
-          this.attributeChangedCallback(propName, oldValue, value);
+          this.attributeChangedCallback(attrName, oldValue, value);
         }
       } else {
         this.constructor.propsInit[propName] = value;
