@@ -24,7 +24,7 @@
     "@ngx-devtools/server": "1.9.2",
     "@ngx-devtools/common": "beta",
     "@types/jasmine": "2.8.8",
-    "@webcomponents/custom-elements": "1.1.2",
+    "@webcomponents/custom-elements": "1.2.0",
     "coveralls": "^3.0.2",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.4",
