@@ -8,6 +8,7 @@ import { CustomElement, Prop, Watch } from 'custom-elements-ts';
 export class PropElement extends HTMLElement {
 
   @Prop() name;
+  @Prop() maxFileSize;
 }
 
 describe('prop decorator', () => {
@@ -35,6 +36,21 @@ describe('prop decorator', () => {
   it('should not reflect as attribute', () => {
     myElementInstance.name = {};
     expect(myElementInstance.getAttribute('name')).toBeFalsy();
+  });
+
+  it('should properly set camelcase properties', () => {
+    myElementInstance.maxFileSize = 1;
+    expect(myElementInstance.maxFileSize).toEqual('1');
+  });
+
+  it('should properly get camelcase properties as kebabcase attributes', () => {
+    myElementInstance.maxFileSize = 1;
+    expect(myElementInstance.getAttribute('max-file-size')).toEqual('1');
+  });
+
+  it('should properly set kebabcase attribues as camelcase properties', () => {
+    myElementInstance.setAttribute('max-file-size', 2);
+    expect(myElementInstance.maxFileSize).toEqual('2');
   });
 
 });

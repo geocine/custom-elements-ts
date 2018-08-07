@@ -8,7 +8,7 @@ export const Prop = (): any => {
     };
     const attrName = toKebabCase(propName);
     function get() {
-      return this.getAttribute(propName);
+      return this.getAttribute(attrName);
     }
     function set(value: any) {
       const oldValue = this[propName];
