@@ -1,6 +1,6 @@
 const { join } = require('path');
 
-const { serverStart } = require('@ngx-devtools/server');
+const { DevServer } = require('@ngx-devtools/server');
 const { inlineSources, mkdirp, rollupGenerate, copyFileAsync, clean, watcher } = require('@ngx-devtools/common');
 
 const { config, ELEMENT_NAME } = require('./rollup-config');
@@ -26,4 +26,4 @@ const fileWatcher = () => {
 
 Promise.all([ clean(DEST_PATH), clean(SRC_TMP_PATH) ])
   .then(() => Promise.all([ inlineSources(SRC_PATH, SRC_TMP_PATH), copy() ]))
-  .then(() => Promise.all([ rollupGenerate(config), serverStart(), fileWatcher() ]));
+  .then(() => Promise.all([ rollupGenerate(config), DevServer.start(), fileWatcher() ]));
