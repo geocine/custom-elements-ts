@@ -44,7 +44,6 @@ export const CustomElement = (args: CustomElementMetadata) => {
           if(this.__connected){
             this[methodToCall]({old: oldValue, new: newValue});
           }
-          this[name] = newValue;
         }
       }
 

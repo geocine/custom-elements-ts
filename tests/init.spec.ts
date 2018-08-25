@@ -1,10 +1,11 @@
-import { CustomElement, Toggle, Prop } from 'custom-elements-ts';
+import { CustomElement, Toggle, Prop, Watch } from 'custom-elements-ts';
 
 @CustomElement({})
 export class InitElement extends HTMLElement {
 
   @Toggle() disabled = true;
   @Prop() color = 'blue';
+  @Prop() icon;
 
   constructor(){
     super();
@@ -18,6 +19,10 @@ describe('init state', () => {
 
   beforeEach(() => {
     myElement = document.createElement('init-element');
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
   });
 
   it('should set attribute based on default prop value on init', () => {
@@ -44,6 +49,18 @@ describe('init state', () => {
     myElement.setAttribute('color','red');
     const element = document.body.appendChild(myElement);
     expect(element.color).toBe('red');
+  });
+
+  it('should not set attribute on second element instance', () => {
+    document.body.innerHTML = `
+      <init-element icon="awesome" disabled="false"></init-element>
+      <init-element></init-element>
+      <init-element></init-element>
+    `;
+    const initElements: any = document.body.querySelectorAll('init-element');
+    console.log(document.body);
+    expect(initElements[1].icon).toBeFalsy();
+    expect(initElements[2].icon).toBeFalsy();
   });
 
   it('should reflect has attribute to toggle on init', () => {
