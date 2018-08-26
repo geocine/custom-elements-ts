@@ -43,7 +43,7 @@ describe('init state', () => {
 
   it('should set attribute based on default toggle value on init', () => {
     const element = document.body.appendChild(myElement);
-    expect(element.disabled).toBe(true);
+    expect(element.hasAttribute('disabled')).toBe(true);
   });
 
   it('should set default toggle value on init', () => {

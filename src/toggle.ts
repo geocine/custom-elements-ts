@@ -1,3 +1,5 @@
+import { toKebabCase } from './util';
+
 export const Toggle = (): any => {
   return (target: any, propName: any) => {
     function get() {
@@ -44,9 +46,15 @@ export const Toggle = (): any => {
         }
         this.props[propName] = value || false;
       } else {
-        this.constructor.propsInit[propName] = value;
+        if (!this.hasAttribute(toKebabCase(propName))) {
+          this.constructor.propsInit[propName] = value;
+        }
       }
     }
+    if (!target.constructor.propsInit) {
+      target.constructor.propsInit = {};
+    }
+    target.constructor.propsInit[propName] = null;
     Object.defineProperty(target, propName, { get, set });
   };
 };

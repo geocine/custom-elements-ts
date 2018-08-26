@@ -1,3 +1,5 @@
+import { toKebabCase } from './util';
+
 export const Prop = (): any => {
   return (target: any, propName: any) => {
     const attrName = toKebabCase(propName);
@@ -13,38 +15,47 @@ export const Prop = (): any => {
         if (typeof value != 'object') {
           this.setAttribute(attrName, value);
         } else {
-          this.attributeChangedCallback(attrName, oldValue, value, false);
+          this.onAttributeChange(attrName, oldValue, value, false);
         }
         this.props[propName] = value;
       } else {
-        this.constructor.propsInit[propName] = value;
+        if (!this.hasAttribute(toKebabCase(propName))) {
+          this.constructor.propsInit[propName] = value;
+        }
       }
     }
+    if (!target.constructor.propsInit) {
+      target.constructor.propsInit = {};
+    }
+    target.constructor.propsInit[propName] = null;
     Object.defineProperty(target, propName, { get, set });
   };
 };
 
-export const toKebabCase = str => {
-  return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
-    .toLowerCase();
+const getProps = (target: any) => {
+  const watchAttributes = target.constructor.watchAttributes;
+  const plainAttributes = {...watchAttributes};
+  Object.keys(plainAttributes).forEach(v => plainAttributes[v] = '');
+  const cycleProps = {...plainAttributes, ...target.constructor.propsInit};
+  return Object.keys(cycleProps);
 };
 
 export const initializeProps = (target: any) => {
   const watchAttributes = target.constructor.watchAttributes;
-  if (watchAttributes) {
-    for (let name of Object.keys(watchAttributes)) {
-      const attribValue =
-        target.props[name] || target.getAttribute(toKebabCase(name));
-      target[watchAttributes[name]]({ new: attribValue });
+  for (let prop of getProps(target)) {
+    if (watchAttributes) {
+      if(watchAttributes[toKebabCase(prop)] == null){
+        watchAttributes[toKebabCase(prop)] = '';
+      } else {
+        const attribValue = target.props[prop] || target.getAttribute(toKebabCase(prop));
+        if(typeof target[watchAttributes[prop]] == 'function'){
+          target[watchAttributes[prop]]({ new: attribValue });
+        }
+      }
     }
-  }
-  const propsInit = target.constructor.propsInit;
-  if (propsInit) {
-    for (let name of Object.keys(propsInit)) {
-      if (!target.hasAttribute(name)) {
-        target[name] = propsInit[name];
+    if(target.constructor.propsInit[prop]) {
+      if (!target.hasAttribute(toKebabCase(prop))) {
+        target[prop] = target.constructor.propsInit[prop];
       }
     }
   }

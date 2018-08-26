@@ -1,4 +1,4 @@
-import { CustomElement, Prop } from 'custom-elements-ts';
+import { CustomElement, Prop, Watch } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'prop-element',
@@ -11,6 +11,10 @@ export class PropElement extends HTMLElement {
   @Prop() maxFileSize;
 
   @Prop() objectProp;
+  @Prop() init = 'blue';
+
+  @Prop() kebabCase = 'kebab';
+
 }
 
 describe('prop decorator', () => {
@@ -27,7 +31,7 @@ describe('prop decorator', () => {
 
   it('should reflect as property', () => {
     myElementInstance.setAttribute('name', 'Mario');
-    expect(myElementInstance.name).toEqual('Mario');
+    expect(myElementInstance.getAttribute('name')).toEqual('Mario');
     myElementInstance.setAttribute('name', 'Luigi');
     expect(myElementInstance.name).toEqual('Luigi');
   });
@@ -62,6 +66,17 @@ describe('prop decorator', () => {
   it('should evaluate property', () => {
     myElementInstance.objectProp = {name: 'Name'};
     expect(myElementInstance.objectProp.name).toEqual('Name');
+  });
+
+  it('should change attribute on attribute change', () => {
+    myElementInstance.setAttribute('init', 'red');
+    expect(myElementInstance.init).toEqual('red');
+    expect(myElementInstance.getAttribute('init')).toEqual('red');
+  });
+
+  it('should change property via kebab attribute', () => {
+    myElementInstance.setAttribute('kebab-case', 'shawarma');
+    expect(myElementInstance.kebabCase).toEqual('shawarma');
   });
 
 });

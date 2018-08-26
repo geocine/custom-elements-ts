@@ -1,5 +1,6 @@
 import { addEventListeners, ListenerMetadata } from './listen';
-import { initializeProps, toKebabCase } from './prop';
+import { initializeProps } from './prop';
+import { toKebabCase, toCamelCase } from './util';
 
 export interface CustomElementMetadata {
   tag?: string;
@@ -20,13 +21,13 @@ export const CustomElement = (args: CustomElementMetadata) => {
       protected static __connected: boolean = false;
 
       props: KeyValue = {};
-      protected static propsInit: KeyValue = {};
+      protected static propsInit: KeyValue;
 
       protected static watchAttributes: KeyValue;
       protected static listeners: ListenerMetadata[];
 
       static get observedAttributes() {
-        return Object.keys(this.watchAttributes || {});
+        return  Object.keys(this.propsInit || {}).map(x => toKebabCase(x));
       }
 
       constructor() {
@@ -37,11 +38,20 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
-        const watchAttributes: KeyValue = (this.constructor as any).watchAttributes;
-        if (watchAttributes && watchAttributes[name] && oldValue != newValue) {
-          const methodToCall: string = watchAttributes[name];
-          if(this.__connected){
-            this[methodToCall]({old: oldValue, new: newValue});
+        this.onAttributeChange(name, oldValue, newValue);
+      }
+
+      onAttributeChange(name: string, oldValue: string, newValue: string, set: boolean = true) {
+        if (oldValue != newValue) {
+          if(set) { this[toCamelCase(name)] = newValue; }
+          const watchAttributes: KeyValue = (this.constructor as any).watchAttributes;
+          if (watchAttributes && watchAttributes[name]) {
+            const methodToCall: string = watchAttributes[name];
+            if(this.__connected){
+              if(typeof this[methodToCall] == 'function'){
+                this[methodToCall]({old: oldValue, new: newValue});
+              }
+            }
           }
         }
       }

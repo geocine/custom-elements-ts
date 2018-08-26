@@ -14,6 +14,39 @@ export class WatchElement extends HTMLElement {
     const span = this.shadowRoot.querySelector('span');
     span.innerHTML = value.new;
   }
+
+  set label(value: any) {
+    this.setAttribute('label', value);
+  }
+  get label(): any {
+    return this.getAttribute('label') || '';
+  }
+
+  newLabel = '';
+  @Watch('label')
+  setLabel(value) {
+    this.newLabel = value.new;
+  }
+
+
+  newColor = '';
+  @Prop() color = 'blue';
+  @Watch('color')
+  changeColor() {
+    this.newColor = this.color;
+  }
+
+  newCase = '';
+  @Prop() setCase;
+  @Watch('setCase')
+  changeCase() {
+    this.newCase = this.setCase;
+  }
+
+  @Watch('set-kebab')
+  changeKebabCase() {
+    this.newCase = this.setCase;
+  }
 }
 
 describe('watch decorator', () => {
@@ -46,4 +79,23 @@ describe('watch decorator', () => {
     expect(myElementInstance.name).toEqual('Mario');
   });
 
+  it('should call @Watch on attribute change with new property value', () => {
+    myElementInstance.setAttribute('color', 'red');
+    expect(myElementInstance.newColor).toEqual('red');
+  });
+
+  it('should call @Watch for plain get/set with correct value.new', () => {
+    myElementInstance.setAttribute('label', 'Name');
+    expect(myElementInstance.newLabel).toEqual('Name');
+  });
+
+  it('should call non kebab @Watch on kebab attribute change with new property value', () => {
+    myElementInstance.setAttribute('set-case', 'kebab');
+    expect(myElementInstance.newCase).toEqual('kebab');
+  });
+
+  it('should call kebab @Watch on kebab attribute change with new property value', () => {
+    myElementInstance.setAttribute('set-case', 'snake');
+    expect(myElementInstance.newCase).toEqual('snake');
+  });
 });

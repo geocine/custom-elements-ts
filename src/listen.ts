@@ -1,3 +1,4 @@
+import { toDotCase } from './util';
 interface ListenerMetadata {
   eventName: string;
   handler: Function;
@@ -39,11 +40,6 @@ const addEventListeners = (target: any) => {
 };
 
 const Dispatch = (eventName?: string) =>{
-  const toDotCase = (str: string) => {
-    return str.replace(/(?!^)([A-Z])/g, ' $1')
-      .replace(/[_\s]+(?=[a-zA-Z])/g, '.')
-      .toLowerCase();
-  };
   return (target: HTMLElement, propertyName: string) => {
     function get(){
       const self: EventTarget = this as EventTarget;
