@@ -15,6 +15,10 @@ describe('basic test', () => {
     myElementInstance = document.body.appendChild(myElement);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('should load html template', () => {
       expect(myElementInstance.shadowRoot.innerHTML).toContain('<span>my element</span>');
   });

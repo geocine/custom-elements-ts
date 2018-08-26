@@ -1,4 +1,4 @@
-import { CustomElement, Prop, Watch } from 'custom-elements-ts';
+import { CustomElement, Prop } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'prop-element',
@@ -9,6 +9,8 @@ export class PropElement extends HTMLElement {
 
   @Prop() name;
   @Prop() maxFileSize;
+
+  @Prop() objectProp;
 }
 
 describe('prop decorator', () => {
@@ -17,6 +19,10 @@ describe('prop decorator', () => {
   beforeEach(() => {
     const myElement = document.createElement('prop-element');
     myElementInstance = document.body.appendChild(myElement);
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
   });
 
   it('should reflect as property', () => {
@@ -40,7 +46,7 @@ describe('prop decorator', () => {
 
   it('should properly set camelcase properties', () => {
     myElementInstance.maxFileSize = 1;
-    expect(myElementInstance.maxFileSize).toEqual('1');
+    expect(myElementInstance.maxFileSize).toEqual(1);
   });
 
   it('should properly get camelcase properties as kebabcase attributes', () => {
@@ -48,9 +54,14 @@ describe('prop decorator', () => {
     expect(myElementInstance.getAttribute('max-file-size')).toEqual('1');
   });
 
-  it('should properly set kebabcase attribues as camelcase properties', () => {
+  it('should properly set kebabcase attributes as camelcase properties', () => {
     myElementInstance.setAttribute('max-file-size', 2);
     expect(myElementInstance.maxFileSize).toEqual('2');
+  });
+
+  it('should evaluate property', () => {
+    myElementInstance.objectProp = {name: 'Name'};
+    expect(myElementInstance.objectProp.name).toEqual('Name');
   });
 
 });

@@ -30,6 +30,10 @@ describe('dispatch decorators', () => {
     element = document.body.appendChild(btnElement);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('should trigger a btn.click DispatchEmitter', (done) => {
     element.addEventListener('btn.click', (e) => {
       expect(e.detail).toBe('Hello');

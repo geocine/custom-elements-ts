@@ -24,6 +24,10 @@ describe('watch decorator', () => {
     myElementInstance = document.body.appendChild(myElement);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('should re-render setting property', () => {
     myElementInstance.name = 'Aivan';
     expect(myElementInstance.shadowRoot.querySelector('span').innerHTML).toEqual('Aivan');

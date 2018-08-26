@@ -20,6 +20,10 @@ describe('toggle decorator', () => {
     myElementInstance = document.body.appendChild(myElement);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('should return false on no attribute set', () => {
     expect(myElementInstance.disabled).toBe(false);
   });

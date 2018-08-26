@@ -1,5 +1,5 @@
 import { addEventListeners, ListenerMetadata } from './listen';
-import { initializeProps } from './prop';
+import { initializeProps, toKebabCase } from './prop';
 
 export interface CustomElementMetadata {
   tag?: string;
@@ -15,12 +15,11 @@ export interface KeyValue {
 
 export const CustomElement = (args: CustomElementMetadata) => {
   return (target: any) => {
-    const toKebabCase = string => string.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-').toLowerCase();
     const tag: string = args.tag || toKebabCase(target.prototype.constructor.name);
     const customElement: any = class extends (target as { new (): any }) {
       protected static __connected: boolean = false;
 
-      protected static props: KeyValue = {};
+      props: KeyValue = {};
       protected static propsInit: KeyValue = {};
 
       protected static watchAttributes: KeyValue;

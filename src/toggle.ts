@@ -32,7 +32,6 @@ export const Toggle = (): any => {
           throw(`TypeError: Cannot set boolean toggle property '${propName}' to '${value}'`);
         }
       }
-      this.constructor.props[propName] = value || false;
       if(this.__connected){
         if(oldValue !== '' && oldValue !== null){
           this.setAttribute(propName, value);
@@ -43,8 +42,9 @@ export const Toggle = (): any => {
             this.removeAttribute(propName);
           }
         }
+        this.props[propName] = value || false;
       } else {
-        this.constructor.propsInit[propName] = value || false;
+        this.constructor.propsInit[propName] = value;
       }
     }
     Object.defineProperty(target, propName, { get, set });

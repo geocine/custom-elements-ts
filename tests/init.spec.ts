@@ -7,6 +7,12 @@ export class InitElement extends HTMLElement {
   @Prop() color = 'blue';
   @Prop() icon;
 
+  setIcon = false;
+  @Watch('icon')
+  changeIcon(_value) {
+    this.setIcon = true;
+  }
+
   constructor(){
     super();
   }
@@ -58,7 +64,6 @@ describe('init state', () => {
       <init-element></init-element>
     `;
     const initElements: any = document.body.querySelectorAll('init-element');
-    console.log(document.body);
     expect(initElements[1].icon).toBeFalsy();
     expect(initElements[2].icon).toBeFalsy();
   });
@@ -79,6 +84,12 @@ describe('init state', () => {
     myElement.setAttribute('disabled','false');
     const element = document.body.appendChild(myElement);
     expect(element.disabled).toBe(false);
+  });
+
+  it('should execute watch of attribute on init', () => {
+    myElement.setAttribute('icon','test');
+    const element = document.body.appendChild(myElement);
+    expect(element.setIcon).toBe(true);
   });
 
 });

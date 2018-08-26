@@ -31,6 +31,10 @@ describe('listen decorator', () => {
     element = document.body.appendChild(btnElement);
   });
 
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   it('should call method decorated @Listen', () => {
     const btnHandlerSpy = spyOn(element.btnHandler,'call');
     element.click();
