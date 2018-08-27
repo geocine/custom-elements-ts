@@ -30,4 +30,39 @@ describe('basic test', () => {
   it('should have shadowroot', () => {
     expect(myElementInstance.shadowRoot).toBeTruthy();
   });
+
+});
+
+
+@CustomElement({
+  tag: 'shadow-false-element',
+  template: '<span>my element</span>',
+  style: ':host{border:0}',
+  shadow: false
+})
+export class ShadowFalseElement extends HTMLElement {}
+
+describe('basic test no shadowroot', () => {
+  let myElementInstance;
+
+  beforeEach(() => {
+    const myElement = document.createElement('shadow-false-element');
+    myElementInstance = document.body.appendChild(myElement);
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('should load html template', () => {
+      expect(myElementInstance.innerHTML).toContain('<span>my element</span>');
+  });
+
+  it('should not css', () => {
+    expect(myElementInstance.querySelector('style')).toBeFalsy();
+  });
+
+  it('shadow not have a shadowroot', () => {
+    expect(myElementInstance.shadowRoot).toBeFalsy();
+  });
 });

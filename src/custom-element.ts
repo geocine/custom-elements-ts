@@ -8,6 +8,7 @@ export interface CustomElementMetadata {
   templateUrl?: string;
   styleUrl?: string;
   style?: string;
+  shadow?: boolean;
 }
 
 export interface KeyValue {
@@ -26,13 +27,16 @@ export const CustomElement = (args: CustomElementMetadata) => {
       protected static watchAttributes: KeyValue;
       protected static listeners: ListenerMetadata[];
 
+      showShadowRoot: boolean;
+
       static get observedAttributes() {
         return  Object.keys(this.propsInit || {}).map(x => toKebabCase(x));
       }
 
       constructor() {
         super();
-        if(!this.shadowRoot){
+        this.showShadowRoot = args.shadow == null ? true : args.shadow;
+        if(!this.shadowRoot && this.showShadowRoot){
           this.attachShadow({ mode: 'open' });
         }
       }
@@ -68,11 +72,9 @@ export const CustomElement = (args: CustomElementMetadata) => {
       __render() {
         if(this.__connected) return;
         const template = document.createElement('template');
-        template.innerHTML = `
-          <style>${args.style ? args.style : ''}</style>
-          ${args.template ? args.template : ''}`;
-
-          this.shadowRoot.appendChild(document.importNode(template.content, true));
+        const style = ` <style>${args.style ? args.style : ''}</style>`;
+        template.innerHTML = `${this.showShadowRoot? style : ''}${args.template ? args.template : ''}`;
+        (this.showShadowRoot ? this.shadowRoot : this).appendChild(document.importNode(template.content, true));
       }
     };
 
