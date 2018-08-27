@@ -6,7 +6,8 @@ interface ListenerMetadata {
 }
 
 interface CustomEventOptions {
-  bubbles?: true;
+  bubbles?: boolean;
+  composed?: boolean;
   detail?: any;
 }
 
