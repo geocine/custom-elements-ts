@@ -1,4 +1,4 @@
-import { CustomElement, Prop, Watch } from 'custom-elements-ts';
+import { CustomElement, Prop, Toggle, Watch } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'watch-element',
@@ -36,16 +36,30 @@ export class WatchElement extends HTMLElement {
     this.newColor = this.color;
   }
 
-  newCase = '';
+  caseChanged = false;
   @Prop() setCase;
   @Watch('setCase')
-  changeCase() {
-    this.newCase = this.setCase;
+  changeCase(value) {
+    this.caseChanged = this.setCase === value.new;
   }
 
   @Watch('set-kebab')
-  changeKebabCase() {
-    this.newCase = this.setCase;
+  changeKebabCase(value) {
+    this.caseChanged = this.setCase === value.new;
+  }
+
+  menuChanged = false;
+  @Prop() menus = 'a';
+  @Watch('menus')
+  changeMenus(value) {
+    this.menuChanged = this.menus === value.new;
+  }
+
+  enabledChanged = false;
+  @Toggle() enabled;
+  @Watch('enabled')
+  changeEnable(value) {
+    this.enabledChanged = this.enabled.toString() === value.new;
   }
 }
 
@@ -91,11 +105,35 @@ describe('watch decorator', () => {
 
   it('should call non kebab @Watch on kebab attribute change with new property value', () => {
     myElementInstance.setAttribute('set-case', 'kebab');
-    expect(myElementInstance.newCase).toEqual('kebab');
+    expect(myElementInstance.setCase).toEqual('kebab');
+    expect(myElementInstance.caseChanged).toBeTruthy();
   });
 
   it('should call kebab @Watch on kebab attribute change with new property value', () => {
     myElementInstance.setAttribute('set-case', 'snake');
-    expect(myElementInstance.newCase).toEqual('snake');
+    expect(myElementInstance.setCase).toEqual('snake');
+    expect(myElementInstance.caseChanged).toBeTruthy();
   });
+
+  it('should call @Watch on property change with new property value', () => {
+    const menus = [
+      {
+        text: 'Colors',
+        link: '/user-interface/style-guides/colors'
+      },
+      {
+        text: 'Logo',
+        link: '/user-interface/style-guides/logo'
+      }
+    ];
+    myElementInstance.menus = menus;
+    expect(myElementInstance.menus).toEqual(menus);
+    expect(myElementInstance.menuChanged).toBeTruthy();
+  });
+
+  it('should call @Watch on toggle attribute with new property value', () => {
+    myElementInstance.enabled = true;
+    expect(myElementInstance.enabledChanged).toBeTruthy();
+  });
+
 });

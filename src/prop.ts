@@ -1,4 +1,4 @@
-import { toKebabCase } from './util';
+import { toKebabCase, tryParseInt } from './util';
 
 export const Prop = (): any => {
   return (target: any, propName: any) => {
@@ -12,12 +12,12 @@ export const Prop = (): any => {
     function set(value: any) {
       if (this.__connected) {
         const oldValue = this.props[propName];
+        this.props[propName] = tryParseInt(value);
         if (typeof value != 'object') {
           this.setAttribute(attrName, value);
         } else {
           this.onAttributeChange(attrName, oldValue, value, false);
         }
-        this.props[propName] = value;
       } else {
         if (!this.hasAttribute(toKebabCase(propName))) {
           this.constructor.propsInit[propName] = value;

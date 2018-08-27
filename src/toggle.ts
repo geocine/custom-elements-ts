@@ -35,6 +35,7 @@ export const Toggle = (): any => {
         }
       }
       if(this.__connected){
+        this.props[propName] = value || false;
         if(oldValue !== '' && oldValue !== null){
           this.setAttribute(propName, value);
         } else {
@@ -44,7 +45,6 @@ export const Toggle = (): any => {
             this.removeAttribute(propName);
           }
         }
-        this.props[propName] = value || false;
       } else {
         if (!this.hasAttribute(toKebabCase(propName))) {
           this.constructor.propsInit[propName] = value;

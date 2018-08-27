@@ -16,3 +16,7 @@ export const toDotCase = (str: string) => {
     .replace(/[_\s]+(?=[a-zA-Z])/g, '.')
     .toLowerCase();
 };
+
+export const tryParseInt = (value) => {
+  return (parseInt(value) == value && parseFloat(value) !== NaN) ? parseInt(value) : value;
+};

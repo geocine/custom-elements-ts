@@ -1,4 +1,4 @@
-import { CustomElement, Prop, Watch } from 'custom-elements-ts';
+import { CustomElement, Prop } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'prop-element',
@@ -60,7 +60,7 @@ describe('prop decorator', () => {
 
   it('should properly set kebabcase attributes as camelcase properties', () => {
     myElementInstance.setAttribute('max-file-size', 2);
-    expect(myElementInstance.maxFileSize).toEqual('2');
+    expect(myElementInstance.maxFileSize).toEqual(2);
   });
 
   it('should evaluate property', () => {
