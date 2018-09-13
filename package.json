@@ -1,6 +1,6 @@
 {
   "name": "custom-elements-ts",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Create native Custom Elements using Typescript without using any third party libraries",
   "main": "index.js",
   "module": "custom-element.js",

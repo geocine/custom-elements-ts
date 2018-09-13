@@ -77,7 +77,7 @@ const copyDtsFiles = async () => {
 const copyPkgFile = () => buildCopyPackageFile(LIB_NAME, { 
   main: `./bundles/${LIB_NAME}.umd.js`,
   esm5: `./esm5/${LIB_NAME}.js`,
-  module: `./esm5/${LIB_NAME}.js`,
+  module: `./esm2015/${LIB_NAME}.js`,
   esm2015: `./esm2015/${LIB_NAME}.js`,
   typings: 'index.d.ts'
 });
