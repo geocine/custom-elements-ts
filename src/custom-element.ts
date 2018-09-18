@@ -1,7 +1,18 @@
 import { addEventListeners, ListenerMetadata } from './listen';
 import { initializeProps } from './prop';
 import { toKebabCase, toCamelCase } from './util';
+import { h, render } from 'preact';
+export { h } from 'preact';
 
+declare global {
+  namespace JSX {
+      interface Element {}
+      export interface IntrinsicElements {
+          // catch all
+          [tagName: string]: any;
+      }
+  }
+}
 export interface CustomElementMetadata {
   tag?: string;
   template?: string;
@@ -57,6 +68,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
               }
             }
           }
+          this.__rerender();
         }
       }
 
@@ -71,10 +83,18 @@ export const CustomElement = (args: CustomElementMetadata) => {
 
       __render() {
         if(this.__connected) return;
-        const template = document.createElement('template');
-        const style = ` <style>${args.style ? args.style : ''}</style>`;
-        template.innerHTML = `${this.showShadowRoot? style : ''}${args.template ? args.template : ''}`;
-        (this.showShadowRoot ? this.shadowRoot : this).appendChild(document.importNode(template.content, true));
+        if(this.shadowRoot ? this.shadowRoot : this) {
+          const root = this.shadowRoot ? this.shadowRoot : this;
+          root.innerHTML = `<style>${args.style ? args.style : ''}</style><content></content>`;
+          this.__rerender();
+        }
+      }
+
+
+      renderTemplate: Element;
+      __rerender() {
+        const container = this.shadowRoot.querySelector('content');
+        render((<any>this).render(), container, container.firstChild);
       }
     };
 

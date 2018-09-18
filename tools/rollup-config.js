@@ -11,7 +11,7 @@ const DEST_PATH = 'dist';
 
 const prodModeParams = [ '--prod',  '--prod=true',  '--prod true'  ];
 
-const ELEMENT_PATH = `${ELEMENT_NAME}/index.ts`;
+const ELEMENT_PATH = `${ELEMENT_NAME}/index.tsx`;
 const INPUT_PATH =  path.join('.tmp', ELEMENT_PATH);
 
 if(ELEMENT_NAME == undefined){

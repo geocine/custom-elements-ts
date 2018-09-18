@@ -19,11 +19,13 @@
     "removeComments": true,
     "rootDir": "src",
     "sourceMap": true,
-    "target": "es5"
+    "target": "es5",
+    "jsx": "react",
+    "jsxFactory": "h"
   },
   "include": [
     ".tmp/**/*",
-    "demos/**/*.ts",
+    "demos/**/*.tsx",
     "src/**/*.ts",
     "tests/**/*.ts"
   ]

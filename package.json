@@ -45,5 +45,8 @@
     "type": "git",
     "url": "git+https://github.com/geocine/custom-elements-ts.git"
   },
-  "homepage": "https://geocine.github.io/custom-elements-ts/"
+  "homepage": "https://geocine.github.io/custom-elements-ts/",
+  "dependencies": {
+    "preact": "^8.3.1"
+  }
 }
