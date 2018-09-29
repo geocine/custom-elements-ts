@@ -1,4 +1,4 @@
-import { CustomElement } from 'custom-elements-ts';
+import { CustomElement, Prop, Listen } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-message',
@@ -24,20 +24,12 @@ import { CustomElement } from 'custom-elements-ts';
 })
 export class MessageElement extends HTMLElement {
 
-  constructor() {
-    super();
-    this.addEventListener('click', () => {
-      alert('what are you waiting for?');
-    });
+  @Listen('click')
+  handleClick() {
+    alert('what are you waiting for?');
   }
 
-  get message() {
-    return this.getAttribute('message');
-  }
-
-  set message(value) {
-    this.setAttribute('message', value);
-  }
+  @Prop() message: string;
 
   connectedCallback(){
     this.shadowRoot.querySelector('h1').innerHTML = this.message;
