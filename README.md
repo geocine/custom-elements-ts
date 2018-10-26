@@ -74,7 +74,7 @@ element.color = 'red';
 On the other hand `list` is a rich data type (objects or arrays) can only be accessed/set via property
 
 ### @Toggle()
-Toggle attributes work the same way as HTML boolean attributes as defined by [W3C](!http://www.w3.org/TR/2008/WD-html5-20080610/semantics.html#boolean) for the most part. We changed a few things to overcome confusion. Check the table below for reference:
+Toggle attributes work the same way as HTML boolean attributes as defined by [W3C](http://www.w3.org/TR/2008/WD-html5-20080610/semantics.html#boolean) for the most part. We changed a few things to overcome confusion. Check the table below for reference:
 
 | Markup                        | `disabled` | Description                                                          |
 |-------------------------------|------------|----------------------------------------------------------------------|
@@ -130,7 +130,7 @@ export class TodoList extends HTMLElement {
 
 ### @Listen()
 
-Listen has parameters `event` and `selector`. `Event` is any valid javascript event. `Selector` is anything that works with [querySelector()](!https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+Listen has parameters `event` and `selector`. `Event` is any valid javascript event. `Selector` is anything that works with [querySelector()](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
 
 ```ts
 import { CustomElement, Dispatch, Prop } from 'custom-elements-ts';
