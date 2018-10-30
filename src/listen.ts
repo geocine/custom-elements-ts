@@ -26,10 +26,11 @@ const Listen = (eventName: string, selector?: string) => {
 
 const addEventListeners = (target: any) => {
   if (target.constructor.listeners) {
+    const targetRoot: any = target.shadowRoot || target;
     for (const listener of target.constructor.listeners as Array<ListenerMetadata>) {
       const eventTarget = (listener.selector)
-        ? target.shadowRoot.querySelector(listener.selector)
-          ? target.shadowRoot.querySelector(listener.selector): null
+        ? targetRoot.querySelector(listener.selector)
+          ? targetRoot.querySelector(listener.selector): null
         : target;
       if (eventTarget) {
         eventTarget.addEventListener(listener.eventName, (e: CustomEvent) => {
