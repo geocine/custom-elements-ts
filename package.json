@@ -29,7 +29,7 @@
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.4",
     "karma-chrome-launcher": "^2.2.0",
-    "karma-jasmine": "^1.1.2",
+    "karma-jasmine": "^2.0.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^3.0.12",
     "magic-string": "0.25.1",
