@@ -58,8 +58,8 @@ describe('basic test no shadowroot', () => {
       expect(myElementInstance.innerHTML).toContain('<span>my element</span>');
   });
 
-  it('should not css', () => {
-    expect(myElementInstance.querySelector('style')).toBeFalsy();
+  it('should have css', () => {
+    expect(myElementInstance.querySelector('style')).toBeTruthy();
   });
 
   it('shadow not have a shadowroot', () => {

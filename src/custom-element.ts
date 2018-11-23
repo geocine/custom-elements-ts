@@ -72,8 +72,8 @@ export const CustomElement = (args: CustomElementMetadata) => {
       __render() {
         if(this.__connected) return;
         const template = document.createElement('template');
-        const style = ` <style>${args.style ? args.style : ''}</style>`;
-        template.innerHTML = `${this.showShadowRoot? style : ''}${args.template ? args.template : ''}`;
+        const style = `${args.style ? `<style>${args.style}</style>` : ''}`;
+        template.innerHTML = `${style}${args.template ? args.template : ''}`;
         (this.showShadowRoot ? this.shadowRoot : this).appendChild(document.importNode(template.content, true));
       }
     };
