@@ -21,8 +21,8 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@ngx-devtools/server": "beta",
     "@ngx-devtools/common": "beta",
+    "@ngx-devtools/server": "beta",
     "@types/jasmine": "2.8.8",
     "@webcomponents/custom-elements": "1.2.0",
     "coveralls": "^3.0.2",
@@ -33,6 +33,7 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^3.0.12",
     "magic-string": "0.25.1",
+    "rollup-plugin-typescript2": "^0.18.0",
     "typescript": "2.9.2"
   },
   "typings": "index.d.ts",
