@@ -32,7 +32,8 @@
     "karma-jasmine": "^1.1.2",
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^3.0.12",
-    "magic-string": "0.25.1"
+    "magic-string": "0.25.1",
+    "event-stream": "3.3.4"
   },
   "typings": "index.d.ts",
   "contributors": [
