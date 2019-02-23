@@ -10,7 +10,7 @@
     "bundle": "node tools/bundle.js",
     "test": "aria test tests",
     "serve.coverage": "aria serve --test-coverage",
-    "coveralls": "cat ./coverage/lcovonly | ./node_modules/coveralls/bin/coveralls.js"
+    "coveralls": "cat ./node_modules/.tmp/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "keywords": [
     "components",
