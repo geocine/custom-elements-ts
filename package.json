@@ -8,7 +8,8 @@
     "build": "node tools/build.js",
     "start": "node tools/start.js",
     "bundle": "node tools/bundle.js",
-    "test": "karma start --single-run",
+    "test": "aria test tests",
+    "serve.coverage": "aria serve --test-coverage",
     "coveralls": "cat ./coverage/lcovonly | ./node_modules/coveralls/bin/coveralls.js"
   },
   "keywords": [
@@ -22,18 +23,13 @@
   "license": "MIT",
   "devDependencies": {
     "@ngx-devtools/server": "beta",
-    "@ngx-devtools/common": "beta",
     "@types/jasmine": "2.8.8",
     "@webcomponents/custom-elements": "1.2.0",
+    "aria-tools": "0.0.2",
     "coveralls": "^3.0.2",
-    "jasmine-core": "^3.1.0",
-    "karma": "^2.0.4",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-jasmine": "^1.1.2",
-    "karma-mocha-reporter": "^2.2.5",
-    "karma-typescript": "^3.0.12",
+    "event-stream": "3.3.4",
     "magic-string": "0.25.1",
-    "event-stream": "3.3.4"
+    "typescript": "^3.3.3333"
   },
   "typings": "index.d.ts",
   "contributors": [

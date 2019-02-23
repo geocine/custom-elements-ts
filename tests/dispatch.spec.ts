@@ -4,7 +4,7 @@ import { CustomElement, Dispatch, DispatchEmitter, Listen } from 'custom-element
   tag: 'btn-dispatch',
   template: `<button>Test</button>`
 })
-export class DispatchElement extends HTMLElement {
+class DispatchElement extends HTMLElement {
 
   @Dispatch() btnClick: DispatchEmitter;
   @Dispatch('btn.namedClick') btnClickNamed: DispatchEmitter;

@@ -1,7 +1,7 @@
 import { CustomElement, Toggle, Watch } from 'custom-elements-ts';
 
 @CustomElement({})
-export class ToggleElement extends HTMLElement {
+class ToggleElement extends HTMLElement {
 
   @Toggle() disabled;
 
