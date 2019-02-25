@@ -5,7 +5,7 @@ import { CustomElement, Prop } from 'custom-elements-ts';
   template: '<span>my element</span>',
   style: ':host{border:0}'
 })
-export class PropElement extends HTMLElement {
+class PropElement extends HTMLElement {
 
   @Prop() name;
   @Prop() maxFileSize;

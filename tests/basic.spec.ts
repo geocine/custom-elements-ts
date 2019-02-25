@@ -5,7 +5,7 @@ import { CustomElement } from 'custom-elements-ts';
   template: '<span>my element</span>',
   style: ':host{border:0}'
 })
-export class BasicElement extends HTMLElement {}
+class BasicElement extends HTMLElement {}
 
 describe('basic test', () => {
   let myElementInstance;
@@ -40,7 +40,7 @@ describe('basic test', () => {
   style: ':host{border:0}',
   shadow: false
 })
-export class ShadowFalseElement extends HTMLElement {}
+class ShadowFalseElement extends HTMLElement {}
 
 describe('basic test no shadowroot', () => {
   let myElementInstance;

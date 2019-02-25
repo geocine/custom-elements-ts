@@ -4,7 +4,7 @@ import { CustomElement, Dispatch, DispatchEmitter, Listen } from 'custom-element
   tag: 'btn-listen-dispatch',
   template: `<button>Test</button>`
 })
-export class ButtonElement extends HTMLElement {
+class ButtonElement extends HTMLElement {
 
   @Dispatch() btnClick: DispatchEmitter;
   @Dispatch('btn.namedClick') btnClickNamed: DispatchEmitter;
@@ -65,7 +65,7 @@ describe('listen decorator', () => {
   template: `<button>Test</button>`,
   shadow: false
 })
-export class ShadowFalseButtonElement extends HTMLElement {
+class ShadowFalseButtonElement extends HTMLElement {
 
   @Dispatch() btnClick: DispatchEmitter;
   @Dispatch('btn.namedClick') btnClickNamed: DispatchEmitter;

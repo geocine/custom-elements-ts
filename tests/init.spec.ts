@@ -1,7 +1,7 @@
 import { CustomElement, Toggle, Prop, Watch } from 'custom-elements-ts';
 
 @CustomElement({})
-export class InitElement extends HTMLElement {
+class InitElement extends HTMLElement {
 
   @Toggle() disabled = true;
   @Prop() color = 'blue';

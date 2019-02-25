@@ -5,7 +5,7 @@ import { CustomElement, Prop, Toggle, Watch } from 'custom-elements-ts';
   template: '<span>my element</span>',
   style: ':host{border:0}'
 })
-export class WatchElement extends HTMLElement {
+class WatchElement extends HTMLElement {
 
   @Prop() name;
 
