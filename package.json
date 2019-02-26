@@ -25,7 +25,7 @@
     "@ngx-devtools/server": "beta",
     "@types/jasmine": "2.8.8",
     "@webcomponents/custom-elements": "1.2.0",
-    "aria-tools": "0.0.2",
+    "aria-tools": "0.0.3",
     "coveralls": "^3.0.2",
     "event-stream": "3.3.4",
     "magic-string": "0.25.1",
