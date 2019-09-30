@@ -28,7 +28,7 @@
     "aria-tools": "0.0.2",
     "coveralls": "^3.0.2",
     "event-stream": "3.3.4",
-    "magic-string": "0.25.3",
+    "magic-string": "0.25.4",
     "typescript": "^3.3.3333"
   },
   "typings": "index.d.ts",
