@@ -19,7 +19,7 @@ export const CustomElement = (args: CustomElementMetadata) => {
   return (target: any) => {
     const tag: string = args.tag || toKebabCase(target.prototype.constructor.name);
     const customElement: any = class extends (target as { new (): any }) {
-      protected static __connected: boolean = false;
+      private __connected: boolean = false;
 
       props: KeyValue = {};
       protected static propsInit: KeyValue;
@@ -46,14 +46,17 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       onAttributeChange(name: string, oldValue: string, newValue: string, set: boolean = true) {
-        if (oldValue != newValue) {
-          if(set) { this[toCamelCase(name)] = newValue; }
+        if (oldValue !== newValue) {
+          if (set) {
+            const propName = toCamelCase(name);
+            (this as any)[propName] = newValue;
+          }
           const watchAttributes: KeyValue = (this.constructor as any).watchAttributes;
           if (watchAttributes && watchAttributes[name]) {
             const methodToCall: string = watchAttributes[name];
-            if(this.__connected){
-              if(typeof this[methodToCall] == 'function'){
-                this[methodToCall]({old: oldValue, new: newValue});
+            if (this.__connected) {
+              if (typeof (this as any)[methodToCall] === 'function') {
+                (this as any)[methodToCall]({ old: oldValue, new: newValue });
               }
             }
           }

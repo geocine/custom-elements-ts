@@ -4,7 +4,8 @@ export const Prop = (): any => {
   return (target: any, propName: any) => {
     const attrName = toKebabCase(propName);
     function get() {
-      if (this.props[propName]) {
+      const hasOwn = Object.prototype.hasOwnProperty.call(this.props, propName);
+      if (hasOwn) {
         return this.props[propName];
       }
       return this.getAttribute(attrName);
@@ -49,7 +50,8 @@ export const initializeProps = (target: any) => {
       if(watchAttributes[toKebabCase(prop)] == null){
         watchAttributes[toKebabCase(prop)] = '';
       } else {
-        const attribValue = target.props[prop] || target.getAttribute(toKebabCase(prop));
+        const hasOwn = Object.prototype.hasOwnProperty.call(target.props, prop);
+        const attribValue = hasOwn ? target.props[prop] : target.getAttribute(toKebabCase(prop));
         if(typeof target[watchAttributes[prop]] == 'function'){
           target[watchAttributes[prop]]({ new: attribValue });
         }

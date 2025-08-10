@@ -1,11 +1,11 @@
-export const toKebabCase = str => {
+export const toKebabCase = (str: string) => {
   return str
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .replace(/[\s_]+/g, '-')
     .toLowerCase();
 };
 
-export const toCamelCase = str => {
+export const toCamelCase = (str: string) => {
   return str
     .toLowerCase()
     .replace(/(\-\w)/g, (m) => m[1].toUpperCase());
@@ -17,6 +17,18 @@ export const toDotCase = (str: string) => {
     .toLowerCase();
 };
 
-export const tryParseInt = (value) => {
-  return (parseInt(value) == value && parseFloat(value) !== NaN) ? parseInt(value) : value;
+export const tryParseInt = (value: unknown) => {
+  if (typeof value === 'number' && Number.isInteger(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed !== '') {
+      const parsed = Number(trimmed);
+      if (Number.isInteger(parsed) && String(parsed) === trimmed) {
+        return parsed;
+      }
+    }
+  }
+  return value;
 };
