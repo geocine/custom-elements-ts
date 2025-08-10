@@ -1,26 +1,24 @@
 const path = require('path');
-
 const typescript = require('rollup-plugin-typescript2');
 const resolve = require('rollup-plugin-node-resolve');
-
-const { isProcess, rollupPluginUglify } = require('@ngx-devtools/common');
+const { uglify } = require('rollup-plugin-uglify');
 const { existsSync } = require('fs');
 
 const ELEMENT_NAME = process.argv[2];
 const DEST_PATH = 'dist';
 
-const prodModeParams = [ '--prod',  '--prod=true',  '--prod true'  ];
+const prodModeParams = ['--prod', '--prod=true', '--prod true'];
 
 const ELEMENT_PATH = `${ELEMENT_NAME}/index.ts`;
-const INPUT_PATH =  path.join('.tmp', ELEMENT_PATH);
+const INPUT_PATH = path.join('.tmp', ELEMENT_PATH);
 
-if(ELEMENT_NAME == undefined){
+if (ELEMENT_NAME == undefined) {
   console.log('specify which element to start');
   console.log(' ↳  eg. npm start element-name');
   process.exit();
 }
 
-if(!existsSync(`demos/${ELEMENT_PATH}`)){
+if (!existsSync(`demos/${ELEMENT_PATH}`)) {
   console.log('element does not exist');
   process.exit();
 }
@@ -30,19 +28,23 @@ const toPascalCase = (text) => {
     .replace(/^\w/, c => c.toUpperCase());
 }
 
+function isProcess(params) {
+  return params.some(param => process.argv.includes(param));
+}
+
 const config = {
   inputOptions: {
     treeshake: true,
     input: INPUT_PATH,
     plugins: [
-      typescript({ 
+      typescript({
         useTsconfigDeclarationDir: true,
         check: false,
         cacheRoot: path.join(path.resolve(), 'node_modules/.tmp/.rts2_cache')
       }),
       resolve()
     ],
-    onwarn (warning) {
+    onwarn(warning) {
       if (warning.code === 'THIS_IS_UNDEFINED') { return; }
       console.log("Rollup warning: ", warning.message);
     }
@@ -60,7 +62,7 @@ if (isProcess(prodModeParams)) {
   const options = {
     mangle: { keep_fnames: true }
   };
-  config.inputOptions.plugins.push(rollupPluginUglify(options));
+  config.inputOptions.plugins.push(uglify(options));
 }
 
 exports.config = config;
