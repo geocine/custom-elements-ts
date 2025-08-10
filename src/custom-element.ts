@@ -12,7 +12,7 @@ export interface CustomElementMetadata {
 }
 
 export interface KeyValue {
-  [key: string ]: any;
+  [key: string]: any;
 }
 
 export const CustomElement = (args: CustomElementMetadata) => {
@@ -30,13 +30,14 @@ export const CustomElement = (args: CustomElementMetadata) => {
       showShadowRoot: boolean;
 
       static get observedAttributes() {
-        return  Object.keys(this.propsInit || {}).map(x => toKebabCase(x));
+        return Object.keys(this.propsInit || {}).map((x) => toKebabCase(x));
       }
 
       constructor() {
         super();
-        this.showShadowRoot = args.shadow == null ? true : args.shadow;
-        if(!this.shadowRoot && this.showShadowRoot){
+        this.showShadowRoot =
+          args.shadow === undefined || args.shadow === null ? true : args.shadow;
+        if (!this.shadowRoot && this.showShadowRoot) {
           this.attachShadow({ mode: 'open' });
         }
       }
@@ -65,7 +66,13 @@ export const CustomElement = (args: CustomElementMetadata) => {
 
       connectedCallback() {
         this.__render();
-        super.connectedCallback && super.connectedCallback();
+        const parentProto =
+          (Object.getPrototypeOf(Object.getPrototypeOf(this)) as {
+            connectedCallback?: () => void;
+          }) || null;
+        if (parentProto && typeof parentProto.connectedCallback === 'function') {
+          parentProto.connectedCallback.call(this);
+        }
         this.__connected = true;
 
         addEventListeners(this);
@@ -73,15 +80,17 @@ export const CustomElement = (args: CustomElementMetadata) => {
       }
 
       __render() {
-        if(this.__connected) return;
+        if (this.__connected) return;
         const template = document.createElement('template');
         const style = `${args.style ? `<style>${args.style}</style>` : ''}`;
         template.innerHTML = `${style}${args.template ? args.template : ''}`;
-        (this.showShadowRoot ? this.shadowRoot : this).appendChild(document.importNode(template.content, true));
+        (this.showShadowRoot ? this.shadowRoot : this).appendChild(
+          document.importNode(template.content, true)
+        );
       }
     };
 
-    if(!customElements.get(tag)){
+    if (!customElements.get(tag)) {
       customElements.define(tag, customElement);
     }
     return customElement;

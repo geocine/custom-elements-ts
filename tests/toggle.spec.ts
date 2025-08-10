@@ -1,14 +1,13 @@
-import { CustomElement, Toggle, Watch } from 'custom-elements-ts';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { CustomElement, Toggle } from 'custom-elements-ts';
 
 @CustomElement({})
 class ToggleElement extends HTMLElement {
-
-  @Toggle() disabled;
-
+  @Toggle() disabled: any;
 }
 
 describe('toggle decorator', () => {
-  let myElementInstance;
+  let myElementInstance: any;
 
   beforeEach(() => {
     const myElement = document.createElement('toggle-element');
@@ -24,7 +23,7 @@ describe('toggle decorator', () => {
   });
 
   it('should return true on empty attribute set', () => {
-    myElementInstance.setAttribute('disabled','');
+    myElementInstance.setAttribute('disabled', '');
     expect(myElementInstance.disabled).toBe(true);
   });
 
@@ -34,17 +33,17 @@ describe('toggle decorator', () => {
   });
 
   it('should return value on attribute set', () => {
-    myElementInstance.setAttribute('disabled','true');
+    myElementInstance.setAttribute('disabled', 'true');
     expect(myElementInstance.disabled).toBe(true);
-    myElementInstance.setAttribute('disabled','false');
+    myElementInstance.setAttribute('disabled', 'false');
     expect(myElementInstance.disabled).toBe(false);
   });
 
   it('should return false on random string attribute set', () => {
-    let warn = console.warn;
+    const warn = console.warn;
     // suppressing warn
     console.warn = () => {};
-    myElementInstance.setAttribute('disabled','asd');
+    myElementInstance.setAttribute('disabled', 'asd');
     expect(myElementInstance.disabled).toBe(false);
     console.warn = warn;
   });
@@ -73,5 +72,4 @@ describe('toggle decorator', () => {
     expect(myElementInstance.getAttribute('disabled')).toBe('false');
     console.warn = warn;
   });
-
 });

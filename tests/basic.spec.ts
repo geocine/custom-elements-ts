@@ -1,14 +1,15 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CustomElement } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'basic-element',
   template: '<span>my element</span>',
-  style: ':host{border:0}'
+  style: ':host{border:0}',
 })
 class BasicElement extends HTMLElement {}
 
 describe('basic test', () => {
-  let myElementInstance;
+  let myElementInstance: any;
 
   beforeEach(() => {
     const myElement = document.createElement('basic-element');
@@ -20,30 +21,31 @@ describe('basic test', () => {
   });
 
   it('should load html template', () => {
-      expect(myElementInstance.shadowRoot.innerHTML).toContain('<span>my element</span>');
+    expect(myElementInstance.shadowRoot.innerHTML).toContain('<span>my element</span>');
   });
 
   it('should load css', () => {
-    expect(myElementInstance.shadowRoot.querySelector('style').innerText).toContain(':host{border:0}');
+    expect(myElementInstance.shadowRoot.querySelector('style').innerText).toContain(
+      ':host{border:0}'
+    );
   });
 
   it('should have shadowroot', () => {
     expect(myElementInstance.shadowRoot).toBeTruthy();
   });
-
 });
 
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 @CustomElement({
   tag: 'shadow-false-element',
   template: '<span>my element</span>',
   style: ':host{border:0}',
-  shadow: false
+  shadow: false,
 })
 class ShadowFalseElement extends HTMLElement {}
 
 describe('basic test no shadowroot', () => {
-  let myElementInstance;
+  let myElementInstance: any;
 
   beforeEach(() => {
     const myElement = document.createElement('shadow-false-element');
@@ -55,7 +57,7 @@ describe('basic test no shadowroot', () => {
   });
 
   it('should load html template', () => {
-      expect(myElementInstance.innerHTML).toContain('<span>my element</span>');
+    expect(myElementInstance.innerHTML).toContain('<span>my element</span>');
   });
 
   it('should have css', () => {

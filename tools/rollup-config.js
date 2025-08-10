@@ -1,7 +1,8 @@
 const path = require('path');
 const typescript = require('rollup-plugin-typescript2');
-const resolve = require('rollup-plugin-node-resolve');
-const { uglify } = require('rollup-plugin-uglify');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const terserPlugin = require('@rollup/plugin-terser');
+const terser = terserPlugin.terser || terserPlugin;
 const { existsSync } = require('fs');
 
 const ELEMENT_NAME = process.argv[2];
@@ -42,7 +43,7 @@ const config = {
         check: false,
         cacheRoot: path.join(path.resolve(), 'node_modules/.tmp/.rts2_cache')
       }),
-      resolve()
+      nodeResolve()
     ],
     onwarn(warning) {
       if (warning.code === 'THIS_IS_UNDEFINED') { return; }
@@ -62,7 +63,7 @@ if (isProcess(prodModeParams)) {
   const options = {
     mangle: { keep_fnames: true }
   };
-  config.inputOptions.plugins.push(uglify(options));
+  config.inputOptions.plugins.push(terser(options));
 }
 
 exports.config = config;

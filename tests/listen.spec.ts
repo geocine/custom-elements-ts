@@ -1,26 +1,25 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CustomElement, Dispatch, DispatchEmitter, Listen } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'btn-listen-dispatch',
-  template: `<button>Test</button>`
+  template: `<button>Test</button>`,
 })
 class ButtonElement extends HTMLElement {
-
-  @Dispatch() btnClick: DispatchEmitter;
-  @Dispatch('btn.namedClick') btnClickNamed: DispatchEmitter;
+  @Dispatch() btnClick!: DispatchEmitter;
+  @Dispatch('btn.namedClick') btnClickNamed!: DispatchEmitter;
 
   constructor() {
     super();
   }
 
   @Listen('click')
-  btnHandler(){
-    this.shadowRoot.querySelector('button').innerHTML = 'Hello';
+  btnHandler() {
+    this.shadowRoot!.querySelector('button')!.innerHTML = 'Hello';
   }
 
   @Listen('click', 'button')
   btnInnerClick() {}
-
 }
 
 describe('listen decorator', () => {
@@ -36,19 +35,19 @@ describe('listen decorator', () => {
   });
 
   it('should call method decorated @Listen', () => {
-    const btnHandlerSpy = spyOn(element.btnHandler,'call');
+    const btnHandlerSpy = vi.spyOn(element.btnHandler, 'call');
     element.click();
     expect(btnHandlerSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated @Listen on children element click', () => {
-    const btnHandlerSpy = spyOn(element.btnHandler,'call');
+    const btnHandlerSpy = vi.spyOn(element.btnHandler, 'call');
     element.shadowRoot.querySelector('button').click();
     expect(btnHandlerSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated @Listen on selector click', () => {
-    const btnInnerSpy = spyOn(element.btnInnerClick,'call');
+    const btnInnerSpy = vi.spyOn(element.btnInnerClick, 'call');
     element.shadowRoot.querySelector('button').click();
     expect(btnInnerSpy).toHaveBeenCalled();
   });
@@ -57,31 +56,29 @@ describe('listen decorator', () => {
     element.click();
     expect(element.shadowRoot.querySelector('button').innerHTML).toEqual('Hello');
   });
-
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 @CustomElement({
   tag: 'btn-listen-shadow-false',
   template: `<button>Test</button>`,
-  shadow: false
+  shadow: false,
 })
 class ShadowFalseButtonElement extends HTMLElement {
-
-  @Dispatch() btnClick: DispatchEmitter;
-  @Dispatch('btn.namedClick') btnClickNamed: DispatchEmitter;
+  @Dispatch() btnClick!: DispatchEmitter;
+  @Dispatch('btn.namedClick') btnClickNamed!: DispatchEmitter;
 
   constructor() {
     super();
   }
 
   @Listen('click')
-  btnHandler(){
-    this.querySelector('button').innerHTML = 'Hello';
+  btnHandler() {
+    this.querySelector('button')!.innerHTML = 'Hello';
   }
 
   @Listen('click', 'button')
   btnInnerClick() {}
-
 }
 
 describe('listen decorator no shadowroot', () => {
@@ -97,19 +94,19 @@ describe('listen decorator no shadowroot', () => {
   });
 
   it('should call method decorated @Listen', () => {
-    const btnHandlerSpy = spyOn(element.btnHandler,'call');
+    const btnHandlerSpy = vi.spyOn(element.btnHandler, 'call');
     element.click();
     expect(btnHandlerSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated @Listen on children element click', () => {
-    const btnHandlerSpy = spyOn(element.btnHandler,'call');
+    const btnHandlerSpy = vi.spyOn(element.btnHandler, 'call');
     element.querySelector('button').click();
     expect(btnHandlerSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated @Listen on selector click', () => {
-    const btnInnerSpy = spyOn(element.btnInnerClick,'call');
+    const btnInnerSpy = vi.spyOn(element.btnInnerClick, 'call');
     element.querySelector('button').click();
     expect(btnInnerSpy).toHaveBeenCalled();
   });
@@ -118,5 +115,4 @@ describe('listen decorator no shadowroot', () => {
     element.click();
     expect(element.querySelector('button').innerHTML).toEqual('Hello');
   });
-
 });

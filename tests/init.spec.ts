@@ -1,19 +1,19 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CustomElement, Toggle, Prop, Watch } from 'custom-elements-ts';
 
 @CustomElement({})
 class InitElement extends HTMLElement {
-
   @Toggle() disabled = true;
   @Prop() color = 'blue';
-  @Prop() icon;
+  @Prop() icon: any;
 
   setIcon = false;
   @Watch('icon')
-  changeIcon(_value) {
+  changeIcon(_value: any) {
     this.setIcon = true;
   }
 
-  constructor(){
+  constructor() {
     super();
   }
 
@@ -21,7 +21,7 @@ class InitElement extends HTMLElement {
 }
 
 describe('init state', () => {
-  let myElement;
+  let myElement: any;
 
   beforeEach(() => {
     myElement = document.createElement('init-element');
@@ -52,7 +52,7 @@ describe('init state', () => {
   });
 
   it('should reflect attribute to props on init', () => {
-    myElement.setAttribute('color','red');
+    myElement.setAttribute('color', 'red');
     const element = document.body.appendChild(myElement);
     expect(element.color).toBe('red');
   });
@@ -69,27 +69,26 @@ describe('init state', () => {
   });
 
   it('should reflect has attribute to toggle on init', () => {
-    myElement.setAttribute('disabled','');
+    myElement.setAttribute('disabled', '');
     const element = document.body.appendChild(myElement);
     expect(element.disabled).toBe(true);
   });
 
   it('should reflect true attribute to toggle on init', () => {
-    myElement.setAttribute('disabled','true');
+    myElement.setAttribute('disabled', 'true');
     const element = document.body.appendChild(myElement);
     expect(element.disabled).toBe(true);
   });
 
   it('should reflect false attribute to toggle on init', () => {
-    myElement.setAttribute('disabled','false');
+    myElement.setAttribute('disabled', 'false');
     const element = document.body.appendChild(myElement);
     expect(element.disabled).toBe(false);
   });
 
   it('should execute watch of attribute on init', () => {
-    myElement.setAttribute('icon','test');
+    myElement.setAttribute('icon', 'test');
     const element = document.body.appendChild(myElement);
     expect(element.setIcon).toBe(true);
   });
-
 });

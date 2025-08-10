@@ -1,0 +1,46 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2019,
+    "sourceType": "module",
+    "warnOnUnsupportedTypeScriptVersion": false
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "env": { "browser": true, "es6": true, "jasmine": true },
+  "overrides": [
+    {
+      "files": ["tools/**/*.js"],
+      "parser": "espree",
+      "env": { "node": true, "es6": true },
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "no-undef": "off",
+        "no-console": "off",
+        "prettier/prettier": "off"
+      }
+    }
+  ],
+  "ignorePatterns": ["dist/", ".tmp/", "node_modules/", "demos/**"],
+  "rules": {
+    "eqeqeq": ["error", "always"],
+    "no-throw-literal": "error",
+    "prettier/prettier": "error",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "args": "none",
+        "varsIgnorePattern": "^_|^[A-Z].*Element$",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
+  }
+}

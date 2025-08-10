@@ -181,3 +181,11 @@ If you want to create a minified bundle
 ```
 npm run build -- <element-name> --prod
 ```
+
+### Building the library (publish artifacts)
+
+Builds the library from `src/index.ts` into `dist/` (UMD + ESM builds with typings):
+
+```
+npm run bundle
+```

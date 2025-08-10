@@ -1,27 +1,26 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { CustomElement, Prop } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'prop-element',
   template: '<span>my element</span>',
-  style: ':host{border:0}'
+  style: ':host{border:0}',
 })
 class PropElement extends HTMLElement {
+  @Prop() name: any;
+  @Prop() maxFileSize: any;
 
-  @Prop() name;
-  @Prop() maxFileSize;
-
-  @Prop() objectProp;
+  @Prop() objectProp: any;
   @Prop() init = 'blue';
 
   @Prop() kebabCase = 'kebab';
 
-  @Prop() fnProp;
-  @Prop() classProp;
-
+  @Prop() fnProp: any;
+  @Prop() classProp: any;
 }
 
 describe('prop decorator', () => {
-  let myElementInstance;
+  let myElementInstance: any;
 
   beforeEach(() => {
     const myElement = document.createElement('prop-element');
@@ -67,7 +66,7 @@ describe('prop decorator', () => {
   });
 
   it('should evaluate property', () => {
-    myElementInstance.objectProp = {name: 'Name'};
+    myElementInstance.objectProp = { name: 'Name' };
     expect(myElementInstance.objectProp.name).toEqual('Name');
   });
 
@@ -96,5 +95,4 @@ describe('prop decorator', () => {
     expect(myElementInstance.getAttribute('class-prop')).toBeFalsy();
     expect(myElementInstance.classProp).toBe(Foo);
   });
-
 });

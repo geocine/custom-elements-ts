@@ -1,6 +1,6 @@
 const path = require('path');
 const rollup = require('rollup');
-const resolve = require('rollup-plugin-node-resolve');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
 const rimraf = require('rimraf');
 const { existsSync, mkdirSync, renameSync, copyFileSync, readFileSync, writeFileSync } = require('fs');
@@ -9,23 +9,13 @@ const MagicString = require('magic-string');
 
 const LIB_NAME = 'custom-elements-ts';
 
-function stripCode() {
-  return {
-    name: 'stripCode',
-    transform(source, id) {
-      let code = source.replace(/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/g, '')
-      const magicString = new MagicString(code)
-      let map = magicString.generateMap({ hires: true })
-      return { code, map }
-    }
-  }
-}
+// removing custom comment-strip plugin; modern toolchain handles comments safely
 
 const createConfig = () => {
-  return ['umd', 'esm5', 'esm2015'].map(format => {
+      return ['umd', 'esm5', 'esm2015'].map(format => {
     const tsConfig = {
       compilerOptions: {
-        target: (format.includes('esm2015') ? 'es2015' : 'es5')
+            target: (format.includes('esm2015') ? 'es2015' : 'es5')
       }
     };
 
@@ -42,15 +32,16 @@ const createConfig = () => {
         treeshake: true,
         input: 'src/index.ts',
         plugins: [
-          stripCode(),
           typescript({
             tsconfig: 'src/tsconfig.json',
             tsconfigOverride: { ...tsConfig },
             check: false,
             cacheRoot: path.join(path.resolve(), 'node_modules/.tmp/.rts2_cache'),
-            useTsconfigDeclarationDir: hasDeclaration
+            useTsconfigDeclarationDir: hasDeclaration,
+            // ensure tslib helpers are injected correctly for ES5 target
+            tslib: require.resolve('tslib')
           }),
-          resolve()
+          nodeResolve()
         ],
         onwarn(warning) {
           if (warning.code === 'THIS_IS_UNDEFINED') { return; }

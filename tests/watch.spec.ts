@@ -1,18 +1,18 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CustomElement, Prop, Toggle, Watch } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'watch-element',
   template: '<span>my element</span>',
-  style: ':host{border:0}'
+  style: ':host{border:0}',
 })
 class WatchElement extends HTMLElement {
-
-  @Prop() name;
+  @Prop() name: any;
 
   @Watch('name')
-  setSpan(value){
-    const span = this.shadowRoot.querySelector('span');
-    span.innerHTML = value.new;
+  setSpan(value: any) {
+    const span = this.shadowRoot!.querySelector('span');
+    span!.innerHTML = value.new;
   }
 
   set label(value: any) {
@@ -24,10 +24,9 @@ class WatchElement extends HTMLElement {
 
   newLabel = '';
   @Watch('label')
-  setLabel(value) {
+  setLabel(value: any) {
     this.newLabel = value.new;
   }
-
 
   newColor = '';
   @Prop() color = 'blue';
@@ -37,34 +36,34 @@ class WatchElement extends HTMLElement {
   }
 
   caseChanged = false;
-  @Prop() setCase;
+  @Prop() setCase: any;
   @Watch('setCase')
-  changeCase(value) {
+  changeCase(value: any) {
     this.caseChanged = this.setCase === value.new;
   }
 
   @Watch('set-kebab')
-  changeKebabCase(value) {
+  changeKebabCase(value: any) {
     this.caseChanged = this.setCase === value.new;
   }
 
   menuChanged = false;
   @Prop() menus = 'a';
   @Watch('menus')
-  changeMenus(value) {
+  changeMenus(value: any) {
     this.menuChanged = this.menus === value.new;
   }
 
   enabledChanged = false;
-  @Toggle() enabled;
+  @Toggle() enabled: any;
   @Watch('enabled')
-  changeEnable(value) {
+  changeEnable(value: any) {
     this.enabledChanged = this.enabled.toString() === value.new;
   }
 }
 
 describe('watch decorator', () => {
-  let myElementInstance;
+  let myElementInstance: any;
 
   beforeEach(() => {
     const myElement = document.createElement('watch-element');
@@ -81,15 +80,15 @@ describe('watch decorator', () => {
   });
 
   it('should call method decorated with @Watch on prop change', () => {
-    const watchSpy = spyOn(myElementInstance,'setSpan');
+    const watchSpy = vi.spyOn(myElementInstance, 'setSpan');
     myElementInstance.name = 'Aivan';
     expect(watchSpy).toHaveBeenCalled();
   });
 
   it('should call method decorated with @Watch on prop change', () => {
-    const watchSpy = spyOn(myElementInstance,'setSpan');
+    const watchSpy = vi.spyOn(myElementInstance, 'setSpan');
     myElementInstance.setAttribute('name', 'Mario');
-    expect(watchSpy).toHaveBeenCalledWith(...[{ old: null, new: 'Mario'}]);
+    expect(watchSpy).toHaveBeenCalledWith(...[{ old: null, new: 'Mario' }]);
     expect(myElementInstance.name).toEqual('Mario');
   });
 
@@ -119,12 +118,12 @@ describe('watch decorator', () => {
     const menus = [
       {
         text: 'Colors',
-        link: '/user-interface/style-guides/colors'
+        link: '/user-interface/style-guides/colors',
       },
       {
         text: 'Logo',
-        link: '/user-interface/style-guides/logo'
-      }
+        link: '/user-interface/style-guides/logo',
+      },
     ];
     myElementInstance.menus = menus;
     expect(myElementInstance.menus).toEqual(menus);
@@ -135,5 +134,4 @@ describe('watch decorator', () => {
     myElementInstance.enabled = true;
     expect(myElementInstance.enabledChanged).toBeTruthy();
   });
-
 });

@@ -1,7 +1,7 @@
 import { toDotCase } from './util';
 interface ListenerMetadata {
   eventName: string;
-  handler: Function;
+  handler: (e: Event) => void;
   selector?: string;
 }
 
@@ -20,7 +20,11 @@ const Listen = (eventName: string, selector?: string) => {
     if (!target.constructor.listeners) {
       target.constructor.listeners = [];
     }
-    target.constructor.listeners.push({ selector: selector, eventName: eventName, handler: target[methodName] });
+    target.constructor.listeners.push({
+      selector: selector,
+      eventName: eventName,
+      handler: target[methodName],
+    });
   };
 };
 
@@ -41,19 +45,26 @@ const addEventListeners = (target: any) => {
   }
 };
 
-const Dispatch = (eventName?: string) =>{
+const Dispatch = (eventName?: string) => {
   return (target: HTMLElement, propertyName: string) => {
-    function get(){
+    function get() {
       const self: EventTarget = this as EventTarget;
       return {
         emit(options?: CustomEventOptions) {
-          const evtName = (eventName) ? eventName: toDotCase(propertyName);
+          const evtName = eventName ? eventName : toDotCase(propertyName);
           self.dispatchEvent(new CustomEvent(evtName, options));
-        }
+        },
       };
     }
     Object.defineProperty(target, propertyName, { get });
   };
 };
 
-export { Listen,  addEventListeners, DispatchEmitter, Dispatch, CustomEventOptions, ListenerMetadata };
+export {
+  Listen,
+  addEventListeners,
+  DispatchEmitter,
+  Dispatch,
+  CustomEventOptions,
+  ListenerMetadata,
+};

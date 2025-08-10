@@ -2,10 +2,10 @@ import { toKebabCase } from './util';
 
 export const Toggle = (): any => {
   return (target: any, propName: any) => {
-    function get() {
-      const getAttribute = (propName) => {
-        if (this.hasAttribute(propName)) {
-          const attrValue = this.getAttribute(propName);
+    function get(this: any) {
+      const getAttribute = (attrName: string) => {
+        if (this.hasAttribute(attrName)) {
+          const attrValue = this.getAttribute(attrName);
           if (/^(true|false|^$)$/.test(attrValue)) {
             return attrValue === 'true' || attrValue === '';
           } else {
@@ -16,22 +16,24 @@ export const Toggle = (): any => {
       };
       return getAttribute(propName);
     }
-    function set(value: any) {
+    function set(this: any, value: any) {
       const oldValue = value;
       if (value !== null && value !== undefined) {
         switch (typeof value) {
           case 'boolean':
-          break;
+            break;
           case 'string':
-          if (/^(true|false|^$)$/.test(value)) {
-            value = oldValue === 'true' || oldValue === '';
-          } else {
-            console.warn(`TypeError: Cannot set boolean toggle property '${propName}' to '${value}'`);
-            value = false;
-          }
-          break;
+            if (/^(true|false|^$)$/.test(value)) {
+              value = oldValue === 'true' || oldValue === '';
+            } else {
+              console.warn(
+                `TypeError: Cannot set boolean toggle property '${propName}' to '${value}'`
+              );
+              value = false;
+            }
+            break;
           default:
-          throw new TypeError(`Cannot set boolean toggle property '${propName}' to '${value}'`);
+            throw new TypeError(`Cannot set boolean toggle property '${propName}' to '${value}'`);
         }
       }
       if (this.__connected) {
