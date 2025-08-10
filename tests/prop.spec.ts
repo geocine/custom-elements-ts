@@ -15,6 +15,9 @@ class PropElement extends HTMLElement {
 
   @Prop() kebabCase = 'kebab';
 
+  @Prop() fnProp;
+  @Prop() classProp;
+
 }
 
 describe('prop decorator', () => {
@@ -77,6 +80,21 @@ describe('prop decorator', () => {
   it('should change property via kebab attribute', () => {
     myElementInstance.setAttribute('kebab-case', 'shawarma');
     expect(myElementInstance.kebabCase).toEqual('shawarma');
+  });
+
+  it('should not reflect function values as attributes and preserve reference', () => {
+    const fn = () => 42;
+    myElementInstance.fnProp = fn;
+    expect(myElementInstance.getAttribute('fn-prop')).toBeFalsy();
+    expect(typeof myElementInstance.fnProp).toEqual('function');
+    expect(myElementInstance.fnProp()).toEqual(42);
+  });
+
+  it('should not reflect class/constructor values as attributes and preserve reference', () => {
+    class Foo {}
+    myElementInstance.classProp = Foo;
+    expect(myElementInstance.getAttribute('class-prop')).toBeFalsy();
+    expect(myElementInstance.classProp).toBe(Foo);
   });
 
 });

@@ -13,7 +13,9 @@ export const Prop = (): any => {
       if (this.__connected) {
         const oldValue = this.props[propName];
         this.props[propName] = tryParseInt(value);
-        if (typeof value != 'object') {
+        const valueType = typeof value;
+        const shouldReflect = valueType === 'string' || valueType === 'number' || valueType === 'boolean';
+        if (shouldReflect) {
           this.setAttribute(attrName, value);
         } else {
           this.onAttributeChange(attrName, oldValue, value, false);

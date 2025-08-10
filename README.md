@@ -38,7 +38,7 @@ export class CounterElement extends HTMLElement {
 
 | Decorator   | Target   | Parameters         | Description                                                                                                                                                                       |
 |-------------|----------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @Prop()     | property | -                  | custom attribute/properties, reflects primitive properties to attributes                                                                                                          |
+| @Prop()     | property | -                  | custom attribute/properties, reflects primitive properties (string, number, boolean) to attributes                                                                                 |
 | @Toggle()   | property | -                  | boolean attribute/properties, it is based on the presence of the attribute but also works with "true" and "false"                                                                 |
 | @Dispatch() | property | (event?)           | used to declare a CustomEvent which you could dispatch using the `.emit` method of its type `DispatchEmitter`. The `event` parameter is used to set the name of the `CustomEvent` |
 | @Watch()    | method   | (property)         | triggers the method when a `property` is changed                                                                                                                                  |
@@ -71,7 +71,22 @@ const propertyValue = element.color;
 element.color = 'red';
 ```
 
-On the other hand `list` is a rich data type (objects or arrays) can only be accessed/set via property
+On the other hand `list` is a rich data type (objects or arrays), and functions/classes can only be accessed/set via property and are not reflected as attributes.
+
+```ts
+// Functions and classes are not reflected to attributes
+@Prop() onChange: (detail: any) => void;
+@Prop() itemConstructor: { new(...args: any[]): any };
+
+element.onChange = () => {};
+// not reflected as attribute
+console.log(element.getAttribute('on-change')); // null
+
+class Foo {}
+element.itemConstructor = Foo;
+// not reflected as attribute
+console.log(element.getAttribute('item-ctor')); // null
+```
 
 ### @Toggle()
 Toggle attributes work the same way as HTML boolean attributes as defined by [W3C](http://www.w3.org/TR/2008/WD-html5-20080610/semantics.html#boolean) for the most part. We changed a few things to overcome confusion. Check the table below for reference:
