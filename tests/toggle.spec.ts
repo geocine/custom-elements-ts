@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CustomElement, Toggle } from 'custom-elements-ts';
 
 @CustomElement({})
@@ -66,10 +66,16 @@ describe('toggle decorator', () => {
   });
 
   it('should reflect random string prop to attribute as false', () => {
-    const warn = console.warn;
-    console.warn = () => {};
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     myElementInstance.disabled = 'asd';
     expect(myElementInstance.getAttribute('disabled')).toBe('false');
-    console.warn = warn;
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it('should throw for unsupported type assignment', () => {
+    expect(() => {
+      myElementInstance.disabled = 123;
+    }).toThrow(TypeError);
   });
 });

@@ -134,4 +134,44 @@ describe('watch decorator', () => {
     myElementInstance.enabled = true;
     expect(myElementInstance.enabledChanged).toBeTruthy();
   });
+
+  it('should register watch metadata on the constructor for all watched attributes', () => {
+    const meta = (WatchElement as any).watchAttributes as Record<string, string>;
+    const propsInit = (WatchElement as any).propsInit as Record<string, unknown>;
+
+    expect(meta['name']).toBe('setSpan');
+    expect(meta['label']).toBe('setLabel');
+    expect(meta['color']).toBe('changeColor');
+    // camelCase key is kebab-cased in metadata
+    expect(meta['set-case']).toBe('changeCase');
+    // kebab key is preserved
+    expect(meta['set-kebab']).toBe('changeKebabCase');
+    expect(meta['menus']).toBe('changeMenus');
+    expect(meta['enabled']).toBe('changeEnable');
+
+    // propsInit entries are created (null placeholders)
+    ['name', 'label', 'color', 'setCase', 'set-kebab', 'menus', 'enabled'].forEach((k) => {
+      expect(propsInit).toHaveProperty(k);
+    });
+  });
+});
+
+// Ensure subsequent @Watch registrations on the same attribute update the mapping (last one wins)
+@CustomElement({
+  tag: 'dupe-watch-element',
+  template: '<span>dupe</span>',
+})
+class DupeWatchElement extends HTMLElement {
+  @Watch('foo')
+  first(_v: any) {}
+
+  @Watch('foo')
+  second(_v: any) {}
+}
+
+describe('watch decorator duplicate attribute handling', () => {
+  it('last @Watch for same attribute should win in metadata map', () => {
+    const meta = (DupeWatchElement as any).watchAttributes as Record<string, string>;
+    expect(meta['foo']).toBe('second');
+  });
 });
