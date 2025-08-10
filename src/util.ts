@@ -8,7 +8,7 @@ export const toKebabCase = (str: string) => {
 export const toCamelCase = (str: string) => {
   return str
     .toLowerCase()
-    .replace(/(\-\w)/g, (m) => m[1].toUpperCase());
+    .replace(/(\-\w)/g, (m: string) => m[1].toUpperCase());
 };
 
 export const toDotCase = (str: string) => {
