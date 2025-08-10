@@ -8,6 +8,8 @@
     "build": "node tools/build.js",
     "start": "node tools/start.js",
     "bundle": "node tools/bundle.js",
+    "publish:dist": "npm run bundle && npm publish dist --access public",
+    "publish:dry-run": "npm run bundle && npm publish dist --dry-run",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage --coverage.reporter=lcov",

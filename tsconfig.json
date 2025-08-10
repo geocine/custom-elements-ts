@@ -21,7 +21,7 @@
       "custom-elements-ts": ["src/index"]
     },
     "removeComments": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "sourceMap": true,
     "target": "es6"
   },
@@ -30,5 +30,9 @@
     "demos/**/*.ts",
     "src/**/*.ts",
     "tests/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
   ]
 }
