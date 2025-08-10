@@ -10,8 +10,8 @@
     "bundle": "node tools/bundle.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "coveralls": "cat ./node_modules/.tmp/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:coverage": "vitest run --coverage --coverage.reporter=lcov",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "lint": "eslint \"{src,tests}/**/*.ts\"",
     "lint:fix": "eslint \"{src,tests}/**/*.ts\" --fix"
   },
