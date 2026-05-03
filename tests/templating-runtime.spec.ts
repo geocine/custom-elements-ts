@@ -220,7 +220,7 @@ class StateEdgeElement extends HTMLElement {
 
   @State() maybe: any;
   @State() model = { user: { name: 'Ada' }, count: 1 };
-  @State() nodeValue = document.createElement('span');
+  @State() spanState = document.createElement('span');
   @State() mapValue = new Map<string, string>();
 
   render(): TemplateResult {
@@ -229,7 +229,7 @@ class StateEdgeElement extends HTMLElement {
       <span id="maybe">${String(this.maybe)}</span>
       <span id="name">${this.model.user?.name ?? 'missing'}</span>
       <span id="count">${this.model.count ?? 'missing'}</span>
-      <span id="node">${this.nodeValue.tagName}</span>
+      <span id="node">${this.spanState.tagName}</span>
       <span id="map">${this.mapValue.size}</span>
     `;
   }
@@ -478,12 +478,14 @@ describe('render-aware decorator reactivity', () => {
   });
 
   it('covers state proxy cache, proxy reassignment, deletion, and non-proxyable nodes', async () => {
-    const disconnected = document.createElement('state-edge-element') as StateEdgeElement;
+    const disconnected = document.createElement(
+      'state-edge-element'
+    ) as unknown as StateEdgeElement;
     expect(disconnected.maybe).toBeUndefined();
 
     const element = document.body.appendChild(
       document.createElement('state-edge-element')
-    ) as StateEdgeElement;
+    ) as unknown as StateEdgeElement;
 
     expect(isStateName(element, 'model')).toBe(true);
     expect(isStateName(element, 'missing')).toBe(false);
@@ -498,12 +500,12 @@ describe('render-aware decorator reactivity', () => {
     await nextMicrotask();
     expect(element.renderCount).toBe(renderCount);
 
-    element.nodeValue.textContent = 'not reactive';
+    element.spanState.textContent = 'not reactive';
     element.mapValue.set('x', 'y');
     await nextMicrotask();
     expect(element.renderCount).toBe(renderCount);
 
-    delete element.model.count;
+    delete (element.model as { count?: number }).count;
     await nextMicrotask();
     expect(element.shadowRoot!.querySelector('#count')!.textContent).toBe('missing');
     expect(element.renderCount).toBe(renderCount + 1);
