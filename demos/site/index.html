@@ -4,12 +4,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0c10">
-    <meta name="description" content="custom-elements-ts — author native Web Components in TypeScript with a small set of decorators and zero runtime dependencies.">
-    <meta property="og:title" content="custom-elements-ts">
-    <meta property="og:description" content="Author native Web Components in TypeScript with a small set of decorators. Zero dependencies. Framework-free.">
-    <meta property="og:type" content="website">
-    <title>custom-elements-ts — native Web Components in TypeScript</title>
+    <meta name="color-scheme" content="dark">
 
+    <title>custom-elements-ts — native Web Components in TypeScript</title>
+    <meta name="description" content="Author native Web Components in TypeScript with a tiny set of decorators — @CustomElement, @Prop, @State, @Watch, @Listen, @Dispatch — and a 3 kB runtime. Zero dependencies. Framework-free.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="custom-elements-ts">
+    <meta property="og:url" content="https://geocine.github.io/custom-elements-ts/">
+    <meta property="og:title" content="custom-elements-ts — Native Web Components in TypeScript">
+    <meta property="og:description" content="A 3 kB decorator-based runtime for authoring standards-compliant custom elements in TypeScript. Zero dependencies. Framework-free.">
+    <meta property="og:image" content="https://geocine.github.io/custom-elements-ts/og-image.png">
+    <meta property="og:image:secure_url" content="https://geocine.github.io/custom-elements-ts/og-image.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="custom-elements-ts — Native Web Components, written in TypeScript. Sample code window showing a @CustomElement decorator.">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="custom-elements-ts — Native Web Components in TypeScript">
+    <meta name="twitter:description" content="A 3 kB decorator-based runtime for authoring standards-compliant custom elements in TypeScript. Zero dependencies. Framework-free.">
+    <meta name="twitter:image" content="https://geocine.github.io/custom-elements-ts/og-image.png">
+    <meta name="twitter:image:alt" content="custom-elements-ts — Native Web Components, written in TypeScript.">
+
+    <link rel="canonical" href="https://geocine.github.io/custom-elements-ts/">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +56,7 @@
 
         <nav class="nav__links" aria-label="Primary">
           <a class="nav__link" href="#showcase">Example</a>
+          <a class="nav__link" href="#live">Live demos</a>
           <a class="nav__link" href="#api">Decorators</a>
           <a class="nav__link" href="https://github.com/geocine/custom-elements-ts#readme">Docs</a>
           <a class="nav__link" href="https://www.npmjs.com/package/custom-elements-ts">npm</a>
@@ -68,14 +89,15 @@
 
           <p class="hero__lede">
             <strong>custom-elements-ts</strong> is a tiny set of decorators —
-            <code>@CustomElement</code>, <code>@Prop</code>, <code>@Watch</code>,
-            <code>@Listen</code>, <code>@Dispatch</code>, <code>@Toggle</code> —
-            that let you author standards-based custom elements without a framework
-            or a runtime, then ship them anywhere.
+            <code>@CustomElement</code>, <code>@Prop</code>, <code>@State</code>,
+            <code>@Watch</code>, <code>@Listen</code>, <code>@Dispatch</code>,
+            <code>@Toggle</code> — plus a 3&nbsp;kB <code>html</code>/<code>render()</code>
+            runtime that lets you author standards-compliant custom elements
+            without a framework.
           </p>
 
           <div class="hero__actions">
-            <a class="btn btn--primary" href="#showcase">
+            <a class="btn btn--primary" href="#live">
               See it in action
               <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </a>
@@ -98,7 +120,7 @@
         <div class="container">
           <div class="showcase__grid">
 
-            <article class="window" aria-label="Example component source">
+            <article class="window" aria-label="Source for the install pill on the right">
               <header class="window__bar">
                 <span class="window__dots" aria-hidden="true">
                   <span></span><span></span><span></span>
@@ -108,7 +130,7 @@
                 </span>
                 <span class="window__copy">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  example
+                  what runs the install pill →
                 </span>
               </header>
               <div class="window__body">
@@ -118,8 +140,12 @@
 
             <aside class="side-card" aria-label="Install custom-elements-ts">
               <div class="side-card__head">
-                <div class="side-card__kicker">Install</div>
-                <h2 class="side-card__title">One package. Zero baggage.</h2>
+                <div class="side-card__kicker">Install · live</div>
+                <h2 class="side-card__title">Click the pill — see the source.</h2>
+                <p class="side-card__sub">
+                  The component on the left <em>is</em> the component below.
+                  Click to copy, watch <code>cts:toast</code> fire.
+                </p>
               </div>
 
               <cts-message message="npm install custom-elements-ts"></cts-message>
@@ -141,7 +167,7 @@
                   <span class="check" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                   </span>
-                  <span><strong>Tiny surface area.</strong> Six decorators is the whole API.</span>
+                  <span><strong>Tiny surface area.</strong> Seven decorators is the whole API.</span>
                 </li>
               </ul>
 
@@ -157,13 +183,102 @@
         </div>
       </section>
 
+      <!-- ─── Live demos ─────────────────────────────────────── -->
+      <section class="live" id="live">
+        <div class="container">
+
+          <div class="live__head">
+            <div>
+              <span class="eyebrow"><span class="dot"></span> Live in your browser</span>
+              <h2 class="live__title">Two demos. Real components. Real events.</h2>
+            </div>
+            <p class="live__lede">
+              Each demo below is a custom element built with the same library you'd
+              <code>npm install</code>. The event log on the side is itself a
+              <code>render()</code> + <code>@State()</code> component — it subscribes
+              to the bubbling, composed <code>CustomEvent</code>s the demo dispatches.
+            </p>
+          </div>
+
+          <!-- Counter playground -->
+          <article class="playground playground--counter" aria-labelledby="demo-counter-title">
+            <header class="playground__head">
+              <div>
+                <span class="playground__kicker">Demo · 01</span>
+                <h3 id="demo-counter-title" class="playground__title">Counter — <code>@State()</code> + <code>@Dispatch()</code></h3>
+                <p class="playground__sub">
+                  A single-button card that owns an internal count, re-renders via the
+                  <code>html</code> tagged template, and fires <code>counter.change</code>
+                  whenever its <code>@State()</code> changes.
+                </p>
+              </div>
+              <a class="playground__source" href="https://github.com/geocine/custom-elements-ts/blob/master/demos/counter/counter.element.ts">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                View source
+              </a>
+            </header>
+
+            <div class="playground__body playground__body--split">
+              <div class="stage stage--counter">
+                <cts-counter></cts-counter>
+                <p class="stage__caption">
+                  Click the card. <code>@State() count</code> increments and
+                  re-renders the template; <code>@Watch('count')</code> emits
+                  the event picked up on the right.
+                </p>
+              </div>
+
+              <cts-event-log
+                class="playground__log"
+                label="counter.change"
+                events="counter.change"
+                empty="Click the counter to dispatch counter.change events."
+              ></cts-event-log>
+            </div>
+          </article>
+
+          <!-- Todo dashboard playground -->
+          <article class="playground playground--todo" aria-labelledby="demo-todo-title">
+            <header class="playground__head">
+              <div>
+                <span class="playground__kicker">Demo · 02</span>
+                <h3 id="demo-todo-title" class="playground__title">Sprint board — composition, deep state, custom events</h3>
+                <p class="playground__sub">
+                  Four cooperating elements: a parent dashboard that owns the source
+                  of truth, plus child stats, filters, and item rows that talk back
+                  through bubbling, composed events. Mutate a nested array — the
+                  parent re-renders.
+                </p>
+              </div>
+              <a class="playground__source" href="https://github.com/geocine/custom-elements-ts/blob/master/demos/todo-dashboard/todo-dashboard.element.ts">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                View source
+              </a>
+            </header>
+
+            <div class="playground__body playground__body--stack">
+              <div class="stage stage--todo">
+                <cts-todo-dashboard heading="Sprint board"></cts-todo-dashboard>
+              </div>
+
+              <cts-event-log
+                class="playground__log playground__log--wide"
+                label="todo events"
+                events="todo.change,todo.toggle,todo.labelchange,todo.remove,filter.change,goal.change"
+                empty="Add, complete, edit, or remove a task to see events bubble up here."
+              ></cts-event-log>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- ─── API at-a-glance ─────────────────────────────────── -->
       <section class="api" id="api">
         <div class="container">
           <div class="api__head">
             <div>
               <span class="eyebrow"><span class="dot"></span> The API</span>
-              <h2 class="api__title">Six decorators. That's the whole library.</h2>
+              <h2 class="api__title">Seven decorators. That's the whole library.</h2>
             </div>
             <p class="api__lede">
               Every decorator maps directly onto a built-in browser primitive —
@@ -175,11 +290,15 @@
           <div class="api__grid">
             <div class="api-card">
               <div class="api-card__name">@CustomElement<span class="target">class</span></div>
-              <p class="api-card__desc">Registers the class as a native custom element with a tag, template, and styles.</p>
+              <p class="api-card__desc">Registers the class as a native custom element with a tag, optional template, and styles.</p>
             </div>
             <div class="api-card">
               <div class="api-card__name">@Prop<span class="target">property</span></div>
               <p class="api-card__desc">Reflects a primitive between attribute and property; passes objects and arrays through untouched.</p>
+            </div>
+            <div class="api-card">
+              <div class="api-card__name">@State<span class="target">property</span></div>
+              <p class="api-card__desc">Internal reactive state for <code>render()</code> components. Deeply proxied — mutate nested arrays and objects.</p>
             </div>
             <div class="api-card">
               <div class="api-card__name">@Toggle<span class="target">property</span></div>
@@ -218,7 +337,8 @@
     <!-- Toast notifications (the element subscribes to `cts:toast` document events) -->
     <cts-toast></cts-toast>
 
-    <script src="//unpkg.com/prismjs@1.15.0/prism.js"></script>
+    <script src="//unpkg.com/prismjs@1.29.0/prism.js"></script>
+    <script src="//unpkg.com/prismjs@1.29.0/components/prism-typescript.min.js"></script>
     <script src="//unpkg.com/@webcomponents/custom-elements/src/native-shim.js"></script>
     <script src="//unpkg.com/@webcomponents/custom-elements/custom-elements.min.js"></script>
     <script src="site.umd.js"></script>

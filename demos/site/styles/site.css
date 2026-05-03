@@ -460,6 +460,26 @@ a:hover { color: var(--accent); }
   letter-spacing: -0.01em;
   color: var(--fg);
 }
+.side-card__sub {
+  margin: 10px 0 16px;
+  color: var(--fg-muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.side-card__sub em {
+  font-style: normal;
+  color: var(--fg);
+}
+.side-card__sub code {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.025);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-fg);
+}
 
 /* Checklist */
 .checks {
@@ -509,6 +529,263 @@ a:hover { color: var(--accent); }
 }
 .side-card__foot a .arrow { transition: transform var(--dur) var(--ease); }
 .side-card__foot a:hover .arrow { transform: translateX(3px); }
+
+/* ─────────────────────────────────────────────────────────────
+   Live demos
+   Two playgrounds (counter, todo dashboard) hosted alongside
+   real <cts-event-log> panels so visitors can watch the events
+   the components emit in real time.
+   ───────────────────────────────────────────────────────────── */
+
+.live {
+  padding: clamp(60px, 8vw, 96px) 0 clamp(40px, 6vw, 72px);
+  border-top: 1px solid var(--line);
+  position: relative;
+}
+
+.live__head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+.live__title {
+  margin: 12px 0 0;
+  font-size: clamp(28px, 3.4vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+  text-wrap: balance;
+}
+.live__lede {
+  max-width: 50ch;
+  color: var(--fg-muted);
+  font-size: 15px;
+  text-wrap: pretty;
+  margin: 0;
+}
+.live__lede code {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.025);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent-fg);
+}
+
+.playground {
+  position: relative;
+  margin-top: 22px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-strong);
+  background:
+    radial-gradient(160px 110px at 100% 0%,
+                    rgba(49, 120, 198, 0.10) 0%,
+                    transparent 70%),
+    linear-gradient(180deg, #131720 0%, #0c0f15 100%);
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 30px 60px -30px rgba(0, 0, 0, 0.55);
+}
+
+.playground__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.playground__head > div {
+  min-width: 0;
+}
+.playground__kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-fg);
+}
+.playground__title {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+  text-wrap: balance;
+}
+.playground__title code {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.025);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent-fg);
+}
+.playground__sub {
+  margin: 10px 0 0;
+  max-width: 60ch;
+  color: var(--fg-muted);
+  font-size: 14px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.playground__sub code {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.025);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent-fg);
+}
+.playground__source {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  transition: border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.playground__source:hover {
+  color: var(--fg);
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+}
+
+.playground__body {
+  display: grid;
+  gap: 20px;
+  padding: 26px 24px 28px;
+}
+
+/* Counter playground: stage on the left, log on the right at >=900px. */
+.playground__body--split {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  .playground__body--split {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    align-items: stretch;
+  }
+}
+
+/* Todo playground: dashboard on top, full-width log below.
+   The dashboard sets its own max width; we just center it. */
+.playground__body--stack {
+  grid-template-columns: 1fr;
+}
+
+.stage {
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  padding: 28px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(60% 60% at 50% 0%,
+                    rgba(49, 120, 198, 0.05) 0%,
+                    transparent 60%),
+    rgba(0, 0, 0, 0.18);
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    radial-gradient(60% 60% at 50% 0%,
+                    rgba(49, 120, 198, 0.05) 0%,
+                    transparent 60%),
+    linear-gradient(180deg, #0d1118 0%, #0a0d13 100%);
+  background-size: 28px 28px, 28px 28px, auto, auto;
+  min-height: 240px;
+}
+
+.stage--counter {
+  grid-template-rows: auto auto;
+}
+
+.stage--todo {
+  padding: 32px 18px;
+}
+
+.stage__caption {
+  margin: 0;
+  max-width: 38ch;
+  color: var(--fg-subtle);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: center;
+  text-wrap: balance;
+}
+.stage__caption code {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--accent-fg);
+}
+
+.playground__log {
+  display: flex; /* lets the host stretch in grid contexts */
+}
+.playground__log--wide {
+  /* Sits below the dashboard; let it span the full row. */
+  width: 100%;
+}
+
+/* Custom element loading skeletons for the live demos.
+   Match the same hydration pattern used on the install pill above. */
+cts-counter,
+cts-todo-dashboard,
+cts-event-log {
+  display: block;
+}
+
+cts-counter:not(:defined) {
+  width: 320px;
+  height: 230px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #11141a 0%, #0f131b 100%);
+}
+
+cts-todo-dashboard:not(:defined) {
+  width: min(720px, calc(100vw - 80px));
+  height: 520px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #11141a 0%, #0f131b 100%);
+}
+
+cts-event-log:not(:defined) {
+  min-height: 240px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, #11141a 0%, #0f131b 100%);
+}
+
+cts-counter:defined,
+cts-todo-dashboard:defined,
+cts-event-log:defined {
+  animation: cts-hydrate 280ms var(--ease) both;
+}
 
 /* ─────────────────────────────────────────────────────────────
    Decorators / API at-a-glance

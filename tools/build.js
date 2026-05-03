@@ -9,7 +9,9 @@ const glob = require('glob');
 const { readFileSync, writeFileSync } = require('fs');
 
 const DEST_PATH = 'dist';
-const SRC_PATH = `demos/${ELEMENT_NAME}/**/*.ts`;
+// Inline every demo source so a demo (like `site`) can freely import sibling
+// demos and have their templateUrl/styleUrl references resolved.
+const SRC_PATH = `demos/**/*.ts`;
 const SRC_TMP_PATH = `.tmp`;
 
 const STATIC_ASSET_EXTS = new Set([
