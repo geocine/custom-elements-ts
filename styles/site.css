@@ -167,6 +167,7 @@ a:hover { color: var(--accent); }
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--fg);
+  white-space: nowrap;
 }
 .brand__name .dim { color: var(--fg-subtle); }
 
@@ -238,6 +239,7 @@ a:hover { color: var(--accent); }
   font-size: 12px;
   color: var(--fg-muted);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .hero__pill .badge {
   display: inline-flex;
@@ -410,21 +412,6 @@ a:hover { color: var(--accent); }
 }
 .window__title .accent { color: var(--accent-fg); }
 
-.window__copy {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--fg-muted);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xs);
-  background: var(--bg-elev-2);
-}
-.window__copy svg { width: 12px; height: 12px; }
-
 .window__body {
   background: #0b0e14;
 }
@@ -576,6 +563,13 @@ a:hover { color: var(--accent); }
   color: var(--accent-fg);
 }
 
+/* Keep inline code chips like `npm install` or `@State()` atomic so
+   prose wraps around them instead of breaking them mid-token. */
+:where(.hero__lede, .live__lede, .side-card__sub, .playground__title,
+       .playground__sub, .stage__caption, .api__lede) code {
+  white-space: nowrap;
+}
+
 .playground {
   position: relative;
   margin-top: 22px;
@@ -646,6 +640,68 @@ a:hover { color: var(--accent); }
   font-size: 12px;
   color: var(--accent-fg);
 }
+/* Playground header actions. */
+.playground__actions {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.playground__btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.playground__btn:hover {
+  color: var(--fg);
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+}
+.playground__btn:active {
+  transform: translateY(1px);
+}
+.playground__btn[aria-expanded="true"],
+.playground__btn.is-active {
+  color: var(--accent-fg);
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+}
+
+.playground__btn-caret {
+  margin-left: 2px;
+  opacity: 0.6;
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.playground__btn[aria-expanded="true"] .playground__btn-caret {
+  transform: rotate(180deg);
+  opacity: 0.9;
+}
+
+.playground__btn--ghost {
+  background: transparent;
+}
+.playground__btn--ghost:hover {
+  background: var(--bg-elev-2);
+}
+
+/* Backwards compatibility for the original source link class. */
 .playground__source {
   flex: 0 0 auto;
   display: inline-flex;
@@ -686,8 +742,18 @@ a:hover { color: var(--accent); }
   }
 }
 
-/* Todo playground: dashboard on top, full-width log below.
-   The dashboard sets its own max width; we just center it. */
+/* Todo needs a wider breakpoint than the counter card. */
+.playground--todo .playground__body--split {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .playground--todo .playground__body--split {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    align-items: stretch;
+  }
+}
+
+/* Legacy stack variant for external embeds. */
 .playground__body--stack {
   grid-template-columns: 1fr;
 }
@@ -722,6 +788,11 @@ a:hover { color: var(--accent); }
 .stage--todo {
   padding: 32px 18px;
 }
+/* Prevent host min-content overflow on narrow phones. */
+.stage--todo cts-todo-dashboard {
+  width: min(540px, 100%);
+  min-width: 0;
+}
 
 .stage__caption {
   margin: 0;
@@ -750,8 +821,15 @@ a:hover { color: var(--accent); }
   width: 100%;
 }
 
-/* Custom element loading skeletons for the live demos.
-   Match the same hydration pattern used on the install pill above. */
+/* Do not set display here; the host grid drives the open/close animation. */
+cts-source-viewer:not(:defined) {
+  /* Keep the collapsed state during hydration. */
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Loading skeletons for live demos. */
 cts-counter,
 cts-todo-dashboard,
 cts-event-log {
@@ -767,7 +845,8 @@ cts-counter:not(:defined) {
 }
 
 cts-todo-dashboard:not(:defined) {
-  width: min(720px, calc(100vw - 80px));
+  /* Match the compact hydrated width. */
+  width: min(540px, calc(100vw - 80px));
   height: 520px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
@@ -937,9 +1016,7 @@ cts-message:not(:defined)::after {
   pointer-events: none;
 }
 
-/* Code window: fake "lines of code" via stacked gradients.
-   --skel is the line color; positions are content-box relative
-   so we don't have to add the padding offset to every value. */
+/* Code skeleton lines via stacked gradients. */
 cts-code-example:not(:defined) {
   --skel: rgba(255, 255, 255, 0.06);
   min-height: 380px;
@@ -997,9 +1074,7 @@ cts-message:not(:defined) {
   100% { background-position: -110% 0; }
 }
 
-/* Soft fade-in once the real component swaps in, so the skeleton
-   doesn't pop. `:defined` matches the moment customElements.define
-   completes, which is exactly when the new content renders. */
+/* Fade in once custom elements are defined. */
 cts-code-example:defined,
 cts-message:defined {
   animation: cts-hydrate 280ms var(--ease) both;
@@ -1008,6 +1083,43 @@ cts-message:defined {
 @keyframes cts-hydrate {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* Mobile / narrow-viewport adjustments */
+@media (max-width: 720px) {
+  .playground__head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 20px 18px 16px;
+  }
+  .playground__actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .playground__title {
+    font-size: 19px;
+  }
+  .playground__sub {
+    font-size: 13.5px;
+  }
+
+  .playground__body {
+    padding: 18px 16px 22px;
+    gap: 18px;
+  }
+
+  .stage {
+    padding: 22px 14px;
+    min-height: 200px;
+  }
+  .stage--todo {
+    padding: 22px 10px;
+  }
+
+  cts-code-example {
+    font-size: 12px;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────

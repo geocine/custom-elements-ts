@@ -1529,7 +1529,7 @@ code[class*="language-"] {
             this.entries = [entry, ...this.entries].slice(0, MAX_ENTRIES);
         }
         formatDetail(detail) {
-            if (detail == null)
+            if (detail === null || detail === undefined)
                 return '—';
             if (typeof detail === 'string')
                 return detail;
@@ -1756,6 +1756,543 @@ code[class*="language-"] {
 `,
         })
     ], exports.EventLogElement);
+
+    const SOURCES = {
+        "counter": [
+            {
+                "name": "counter.element.ts",
+                "source": "import {\n  CustomElement,\n  Dispatch,\n  DispatchEmitter,\n  State,\n  TemplateResult,\n  Watch,\n  html,\n} from 'custom-elements-ts';\n\n@CustomElement({\n  tag: 'cts-counter',\n  styleUrl: './counter.element.scss',\n})\nexport class CounterElement extends HTMLElement {\n  @State() count = 0;\n\n  @Dispatch('counter.change') counterChange!: DispatchEmitter;\n\n  @Watch('count')\n  handleCountChange(change: { new: number }) {\n    this.counterChange.emit({\n      bubbles: true,\n      composed: true,\n      detail: {\n        count: change.new,\n      },\n    });\n  }\n\n  render(): TemplateResult {\n    const display = this.format(this.count);\n    return html`\n      <button class=\"card\" type=\"button\" @click=${this.increment}>\n        <span class=\"kicker\">\n          <span class=\"kicker-dot\"></span>\n          counter · @State()\n        </span>\n\n        <span class=\"display\" aria-live=\"polite\">\n          <span class=\"display-mute\">${display.mute}</span\n          ><span class=\"display-num\">${display.num}</span>\n        </span>\n\n        <span class=\"hint\">\n          <span class=\"hint-text\">tap anywhere to count</span>\n          <span class=\"hint-chip\">+1</span>\n        </span>\n      </button>\n    `;\n  }\n\n  private increment() {\n    this.count++;\n  }\n\n  // Pad to at least 4 digits and split into a muted lead and a bright tail\n  // so the number reads like a stopwatch — e.g. 0042, 0420, 4200, 42000.\n  private format(value: number): { mute: string; num: string } {\n    const raw = String(value);\n    const padded = raw.length >= 4 ? raw : `${'0000'.slice(raw.length)}${raw}`;\n    const tail = padded.length - raw.length;\n    return {\n      mute: padded.slice(0, tail),\n      num: padded.slice(tail),\n    };\n  }\n}\n"
+            }
+        ],
+        "todo-dashboard": [
+            {
+                "name": "todo-dashboard.element.ts",
+                "source": "import {\n  CustomElement,\n  Dispatch,\n  DispatchEmitter,\n  Prop,\n  State,\n  TemplateResult,\n  Toggle,\n  Watch,\n  html,\n} from 'custom-elements-ts';\n\ntype Filter = 'all' | 'active' | 'done';\n\ninterface TodoItem {\n  id: number;\n  label: string;\n  done: boolean;\n}\n\ninterface EmptyMessage {\n  title: string;\n  sub: string;\n}\n\nconst EMPTY_MESSAGES: Record<Filter, EmptyMessage> = {\n  all: {\n    title: 'Nothing on the board.',\n    sub: 'Capture a task above to start tracking work.',\n  },\n  active: {\n    title: 'All caught up.',\n    sub: 'No active tasks remain — bask in the silence.',\n  },\n  done: {\n    title: 'Nothing finished yet.',\n    sub: 'Tick a task off the list to see it surface here.',\n  },\n};\n\n@CustomElement({\n  tag: 'cts-todo-dashboard',\n  styleUrl: './todo-dashboard.element.scss',\n})\nexport class TodoDashboardElement extends HTMLElement {\n  @Prop() heading = 'Sprint board';\n  @Toggle() compact = false;\n\n  @State() draft = '';\n  @State() filter: Filter = 'all';\n  @State() goal = 5;\n  @State() revision = 0;\n  @State() items: TodoItem[] = [\n    { id: 1, label: 'Wire @CustomElement decorator', done: true },\n    { id: 2, label: 'Diff deeply nested @State() arrays', done: false },\n    { id: 3, label: 'Audit @Listen on shadow root selectors', done: false },\n  ];\n\n  @Dispatch('todo.change') todoChange!: DispatchEmitter;\n\n  private nextId = 4;\n\n  @Watch('items')\n  handleItemsChange() {\n    this.revision++;\n    this.todoChange.emit({\n      bubbles: true,\n      composed: true,\n      detail: {\n        total: this.items.length,\n        done: this.doneCount,\n        active: this.activeCount,\n      },\n    });\n  }\n\n  render(): TemplateResult {\n    const visible = this.visibleItems;\n    const total = this.items.length;\n    const done = this.doneCount;\n    const active = total - done;\n    const progress = total === 0 ? 0 : Math.round((done / total) * 100);\n\n    return html`\n      <section class=${this.compact ? 'shell compact' : 'shell'}>\n        <header class=\"header\">\n          <div class=\"title-block\">\n            <span class=\"eyebrow\">\n              <span class=\"eyebrow-dot\"></span>\n              Taskboard\n            </span>\n            <h1>${this.heading}</h1>\n            <p class=\"meta\">\n              <span><strong>${active}</strong> active</span>\n              <span class=\"dot-sep\">·</span>\n              <span><strong>${done}</strong> done</span>\n              <span class=\"dot-sep\">·</span>\n              <span><strong>${total}</strong> total</span>\n            </p>\n          </div>\n          <span class=\"revision\" title=\"State revision count\">\n            <span class=\"revision-pulse\"></span>\n            <span class=\"revision-label\">live</span>\n            <span class=\"revision-num\">r${this.padRev(this.revision)}</span>\n          </span>\n        </header>\n\n        <div class=\"progress\" aria-hidden=\"true\">\n          <span class=\"progress-fill\" style=${`--progress:${progress / 100}`}></span>\n        </div>\n\n        <cts-todo-stats\n          total=${total}\n          done=${done}\n          goal=${this.goal}\n          @goal.change=${this.handleGoalChange}\n        ></cts-todo-stats>\n\n        <div class=\"composer\">\n          <div class=\"composer-field\">\n            <span class=\"composer-icon\" aria-hidden=\"true\">${this.iconPlus()}</span>\n            <input\n              name=\"new-task\"\n              aria-label=\"New task\"\n              placeholder=\"Capture a task and press enter\"\n              .value=${this.draft}\n              @input=${this.updateDraft}\n              @keydown=${this.handleDraftKeydown}\n            />\n            <kbd aria-hidden=\"true\">Enter</kbd>\n          </div>\n          <button class=\"primary\" disabled=${!this.canAdd} @click=${this.addItem}>Add task</button>\n        </div>\n\n        <cts-todo-filters\n          filter=${this.filter}\n          total=${total}\n          active=${active}\n          done=${done}\n          @filter.change=${this.handleFilterChange}\n        ></cts-todo-filters>\n\n        ${visible.length\n          ? html`<div\n              class=\"list\"\n              role=\"list\"\n              @todo.toggle=${this.handleTodoToggle}\n              @todo.labelchange=${this.handleTodoLabelChange}\n              @todo.remove=${this.handleTodoRemove}\n            >\n              ${visible.map(\n                (item, index) => html`\n                  <cts-todo-item\n                    todoid=${item.id}\n                    label=${item.label}\n                    done=${item.done}\n                    rowindex=${index}\n                  ></cts-todo-item>\n                `\n              )}\n            </div>`\n          : this.renderEmpty()}\n\n        <footer class=\"footer\">\n          <span class=\"footer-stats\">\n            <strong>${done}</strong>\n            <span class=\"footer-divider\">/</span>\n            <span>${total}</span>\n            <span class=\"footer-label\">completed</span>\n          </span>\n          <div class=\"footer-actions\">\n            <button disabled=${total === 0} @click=${this.completeAll}>Complete all</button>\n            <button disabled=${done === 0} @click=${this.clearDone}>Clear done</button>\n          </div>\n        </footer>\n      </section>\n    `;\n  }\n\n  private renderEmpty(): TemplateResult {\n    const message = EMPTY_MESSAGES[this.filter];\n    return html`\n      <div class=\"empty\">\n        <span class=\"empty-icon\" aria-hidden=\"true\">${this.iconClipboard()}</span>\n        <p class=\"empty-title\">${message.title}</p>\n        <p class=\"empty-sub\">${message.sub}</p>\n      </div>\n    `;\n  }\n\n  // Inline SVG icons — kept tiny and reused via the template cache.\n\n  private iconPlus(): TemplateResult {\n    return html`<svg\n      viewBox=\"0 0 24 24\"\n      fill=\"none\"\n      stroke=\"currentColor\"\n      stroke-width=\"2\"\n      stroke-linecap=\"round\"\n      stroke-linejoin=\"round\"\n      width=\"14\"\n      height=\"14\"\n    >\n      <path d=\"M12 5v14M5 12h14\" />\n    </svg>`;\n  }\n\n  private iconClipboard(): TemplateResult {\n    return html`<svg\n      viewBox=\"0 0 24 24\"\n      fill=\"none\"\n      stroke=\"currentColor\"\n      stroke-width=\"1.5\"\n      stroke-linecap=\"round\"\n      stroke-linejoin=\"round\"\n      width=\"26\"\n      height=\"26\"\n    >\n      <path d=\"M9 4h6a1 1 0 0 1 1 1v2H8V5a1 1 0 0 1 1-1z\" />\n      <path d=\"M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2\" />\n      <path d=\"M9 13h6M9 17h4\" />\n    </svg>`;\n  }\n\n  // Event handlers\n\n  private updateDraft(event: Event) {\n    this.draft = (event.target as HTMLInputElement).value;\n  }\n\n  private handleDraftKeydown(event: KeyboardEvent) {\n    if (event.key === 'Enter') {\n      this.addItem();\n    }\n  }\n\n  private addItem() {\n    const label = this.draft.trim();\n    if (!label) return;\n    this.items.push({ id: this.nextId++, label, done: false });\n    this.draft = '';\n  }\n\n  private setFilter(filter: Filter) {\n    this.filter = filter;\n  }\n\n  private handleFilterChange(event: Event) {\n    this.setFilter((event as CustomEvent<{ filter: Filter }>).detail.filter);\n  }\n\n  private handleGoalChange(event: Event) {\n    this.goal = Math.max(1, (event as CustomEvent<{ goal: number }>).detail.goal);\n  }\n\n  private handleTodoToggle(event: Event) {\n    this.toggleItem((event as CustomEvent<{ id: number }>).detail.id);\n  }\n\n  private handleTodoLabelChange(event: Event) {\n    const { id, label } = (event as CustomEvent<{ id: number; label: string }>).detail;\n    this.updateItemLabel(id, label);\n  }\n\n  private handleTodoRemove(event: Event) {\n    this.removeItem((event as CustomEvent<{ id: number }>).detail.id);\n  }\n\n  private toggleItem(id: number) {\n    const item = this.items.find((entry) => entry.id === id);\n    if (item) {\n      item.done = !item.done;\n    }\n  }\n\n  private updateItemLabel(id: number, value: string) {\n    const item = this.items.find((entry) => entry.id === id);\n    if (!item) return;\n    const label = value.trim();\n    if (label) {\n      item.label = label;\n    } else {\n      this.removeItem(id);\n    }\n  }\n\n  private removeItem(id: number) {\n    const index = this.items.findIndex((entry) => entry.id === id);\n    if (index >= 0) {\n      this.items.splice(index, 1);\n    }\n  }\n\n  private completeAll() {\n    this.items.forEach((item) => {\n      item.done = true;\n    });\n  }\n\n  private clearDone() {\n    for (let index = this.items.length - 1; index >= 0; index--) {\n      if (this.items[index].done) {\n        this.items.splice(index, 1);\n      }\n    }\n  }\n\n  private padRev(value: number): string {\n    return value < 10 ? `0${value}` : String(value);\n  }\n\n  private get canAdd(): boolean {\n    return this.draft.trim().length > 0;\n  }\n\n  private get visibleItems(): TodoItem[] {\n    if (this.filter === 'active') {\n      return this.items.filter((item) => !item.done);\n    }\n    if (this.filter === 'done') {\n      return this.items.filter((item) => item.done);\n    }\n    return this.items;\n  }\n\n  private get activeCount(): number {\n    return this.items.filter((item) => !item.done).length;\n  }\n\n  private get doneCount(): number {\n    return this.items.filter((item) => item.done).length;\n  }\n}\n"
+            },
+            {
+                "name": "todo-stats.element.ts",
+                "source": "import {\n  CustomElement,\n  Dispatch,\n  DispatchEmitter,\n  Prop,\n  TemplateResult,\n  html,\n} from 'custom-elements-ts';\n\ninterface PipTrack {\n  filled: number;\n  total: number;\n  overflow: number;\n}\n\nconst MAX_PIPS = 10;\n\n@CustomElement({\n  tag: 'cts-todo-stats',\n  shadow: false,\n})\nexport class TodoStatsElement extends HTMLElement {\n  @Prop() total = 0;\n  @Prop() done = 0;\n  @Prop() goal = 5;\n\n  @Dispatch('goal.change') goalChange!: DispatchEmitter;\n\n  render(): TemplateResult {\n    const total = this.asNumber(this.total);\n    const done = this.asNumber(this.done);\n    const goal = Math.max(1, this.asNumber(this.goal));\n    const percent = total === 0 ? 0 : Math.round((done / total) * 100);\n    const remaining = Math.max(0, goal - done);\n    const overGoal = Math.max(0, done - goal);\n    const reached = done >= goal;\n    const pip = this.buildPipTrack(done, goal);\n\n    return html`\n      <aside class=\"stats-panel\">\n        ${this.renderProgressCard(total, done, percent)}\n        ${this.renderGoalCard(done, goal, remaining, overGoal, reached, pip)}\n      </aside>\n    `;\n  }\n\n  private renderProgressCard(total: number, done: number, percent: number): TemplateResult {\n    const empty = total === 0;\n    const complete = !empty && percent >= 100;\n    const className = complete\n      ? 'stat-card stat-card--progress is-complete'\n      : 'stat-card stat-card--progress';\n\n    return html`\n      <article class=${className}>\n        <header class=\"stat-head\">\n          <span class=\"stat-label\">Progress</span>\n          <span class=\"stat-tag\" data-state=${complete ? 'complete' : empty ? 'empty' : 'live'}>\n            ${complete ? 'Sprint complete' : empty ? 'No tasks yet' : 'In flight'}\n          </span>\n        </header>\n\n        <div class=\"progress-display\" aria-live=\"polite\">\n          ${empty\n            ? html`<span class=\"progress-num is-empty\">—</span>`\n            : html`<span class=\"progress-num\">${percent}</span\n                ><span class=\"progress-suffix\">%</span>`}\n        </div>\n\n        <div class=\"progress-track\" aria-hidden=\"true\">\n          <span class=\"progress-track-fill\" style=${`--p:${empty ? 0 : percent / 100}`}></span>\n        </div>\n\n        <p class=\"stat-caption\">\n          ${empty\n            ? html`Add a task above to start tracking progress.`\n            : html`<strong>${done}</strong> of <strong>${total}</strong> ${total === 1\n                  ? 'task'\n                  : 'tasks'}\n                complete`}\n        </p>\n      </article>\n    `;\n  }\n\n  private renderGoalCard(\n    done: number,\n    goal: number,\n    remaining: number,\n    overGoal: number,\n    reached: boolean,\n    pip: PipTrack\n  ): TemplateResult {\n    const className = reached ? 'stat-card stat-card--goal is-met' : 'stat-card stat-card--goal';\n\n    return html`\n      <article class=${className}>\n        <header class=\"stat-head\">\n          <span class=\"stat-label\">Sprint goal</span>\n          <div class=\"stepper\" aria-label=\"Adjust completion goal\">\n            <button\n              class=\"stepper-btn\"\n              type=\"button\"\n              aria-label=\"Decrease goal\"\n              disabled=${goal <= 1}\n              @click=${this.decreaseGoal}\n            >\n              −\n            </button>\n            <span class=\"stepper-value\" aria-hidden=\"true\">${goal}</span>\n            <button\n              class=\"stepper-btn\"\n              type=\"button\"\n              aria-label=\"Increase goal\"\n              @click=${this.increaseGoal}\n            >\n              +\n            </button>\n          </div>\n        </header>\n\n        <div\n          class=\"goal-pips\"\n          role=\"img\"\n          aria-label=${`${Math.min(done, pip.total)} of ${pip.total} goal pips filled`}\n        >\n          ${this.renderPips(pip.filled, pip.total)}\n          ${pip.overflow > 0\n            ? html`<span class=\"pip-more\" aria-hidden=\"true\">+${pip.overflow}</span>`\n            : null}\n        </div>\n\n        <p class=\"stat-caption\">\n          ${reached\n            ? html`<span class=\"goal-met\">Goal met</span>${overGoal > 0\n                  ? html`<span class=\"goal-over\">+${overGoal} bonus</span>`\n                  : null}`\n            : html`<strong>${done}</strong>/<strong>${goal}</strong>\n                <span class=\"goal-sep\">·</span>\n                <strong>${remaining}</strong> to go`}\n        </p>\n      </article>\n    `;\n  }\n\n  private renderPips(filled: number, total: number): TemplateResult[] {\n    const pips: TemplateResult[] = [];\n    for (let i = 0; i < total; i++) {\n      pips.push(html`<span class=${i < filled ? 'pip is-filled' : 'pip'}></span>`);\n    }\n    return pips;\n  }\n\n  private buildPipTrack(done: number, goal: number): PipTrack {\n    if (goal <= MAX_PIPS) {\n      return {\n        filled: Math.min(done, goal),\n        total: goal,\n        overflow: 0,\n      };\n    }\n    const filled = Math.min(MAX_PIPS, Math.round((done / goal) * MAX_PIPS));\n    return {\n      filled,\n      total: MAX_PIPS,\n      overflow: goal - MAX_PIPS,\n    };\n  }\n\n  private decreaseGoal() {\n    this.emitGoal(Math.max(1, this.asNumber(this.goal) - 1));\n  }\n\n  private increaseGoal() {\n    this.emitGoal(this.asNumber(this.goal) + 1);\n  }\n\n  private emitGoal(goal: number) {\n    this.goalChange.emit({\n      bubbles: true,\n      composed: true,\n      detail: { goal },\n    });\n  }\n\n  private asNumber(value: unknown): number {\n    return typeof value === 'number' ? value : Number(value) || 0;\n  }\n}\n"
+            },
+            {
+                "name": "todo-filters.element.ts",
+                "source": "import {\n  CustomElement,\n  Dispatch,\n  DispatchEmitter,\n  Prop,\n  TemplateResult,\n  html,\n} from 'custom-elements-ts';\n\ntype Filter = 'all' | 'active' | 'done';\n\n@CustomElement({\n  tag: 'cts-todo-filters',\n  shadow: false,\n})\nexport class TodoFiltersElement extends HTMLElement {\n  @Prop() filter: Filter = 'all';\n  @Prop() total = 0;\n  @Prop() active = 0;\n  @Prop() done = 0;\n\n  @Dispatch('filter.change') filterChange!: DispatchEmitter;\n\n  render(): TemplateResult {\n    return html`\n      <nav class=\"filters\" aria-label=\"Task filters\">\n        ${this.renderButton('all', 'All', this.total)}\n        ${this.renderButton('active', 'Active', this.active)}\n        ${this.renderButton('done', 'Done', this.done)}\n      </nav>\n    `;\n  }\n\n  private renderButton(filter: Filter, label: string, count: number): TemplateResult {\n    return html`\n      <button\n        class=\"filter\"\n        aria-pressed=${this.filter === filter}\n        @click=${() => this.setFilter(filter)}\n      >\n        <span>${label}</span>\n        <span class=\"filter-count\">${count}</span>\n      </button>\n    `;\n  }\n\n  private setFilter(filter: Filter) {\n    this.filterChange.emit({\n      bubbles: true,\n      composed: true,\n      detail: { filter },\n    });\n  }\n}\n"
+            },
+            {
+                "name": "todo-item.element.ts",
+                "source": "import {\n  CustomElement,\n  Dispatch,\n  DispatchEmitter,\n  Prop,\n  TemplateResult,\n  html,\n} from 'custom-elements-ts';\n\n@CustomElement({\n  tag: 'cts-todo-item',\n  shadow: false,\n})\nexport class TodoItemElement extends HTMLElement {\n  @Prop() todoid = 0;\n  @Prop() label = '';\n  @Prop() done: unknown = false;\n  @Prop() rowindex = 0;\n\n  @Dispatch('todo.toggle') todoToggle!: DispatchEmitter;\n  @Dispatch('todo.labelchange') todoLabelChange!: DispatchEmitter;\n  @Dispatch('todo.remove') todoRemove!: DispatchEmitter;\n\n  render(): TemplateResult {\n    const done = this.isDone;\n    return html`\n      <div class=\"row\" role=\"listitem\" data-done=${done} style=${`--index:${this.rowindex}`}>\n        <button\n          class=\"check\"\n          aria-label=${done ? 'Mark as active' : 'Mark as done'}\n          aria-pressed=${done}\n          @click=${this.toggle}\n        >\n          <span class=\"check-tick\">${this.iconCheck()}</span>\n        </button>\n        ${done\n          ? html`<span class=\"task-label is-done\">${this.label}</span>`\n          : html`<input\n              class=\"task-label\"\n              name=${`task-label-${this.todoId}`}\n              aria-label=\"Task label\"\n              .value=${this.label}\n              @change=${this.changeLabel}\n              @keydown=${this.commitEdit}\n            />`}\n        <button class=\"remove\" aria-label=\"Remove task\" @click=${this.removeTodo}>\n          ${this.iconClose()}\n        </button>\n      </div>\n    `;\n  }\n\n  private toggle() {\n    this.todoToggle.emit({\n      bubbles: true,\n      composed: true,\n      detail: { id: this.todoId },\n    });\n  }\n\n  private changeLabel(event: Event) {\n    this.todoLabelChange.emit({\n      bubbles: true,\n      composed: true,\n      detail: {\n        id: this.todoId,\n        label: (event.target as HTMLInputElement).value,\n      },\n    });\n  }\n\n  private commitEdit(event: KeyboardEvent) {\n    if (event.key === 'Enter') {\n      (event.target as HTMLInputElement).blur();\n    }\n  }\n\n  private removeTodo() {\n    this.todoRemove.emit({\n      bubbles: true,\n      composed: true,\n      detail: { id: this.todoId },\n    });\n  }\n\n  private iconCheck(): TemplateResult {\n    return html`<svg\n      viewBox=\"0 0 24 24\"\n      fill=\"none\"\n      stroke=\"currentColor\"\n      stroke-width=\"3\"\n      stroke-linecap=\"round\"\n      stroke-linejoin=\"round\"\n      width=\"11\"\n      height=\"11\"\n    >\n      <path d=\"M5 12.5l4.2 4.2L19 7\" />\n    </svg>`;\n  }\n\n  private iconClose(): TemplateResult {\n    return html`<svg\n      viewBox=\"0 0 24 24\"\n      fill=\"none\"\n      stroke=\"currentColor\"\n      stroke-width=\"2\"\n      stroke-linecap=\"round\"\n      stroke-linejoin=\"round\"\n      width=\"13\"\n      height=\"13\"\n    >\n      <path d=\"M6 6l12 12M18 6L6 18\" />\n    </svg>`;\n  }\n\n  private get todoId(): number {\n    return this.asNumber(this.todoid);\n  }\n\n  private get isDone(): boolean {\n    return this.done === true || this.done === 'true';\n  }\n\n  private asNumber(value: unknown): number {\n    return typeof value === 'number' ? value : Number(value) || 0;\n  }\n}\n"
+            }
+        ]
+    };
+
+    exports.SourceViewerElement = class SourceViewerElement extends HTMLElement {
+        constructor() {
+            super(...arguments);
+            this.slug = '';
+            this.activeIndex = 0;
+            this.files = [];
+            this.highlighted = [];
+            this.cachedFor = '\0';
+            this.bodyNode = null;
+            this.codeNode = null;
+            this.renderedHtml = '';
+        }
+        render() {
+            var _a, _b, _c;
+            if (this.cachedFor !== this.slug) {
+                this.recompute();
+                this.cachedFor = this.slug;
+            }
+            if (!this.files.length) {
+                return html `
+        <div class="viewer">
+          <p class="empty">Source unavailable for <code>${this.slug}</code>.</p>
+        </div>
+      `;
+            }
+            const showTabs = this.files.length > 1;
+            const active = (_a = this.highlighted[this.activeIndex]) !== null && _a !== void 0 ? _a : '';
+            if (!this.bodyNode || !this.codeNode) {
+                this.codeNode = document.createElement('code');
+                this.bodyNode = document.createElement('pre');
+                this.bodyNode.className = 'body';
+                this.bodyNode.tabIndex = 0;
+                this.bodyNode.appendChild(this.codeNode);
+            }
+            if (this.renderedHtml !== active) {
+                this.codeNode.innerHTML = active;
+                this.renderedHtml = active;
+            }
+            return html `
+      <div class="viewer">
+        <div class="bar">
+          <span class="kicker">
+            <span class="kicker-dot" aria-hidden="true"></span>
+            inline source
+          </span>
+
+          ${showTabs
+            ? html `
+                <div class="tabs" role="tablist" aria-label="Source files">
+                  ${this.files.map((file, index) => {
+                const isActive = index === this.activeIndex;
+                return html `
+                      <button
+                        class=${isActive ? 'tab is-active' : 'tab'}
+                        role="tab"
+                        type="button"
+                        aria-selected=${isActive ? 'true' : 'false'}
+                        @click=${() => this.selectTab(index)}
+                      >
+                        ${file.name}
+                      </button>
+                    `;
+            })}
+                </div>
+              `
+            : html `<span class="single">${(_c = (_b = this.files[0]) === null || _b === void 0 ? void 0 : _b.name) !== null && _c !== void 0 ? _c : ''}</span>`}
+        </div>
+
+        ${this.bodyNode}
+      </div>
+    `;
+        }
+        selectTab(index) {
+            if (index === this.activeIndex)
+                return;
+            this.activeIndex = index;
+            requestAnimationFrame(() => {
+                var _a;
+                const tab = (_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelectorAll('.tab')[index];
+                tab === null || tab === void 0 ? void 0 : tab.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+            });
+        }
+        recompute() {
+            var _a, _b;
+            const files = (_a = SOURCES[this.slug]) !== null && _a !== void 0 ? _a : [];
+            this.files = files;
+            const grammar = typeof Prism !== 'undefined'
+                ? ((_b = Prism.languages.typescript) !== null && _b !== void 0 ? _b : Prism.languages.javascript)
+                : null;
+            this.highlighted = files.map((file) => grammar ? Prism.highlight(file.source, grammar) : escapeHtml(file.source));
+            if (this.activeIndex >= files.length) {
+                this.activeIndex = 0;
+            }
+        }
+    };
+    __decorate([
+        Prop(),
+        __metadata("design:type", Object)
+    ], exports.SourceViewerElement.prototype, "slug", void 0);
+    __decorate([
+        State(),
+        __metadata("design:type", Object)
+    ], exports.SourceViewerElement.prototype, "activeIndex", void 0);
+    exports.SourceViewerElement = __decorate([
+        CustomElement({
+            tag: 'cts-source-viewer',
+            style: `/* ─────────────────────────────────────────────────────────────
+   cts-source-viewer
+   Collapsible inline source panel for playground examples.
+   ───────────────────────────────────────────────────────────── */
+
+:host {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+}
+
+:host([open]) {
+  grid-template-rows: 1fr;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.viewer {
+  overflow: hidden;
+  min-height: 0;
+  visibility: hidden;
+  pointer-events: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(420px 200px at 0% 0%,
+                    rgba(49, 120, 198, 0.06) 0%,
+                    transparent 70%),
+    linear-gradient(180deg, #0d1118 0%, #0a0d13 100%);
+  transition: visibility 0s linear 360ms;
+}
+
+:host([open]) .viewer {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+/* ── Top bar: kicker + file tabs ─────────────────────────── */
+
+.bar {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg,
+              rgba(255, 255, 255, 0.02) 0%,
+              rgba(255, 255, 255, 0)    100%);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 4px;
+  margin-right: 4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  align-self: center;
+  height: 30px;
+}
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: #4189d6;
+  box-shadow: 0 0 8px rgba(65, 137, 214, 0.6);
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.82);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #4189d6;
+    outline-offset: -2px;
+    border-radius: 2px;
+  }
+
+  &.is-active {
+    color: #9cc0eb;
+    border-bottom-color: #4189d6;
+    background: rgba(65, 137, 214, 0.04);
+  }
+}
+
+.single {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9cc0eb;
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  padding: 16px 22px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.empty code {
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.025);
+  color: #9cc0eb;
+}
+
+/* ── Code body ───────────────────────────────────────────── */
+
+.body {
+  margin: 0;
+  padding: 22px 26px 26px;
+  background: transparent;
+  color: #d6dce5;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow: auto;
+  max-height: 460px;
+  white-space: pre;
+  -webkit-font-smoothing: antialiased;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.10) transparent;
+
+  &::-webkit-scrollbar { width: 8px; height: 8px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-track { background: transparent; }
+
+  &:focus { outline: none; }
+  &:focus-visible {
+    outline: 2px solid #4189d6;
+    outline-offset: -2px;
+  }
+}
+
+.body code {
+  background: transparent;
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+@media (min-width: 980px) {
+  .body {
+    font-size: 13.5px;
+    padding: 26px 32px 30px;
+    max-height: 540px;
+  }
+}
+
+/* Narrow viewports: preserve tab space and hint at overflow. */
+@media (max-width: 640px) {
+  .bar {
+    padding: 0 10px;
+    mask-image: linear-gradient(to right,
+                                black calc(100% - 22px),
+                                transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+                                        black calc(100% - 22px),
+                                        transparent 100%);
+  }
+  .kicker {
+    padding: 0 10px 0 4px;
+    margin-right: 2px;
+    font-size: 0; /* collapse text, keep the dot */
+  }
+  .tab,
+  .single {
+    padding: 10px 10px;
+    font-size: 11.5px;
+  }
+  .body {
+    padding: 18px 18px 22px;
+    font-size: 12.5px;
+    max-height: 380px;
+  }
+}
+
+/* ── Prism token theme — kept in sync with cts-code-example ── */
+
+.token {
+  &.comment,
+  &.prolog,
+  &.doctype,
+  &.cdata {
+    color: #6e7681;
+    font-style: italic;
+  }
+
+  &.punctuation { color: #c9d1d9; }
+
+  &.property,
+  &.tag,
+  &.attr-name { color: #9cdcfe; }
+
+  &.keyword,
+  &.boolean { color: #4189d6; }
+
+  &.class-name { color: #4ec9b0; }
+
+  &.constant,
+  &.symbol { color: #4189d6; }
+
+  &.number { color: #b5cea8; }
+
+  &.string,
+  &.char,
+  &.attr-value,
+  &.builtin,
+  &.inserted { color: #ce9178; }
+
+  &.selector { color: #d7ba7d; }
+
+  &.variable { color: #d6dce5; }
+
+  &.operator,
+  &.entity { color: #d6dce5; }
+
+  &.url {
+    color: #4189d6;
+    text-decoration: underline;
+  }
+
+  &.atrule { color: #c586c0; }
+
+  &.function { color: #dcdcaa; }
+
+  &.regex { color: #d16969; }
+
+  &.important {
+    color: #f47067;
+    font-weight: 600;
+  }
+
+  &.bold { font-weight: 600; }
+  &.italic { font-style: italic; }
+  &.deleted { color: #f47067; }
+}
+
+.namespace { opacity: .65; }
+
+.language-css .token.string,
+.style .token.string {
+  color: #ce9178;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host { transition: none; }
+}
+`,
+        })
+    ], exports.SourceViewerElement);
+    const ENTITY_MAP = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+    };
+    function escapeHtml(value) {
+        return value.replace(/[&<>]/g, (char) => { var _a; return (_a = ENTITY_MAP[char]) !== null && _a !== void 0 ? _a : char; });
+    }
+
+    const TOGGLE_ATTR = 'data-source-toggle';
+    const TARGET_ATTR = 'data-source-target';
+    const OPEN_ATTR = 'open';
+    const ACTIVE_CLASS = 'is-active';
+    const SCROLL_OFFSET = 88;
+    function prefersReducedMotion() {
+        return (typeof window !== 'undefined' &&
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+    function scrollPanelIntoView(panel) {
+        requestAnimationFrame(() => {
+            const top = panel.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
+            if (top <= window.scrollY)
+                return;
+            window.scrollTo({
+                top,
+                behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+            });
+        });
+    }
+    function findToggle(target) {
+        if (!(target instanceof Element))
+            return null;
+        return target.closest(`[${TOGGLE_ATTR}]`);
+    }
+    function syncTrigger(trigger, isOpen) {
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        trigger.classList.toggle(ACTIVE_CLASS, isOpen);
+    }
+    function handleClick(event) {
+        const trigger = findToggle(event.target);
+        if (!trigger)
+            return;
+        const targetId = trigger.getAttribute(TARGET_ATTR);
+        if (!targetId)
+            return;
+        const panel = document.getElementById(targetId);
+        if (!panel)
+            return;
+        event.preventDefault();
+        const willOpen = !panel.hasAttribute(OPEN_ATTR);
+        if (willOpen) {
+            panel.setAttribute(OPEN_ATTR, '');
+        }
+        else {
+            panel.removeAttribute(OPEN_ATTR);
+        }
+        syncTrigger(trigger, willOpen);
+        if (willOpen) {
+            scrollPanelIntoView(panel);
+        }
+    }
+    function init() {
+        document.querySelectorAll(`[${TOGGLE_ATTR}]`).forEach((trigger) => {
+            const targetId = trigger.getAttribute(TARGET_ATTR);
+            if (!targetId)
+                return;
+            const panel = document.getElementById(targetId);
+            if (!panel)
+                return;
+            syncTrigger(trigger, panel.hasAttribute(OPEN_ATTR));
+        });
+        document.addEventListener('click', handleClick);
+    }
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init, { once: true });
+        }
+        else {
+            init();
+        }
+    }
+
+    function scrollToHashTarget() {
+        const id = decodeURIComponent(window.location.hash.slice(1));
+        const target = id ? document.getElementById(id) : null;
+        if (!target)
+            return false;
+        target.scrollIntoView();
+        return true;
+    }
+    function syncInitialScroll() {
+        if (typeof window === 'undefined')
+            return;
+        if (window.location.hash) {
+            if ('scrollRestoration' in window.history) {
+                window.history.scrollRestoration = 'auto';
+            }
+            requestAnimationFrame(scrollToHashTarget);
+            return;
+        }
+        if ('scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+        }
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+    syncInitialScroll();
+    window.addEventListener('pageshow', syncInitialScroll);
 
     exports.CounterElement = class CounterElement extends HTMLElement {
         constructor() {
@@ -2322,6 +2859,7 @@ code[class*="language-"] {
             ? html `<span class="task-label is-done">${this.label}</span>`
             : html `<input
               class="task-label"
+              name=${`task-label-${this.todoId}`}
               aria-label="Task label"
               .value=${this.label}
               @change=${this.changeLabel}
@@ -2522,6 +3060,7 @@ code[class*="language-"] {
           <div class="composer-field">
             <span class="composer-icon" aria-hidden="true">${this.iconPlus()}</span>
             <input
+              name="new-task"
               aria-label="New task"
               placeholder="Capture a task and press enter"
               .value=${this.draft}
@@ -2797,7 +3336,7 @@ code[class*="language-"] {
   --dur-slow: 420ms;
 
   display: block;
-  width: min(720px, calc(100vw - 32px));
+  width: min(720px, 100%);
   color: var(--fg);
   font-family:
     'Geist',
@@ -2836,7 +3375,7 @@ code[class*="language-"] {
 }
 
 .shell.compact {
-  width: min(540px, calc(100vw - 32px));
+  width: min(540px, 100%);
 }
 
 @keyframes shell-in {
@@ -3060,6 +3599,7 @@ cts-todo-item {
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .stat-tag {
@@ -3079,6 +3619,7 @@ cts-todo-item {
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .stat-tag::before {
@@ -3770,7 +4311,8 @@ input.task-label:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px 12px;
   padding: 14px 18px 14px 24px;
   border-top: 1px solid var(--line);
   background: rgba(0, 0, 0, 0.18);
@@ -3819,6 +4361,7 @@ input.task-label:focus {
 .footer-actions {
   display: flex;
   gap: 6px;
+  margin-left: auto;
 }
 
 .footer-actions button {
@@ -3828,6 +4371,7 @@ input.task-label:focus {
   background: transparent;
   border-color: transparent;
   color: var(--fg-muted);
+  white-space: nowrap;
 }
 
 .footer-actions button:hover {
