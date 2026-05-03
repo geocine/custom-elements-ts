@@ -1,8 +1,8 @@
 # custom-elements-ts
 
-[![Coverage Status](https://coveralls.io/repos/github/geocine/custom-elements-ts/badge.svg?branch=master)](https://coveralls.io/github/geocine/custom-elements-ts?branch=master)
-![CI](https://github.com/geocine/custom-elements-ts/actions/workflows/ci.yml/badge.svg)
-[![npm version](https://badge.fury.io/js/custom-elements-ts.svg)](https://www.npmjs.com/package/custom-elements-ts)
+[![Coverage Status](https://coveralls.io/repos/github/geocine/custom-elements-ts/badge.svg?branch=master&cache-control=no-cache)](https://coveralls.io/github/geocine/custom-elements-ts?branch=master)
+![CI](https://github.com/geocine/custom-elements-ts/actions/workflows/ci.yml/badge.svg?cache-control=no-cache)
+[![npm version](https://badge.fury.io/js/custom-elements-ts.svg?cache-control=no-cache)](https://www.npmjs.com/package/custom-elements-ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/geocine/custom-elements-ts)
 
