@@ -6,6 +6,12 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/geocine/custom-elements-ts)
 
+<p align="center">
+  <a href="https://geocine.github.io/custom-elements-ts/">
+    <img src="assets/readme-header.png" alt="custom-elements-ts — Native Web Components, written in TypeScript">
+  </a>
+</p>
+
 Author native Web Components in TypeScript with a small set of decorators
 (`@CustomElement`, `@Prop`, `@State`, `@Watch`, `@Listen`, `@Dispatch`,
 `@Toggle`) plus a tiny `html` / `render()` runtime. **Zero dependencies.
