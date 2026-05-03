@@ -2,9 +2,9 @@ const path = require('path');
 const rollup = require('rollup');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const typescript = require('rollup-plugin-typescript2');
+const ts = require('typescript');
 const rimraf = require('rimraf');
-const { existsSync, mkdirSync, renameSync, copyFileSync, readFileSync, writeFileSync } = require('fs');
-const glob = require('glob');
+const { existsSync, mkdirSync, copyFileSync, readFileSync, writeFileSync } = require('fs');
 const MagicString = require('magic-string');
 
 const LIB_NAME = 'custom-elements-ts';
@@ -12,20 +12,19 @@ const LIB_NAME = 'custom-elements-ts';
 // removing custom comment-strip plugin; modern toolchain handles comments safely
 
 const createConfig = () => {
-      return ['umd', 'esm5', 'esm2015'].map(format => {
+  return ['umd', 'esm5', 'esm2015'].map((format) => {
     const tsConfig = {
       compilerOptions: {
-            target: (format.includes('esm2015') ? 'es2015' : 'es5')
-      }
+        target: format.includes('esm2015') ? 'es2015' : 'es5',
+        declaration: false,
+      },
     };
 
-    const file = (format.includes('umd'))
+    const file = format.includes('umd')
       ? path.join('dist', 'bundles', `${LIB_NAME}.umd.js`)
-      : path.join('dist', format, `${LIB_NAME}.js`)
+      : path.join('dist', format, `${LIB_NAME}.js`);
 
-    const hasDeclaration = (format.includes('esm2015') || format.includes('umd') ? true : false);
-
-    const formatType = (format.includes('umd') ? 'umd' : 'es');
+    const formatType = format.includes('umd') ? 'umd' : 'es';
 
     return {
       inputOptions: {
@@ -37,23 +36,24 @@ const createConfig = () => {
             tsconfigOverride: { ...tsConfig },
             check: false,
             cacheRoot: path.join(path.resolve(), 'node_modules/.tmp/.rts2_cache'),
-            useTsconfigDeclarationDir: hasDeclaration,
             // ensure tslib helpers are injected correctly for ES5 target
-            tslib: require.resolve('tslib')
+            tslib: require.resolve('tslib'),
           }),
-          nodeResolve()
+          nodeResolve(),
         ],
         onwarn(warning) {
-          if (warning.code === 'THIS_IS_UNDEFINED') { return; }
-          console.log("Rollup warning: ", warning.message);
-        }
+          if (warning.code === 'THIS_IS_UNDEFINED') {
+            return;
+          }
+          console.log('Rollup warning: ', warning.message);
+        },
       },
       outputOptions: {
         sourcemap: true,
         file: file,
         name: LIB_NAME,
-        format: formatType
-      }
+        format: formatType,
+      },
     };
   });
 };
@@ -72,12 +72,43 @@ async function rollupBuild(config) {
   await bundle.write(config.outputOptions);
 }
 
-const copyDtsFiles = async () => {
-  const files = glob.sync('dist/esm5/**/*.d.ts');
-  return Promise.all(files.map(file => {
-    const destPath = file.replace('esm5' + path.sep, '');
-    renameSync(file, destPath);
-  }));
+const emitDtsFiles = () => {
+  const configPath = path.resolve('src', 'tsconfig.json');
+  const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
+  if (configFile.error) {
+    throw new Error(ts.formatDiagnosticsWithColorAndContext([configFile.error], formatHost));
+  }
+
+  const parsedConfig = ts.parseJsonConfigFileContent(
+    configFile.config,
+    ts.sys,
+    path.resolve('src'),
+    {
+      declaration: true,
+      declarationDir: path.resolve('dist'),
+      emitDeclarationOnly: true,
+      outDir: path.resolve('dist'),
+      rootDir: path.resolve('src'),
+      sourceMap: false,
+    },
+    configPath
+  );
+
+  const program = ts.createProgram(parsedConfig.fileNames, parsedConfig.options);
+  const emitResult = program.emit();
+  const diagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+  const errors = diagnostics.filter(
+    (diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error
+  );
+  if (errors.length > 0) {
+    throw new Error(ts.formatDiagnosticsWithColorAndContext(errors, formatHost));
+  }
+};
+
+const formatHost = {
+  getCanonicalFileName: (fileName) => fileName,
+  getCurrentDirectory: () => process.cwd(),
+  getNewLine: () => '\n',
 };
 
 const copyReadMe = () => {
@@ -103,32 +134,34 @@ const buildCopyPackageFile = (libName, paths) => {
     author: pkg.author,
     license: pkg.license,
     bugs: pkg.bugs,
-    homepage: pkg.homepage
+    homepage: pkg.homepage,
   };
-  
+
   if (!existsSync('dist')) {
     mkdirSync('dist', { recursive: true });
   }
-  
+
   if (!existsSync('dist/bundles')) {
     mkdirSync('dist/bundles', { recursive: true });
   }
-  
+
   writeFileSync(path.join('dist', 'package.json'), JSON.stringify(distPkg, null, 2));
 };
 
-const copyPkgFile = () => buildCopyPackageFile(LIB_NAME, {
-  main: `./bundles/${LIB_NAME}.umd.js`,
-  esm5: `./esm5/${LIB_NAME}.js`,
-  module: `./esm2015/${LIB_NAME}.js`,
-  esm2015: `./esm2015/${LIB_NAME}.js`,
-  typings: 'index.d.ts'
-});
+const copyPkgFile = () =>
+  buildCopyPackageFile(LIB_NAME, {
+    main: `./bundles/${LIB_NAME}.umd.js`,
+    esm5: `./esm5/${LIB_NAME}.js`,
+    module: `./esm2015/${LIB_NAME}.js`,
+    esm2015: `./esm2015/${LIB_NAME}.js`,
+    typings: 'index.d.ts',
+  });
 
 Promise.all([clean('dist'), clean('.tmp')])
-  .then(() => Promise.all(createConfig().map(config => rollupBuild(config))))
-  .then(() => Promise.all([copyPkgFile(), copyReadMe(), copyDtsFiles()]))
-  .catch(err => {
+  .then(() => Promise.all(createConfig().map((config) => rollupBuild(config))))
+  .then(() => emitDtsFiles())
+  .then(() => Promise.all([copyPkgFile(), copyReadMe()]))
+  .catch((err) => {
     console.error('Bundle failed:', err);
     process.exit(1);
   });

@@ -48,6 +48,17 @@ describe('toggle decorator', () => {
     console.warn = warn;
   });
 
+  it('should return false for an invalid attribute before connection coerces it', () => {
+    const myElement = document.createElement('toggle-element') as any;
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    myElement.setAttribute('disabled', 'asd');
+
+    expect(myElement.disabled).toBe(false);
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
   it('should add attribute on empty prop set', () => {
     myElementInstance.disabled = '';
     expect(myElementInstance.hasAttribute('disabled')).toBe(true);

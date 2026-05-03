@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { CustomElement } from 'custom-elements-ts';
 
 @CustomElement({
@@ -75,4 +75,3 @@ describe('CustomElement decorator', () => {
     expect(el._watchArgs).toEqual({ old: null, new: 'y' });
   });
 });
-

@@ -37,7 +37,7 @@ const addEventListeners = (target: any) => {
         eventTarget = targetRoot.querySelector(listener.selector);
       }
       if (eventTarget) {
-        eventTarget.addEventListener(listener.eventName, (e: CustomEvent) => {
+        eventTarget.addEventListener(listener.eventName, (e: Event) => {
           listener.handler.call(target, e);
         });
       }
@@ -47,7 +47,7 @@ const addEventListeners = (target: any) => {
 
 const Dispatch = (eventName?: string) => {
   return (target: HTMLElement, propertyName: string) => {
-    function get() {
+    function get(this: EventTarget) {
       const self: EventTarget = this as EventTarget;
       return {
         emit(options?: CustomEventOptions) {

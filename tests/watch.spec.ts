@@ -30,8 +30,10 @@ class WatchElement extends HTMLElement {
 
   newColor = '';
   @Prop() color = 'blue';
+  initialColor = '';
   @Watch('color')
-  changeColor() {
+  changeColor(value: any) {
+    this.initialColor ||= value.new;
     this.newColor = this.color;
   }
 
@@ -95,6 +97,10 @@ describe('watch decorator', () => {
   it('should call @Watch on attribute change with new property value', () => {
     myElementInstance.setAttribute('color', 'red');
     expect(myElementInstance.newColor).toEqual('red');
+  });
+
+  it('should call @Watch for initial kebab-resolved default prop value', () => {
+    expect(myElementInstance.initialColor).toEqual('blue');
   });
 
   it('should call @Watch for plain get/set with correct value.new', () => {

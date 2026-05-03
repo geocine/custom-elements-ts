@@ -17,6 +17,10 @@ class PropElement extends HTMLElement {
 
   @Prop() fnProp: any;
   @Prop() classProp: any;
+
+  @Prop() zero = 0;
+  @Prop() enabled = false;
+  @Prop() empty = '';
 }
 
 describe('prop decorator', () => {
@@ -94,5 +98,21 @@ describe('prop decorator', () => {
     myElementInstance.classProp = Foo;
     expect(myElementInstance.getAttribute('class-prop')).toBeFalsy();
     expect(myElementInstance.classProp).toBe(Foo);
+  });
+
+  it('should initialize falsy default property values', () => {
+    expect(myElementInstance.zero).toBe(0);
+    expect(myElementInstance.enabled).toBe(false);
+    expect(myElementInstance.empty).toBe('');
+  });
+
+  it('should preserve boolean prop type when reflected through attributes', () => {
+    myElementInstance.enabled = true;
+    expect(myElementInstance.enabled).toBe(true);
+    expect(myElementInstance.getAttribute('enabled')).toBe('true');
+
+    myElementInstance.enabled = false;
+    expect(myElementInstance.enabled).toBe(false);
+    expect(myElementInstance.getAttribute('enabled')).toBe('false');
   });
 });

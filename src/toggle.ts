@@ -37,6 +37,7 @@ export const Toggle = (): any => {
         }
       }
       if (this.__connected) {
+        const previous = this.props[propName];
         this.props[propName] = value || false;
         if (oldValue !== '' && oldValue !== null) {
           this.setAttribute(propName, value);
@@ -46,6 +47,9 @@ export const Toggle = (): any => {
           } else {
             this.removeAttribute(propName);
           }
+        }
+        if (!Object.is(previous, this.props[propName])) {
+          this.__scheduleRender?.();
         }
       } else {
         if (!this.hasAttribute(toKebabCase(propName))) {

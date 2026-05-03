@@ -13,7 +13,12 @@ export const Prop = (): any => {
     function set(this: any, value: any) {
       if (this.__connected) {
         const oldValue = this.props[propName];
-        this.props[propName] = tryParseInt(value);
+        this.props[propName] = coercePropValue(
+          value,
+          oldValue,
+          this.constructor.propsInit[propName]
+        );
+        const changed = !Object.is(oldValue, this.props[propName]);
         const valueType = typeof value;
         const shouldReflect =
           valueType === 'string' || valueType === 'number' || valueType === 'boolean';
@@ -21,6 +26,9 @@ export const Prop = (): any => {
           this.setAttribute(attrName, value);
         } else {
           this.onAttributeChange(attrName, oldValue, value, false);
+        }
+        if (changed) {
+          this.__scheduleRender?.();
         }
       } else {
         if (!this.hasAttribute(toKebabCase(propName))) {
@@ -41,30 +49,44 @@ const getProps = (target: any) => {
   const plainAttributes = { ...watchAttributes };
   Object.keys(plainAttributes).forEach((v) => (plainAttributes[v] = ''));
   const cycleProps = { ...plainAttributes, ...target.constructor.propsInit };
-  return Object.keys(cycleProps);
+  const stateInit = target.constructor.stateInit || {};
+  return Object.keys(cycleProps).filter((prop) => stateInit[prop] === undefined);
 };
 
 export const initializeProps = (target: any) => {
   const watchAttributes = target.constructor.watchAttributes;
   for (const prop of getProps(target)) {
+    const attrName = toKebabCase(prop);
     if (watchAttributes) {
-      if (
-        watchAttributes[toKebabCase(prop)] === null ||
-        watchAttributes[toKebabCase(prop)] === undefined
-      ) {
-        watchAttributes[toKebabCase(prop)] = '';
+      const methodName = watchAttributes[attrName];
+      if (methodName === null || methodName === undefined) {
+        watchAttributes[attrName] = '';
       } else {
         const hasOwn = Object.prototype.hasOwnProperty.call(target.props, prop);
-        const attribValue = hasOwn ? target.props[prop] : target.getAttribute(toKebabCase(prop));
-        if (typeof target[watchAttributes[prop]] === 'function') {
-          target[watchAttributes[prop]]({ new: attribValue });
+        const attribValue = hasOwn ? target.props[prop] : target.getAttribute(attrName);
+        if (typeof target[methodName] === 'function') {
+          target[methodName]({ new: attribValue });
         }
       }
     }
-    if (target.constructor.propsInit[prop]) {
-      if (!target.hasAttribute(toKebabCase(prop))) {
-        target[prop] = target.constructor.propsInit[prop];
+    const defaultValue = target.constructor.propsInit[prop];
+    if (defaultValue !== null && defaultValue !== undefined) {
+      if (!target.hasAttribute(attrName)) {
+        target[prop] = defaultValue;
       }
     }
   }
+};
+
+const coercePropValue = (value: any, oldValue: any, defaultValue: any): any => {
+  const expectedType = typeof (oldValue === undefined ? defaultValue : oldValue);
+  if (expectedType === 'boolean' && typeof value === 'string') {
+    if (value === '' || value === 'true') {
+      return true;
+    }
+    if (value === 'false') {
+      return false;
+    }
+  }
+  return tryParseInt(value);
 };
