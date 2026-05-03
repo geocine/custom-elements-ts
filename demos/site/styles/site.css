@@ -154,11 +154,13 @@ a:hover { color: var(--accent); }
   border-radius: var(--radius-sm);
   background: linear-gradient(160deg, #1c2230 0%, #11141a 100%);
   border: 1px solid var(--line-strong);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 600;
   color: var(--accent-fg);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.brand__mark svg {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
 .brand__name {
