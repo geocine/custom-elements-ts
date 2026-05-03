@@ -1,9 +1,6 @@
 /* ─────────────────────────────────────────────────────────────
    cts-source-viewer
-   Collapsible inline panel that shows the TypeScript source for
-   the playground it sits beneath. Animates open/close via the
-   `grid-template-rows: 0fr → 1fr` trick so closed instances cost
-   no layout, but expand smoothly when the [open] attribute lands.
+   Collapsible inline source panel for playground examples.
    ───────────────────────────────────────────────────────────── */
 
 :host {
@@ -194,8 +191,7 @@
   }
 }
 
-/* Narrow viewports — give the tab strip more room and hint at
-   off-screen tabs with a right-edge mask. */
+/* Narrow viewports: preserve tab space and hint at overflow. */
 @media (max-width: 640px) {
   .bar {
     padding: 0 10px;

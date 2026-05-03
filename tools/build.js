@@ -10,8 +10,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { generateSources } = require('./generate-sources');
 
 const DEST_PATH = 'dist';
-// Inline every demo source so a demo (like `site`) can freely import sibling
-// demos and have their templateUrl/styleUrl references resolved.
+// Inline demo sources so sibling demo imports resolve.
 const SRC_PATH = `demos/**/*.ts`;
 const SRC_TMP_PATH = `.tmp`;
 

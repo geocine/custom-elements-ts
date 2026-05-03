@@ -640,9 +640,7 @@ a:hover { color: var(--accent); }
   font-size: 12px;
   color: var(--accent-fg);
 }
-/* Two-button action group sitting in the playground header:
-   1) Source — toggles the inline <cts-source-viewer> below the playground.
-   2) GitHub — opens the actual file on GitHub. */
+/* Playground header actions. */
 .playground__actions {
   flex: 0 0 auto;
   display: inline-flex;
@@ -703,8 +701,7 @@ a:hover { color: var(--accent); }
   background: var(--bg-elev-2);
 }
 
-/* Backwards-compat selector kept in case any external embed still
-   targets the original anchor class. */
+/* Backwards compatibility for the original source link class. */
 .playground__source {
   flex: 0 0 auto;
   display: inline-flex;
@@ -745,11 +742,7 @@ a:hover { color: var(--accent); }
   }
 }
 
-/* Todo playground reuses the split layout. Same `1fr` + fixed-log column
-   pattern the counter uses, with identical log min/max widths so the two
-   logs line up vertically across the page. The breakpoint nudges up
-   because the dashboard's `compact` width (540px) plus the log needs
-   more room than the counter card to fit side-by-side. */
+/* Todo needs a wider breakpoint than the counter card. */
 .playground--todo .playground__body--split {
   grid-template-columns: 1fr;
 }
@@ -760,8 +753,7 @@ a:hover { color: var(--accent); }
   }
 }
 
-/* Legacy stack variant kept around in case any external embed still
-   uses it; the site demo no longer does. */
+/* Legacy stack variant for external embeds. */
 .playground__body--stack {
   grid-template-columns: 1fr;
 }
@@ -796,9 +788,7 @@ a:hover { color: var(--accent); }
 .stage--todo {
   padding: 32px 18px;
 }
-/* `min-width: 0` lets the host shrink below its intrinsic min-content
-   on narrow phones, which otherwise inflates the grid column and
-   overflows the playground body. */
+/* Prevent host min-content overflow on narrow phones. */
 .stage--todo cts-todo-dashboard {
   width: min(540px, 100%);
   min-width: 0;
@@ -831,22 +821,15 @@ a:hover { color: var(--accent); }
   width: 100%;
 }
 
-/* Inline source viewer sits flush against the bottom of each playground
-   article. The inner `:host { display: grid; grid-template-rows: 0fr }`
-   rule in source-viewer.element.scss owns the open/close transition.
-   We deliberately do NOT set `display` from the outside: light-DOM rules
-   targeting the host element override `:host` for the same property,
-   which would force `display: block` and break the grid-row animation. */
+/* Do not set display here; the host grid drives the open/close animation. */
 cts-source-viewer:not(:defined) {
-  /* Keep the collapsed state during hydration so the article doesn't
-     visibly grow then shrink as the bundle finishes loading. */
+  /* Keep the collapsed state during hydration. */
   display: block;
   height: 0;
   overflow: hidden;
 }
 
-/* Custom element loading skeletons for the live demos.
-   Match the same hydration pattern used on the install pill above. */
+/* Loading skeletons for live demos. */
 cts-counter,
 cts-todo-dashboard,
 cts-event-log {
@@ -862,8 +845,7 @@ cts-counter:not(:defined) {
 }
 
 cts-todo-dashboard:not(:defined) {
-  /* Match the compact width the live element will hydrate into so the
-     stage doesn't visibly resize when the bundle finishes loading. */
+  /* Match the compact hydrated width. */
   width: min(540px, calc(100vw - 80px));
   height: 520px;
   border: 1px solid var(--line-strong);
@@ -1034,9 +1016,7 @@ cts-message:not(:defined)::after {
   pointer-events: none;
 }
 
-/* Code window: fake "lines of code" via stacked gradients.
-   --skel is the line color; positions are content-box relative
-   so we don't have to add the padding offset to every value. */
+/* Code skeleton lines via stacked gradients. */
 cts-code-example:not(:defined) {
   --skel: rgba(255, 255, 255, 0.06);
   min-height: 380px;
@@ -1094,9 +1074,7 @@ cts-message:not(:defined) {
   100% { background-position: -110% 0; }
 }
 
-/* Soft fade-in once the real component swaps in, so the skeleton
-   doesn't pop. `:defined` matches the moment customElements.define
-   completes, which is exactly when the new content renders. */
+/* Fade in once custom elements are defined. */
 cts-code-example:defined,
 cts-message:defined {
   animation: cts-hydrate 280ms var(--ease) both;

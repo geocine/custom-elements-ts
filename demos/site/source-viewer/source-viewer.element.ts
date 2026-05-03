@@ -11,12 +11,7 @@ declare const Prism: {
 };
 
 /**
- * Inline source viewer used by the playgrounds on the site demo.
- *
- * Each instance is keyed by `slug`, which maps into the auto-generated
- * `SOURCES` table. The host element is collapsed by default and expands
- * when an external trigger toggles the boolean `open` attribute — the CSS
- * animates the height transition; this class only handles tab state.
+ * Inline source viewer for site playgrounds.
  */
 @CustomElement({
   tag: 'cts-source-viewer',
@@ -29,20 +24,12 @@ export class SourceViewerElement extends HTMLElement {
   /** Index of the file shown in the body. Reset whenever `slug` changes. */
   @State() activeIndex = 0;
 
-  // Cache the highlighted markup so we don't re-tokenise on every render
-  // (Prism is fast, but each re-render of a tab click would otherwise pay
-  //  the cost again for every file).
+  // Avoid re-tokenizing unchanged source.
   private files: SourceFile[] = [];
   private highlighted: string[] = [];
   private cachedFor = '\0';
 
-  // We own the <pre><code> node so we can hand-stamp innerHTML with the
-  // Prism markup. The framework's template runtime parses HTML attribute
-  // names case-insensitively (browser standard), which means a
-  // `.innerHTML=${…}` binding silently lowercases to `.innerhtml` and
-  // writes a stray property instead of the real DOM `innerHTML`.
-  // Embedding a raw Node in the template result sidesteps the issue —
-  // ChildPart.updateNode places it verbatim and we manage its content.
+  // Raw node insertion avoids lowercasing `.innerHTML` in parsed templates.
   private bodyNode: HTMLPreElement | null = null;
   private codeNode: HTMLElement | null = null;
   private renderedHtml = '';

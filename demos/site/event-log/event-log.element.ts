@@ -10,11 +10,7 @@ interface LogEntry {
 const MAX_ENTRIES = 6;
 
 /**
- * Tiny "what just happened" panel used on the showcase page.
- *
- * Subscribes to one or more bubbling, composed CustomEvents at the document
- * level and renders the most recent few. Pure render() / @State() — no manual
- * DOM diffing — so it doubles as a live example of the templating runtime.
+ * Live event log for bubbling CustomEvents on the showcase page.
  */
 @CustomElement({
   tag: 'cts-event-log',
