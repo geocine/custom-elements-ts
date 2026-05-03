@@ -1,0 +1,56 @@
+/* ─────────────────────────────────────────────────────────────
+   Design tokens
+   Single source of truth for color, type, radius, motion.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Surfaces — cool off-black tinted toward blue, never pure #000 */
+  --bg:            #0a0c10;
+  --bg-elev-1:     #11141a;
+  --bg-elev-2:     #161a22;
+  --bg-elev-3:     #1c2230;
+
+  /* Lines */
+  --line:          rgba(255, 255, 255, 0.06);
+  --line-strong:   rgba(255, 255, 255, 0.10);
+  --line-accent:   rgba(49, 120, 198, 0.32);
+
+  /* Type */
+  --fg:            #e6ecf3;
+  --fg-muted:      #97a1ad;
+  --fg-subtle:     #5b6370;
+
+  /* Accent — TypeScript brand blue. One color, used sparingly. */
+  --accent:        #3178c6;            /* canonical TS logo blue       */
+  --accent-bright: #4189d6;            /* hover / focus                */
+  --accent-fg:     #9cc0eb;            /* legible accent on dark bg    */
+  --accent-soft:   rgba(49, 120, 198, 0.14);
+  --accent-line:   rgba(49, 120, 198, 0.42);
+
+  /* Status — kept neutral (no second hue competing with the accent) */
+  --ok:            var(--accent-fg);
+  --ok-soft:       var(--accent-soft);
+
+  /* Type scale */
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, -apple-system,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+
+  /* Radii — minimal. Sharp, technical, editorial. */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur: 220ms;
+  --dur-slow: 420ms;
+
+  /* Container */
+  --container: 1180px;
+  --gutter: clamp(20px, 4vw, 40px);
+}
