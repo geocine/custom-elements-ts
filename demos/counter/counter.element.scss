@@ -1,14 +1,234 @@
+/* ─────────────────────────────────────────────────────────────
+   cts-counter
+   A single-button card showcasing @State(). Sharp radii, Geist
+   typography, TS-blue accent. Aligned with demos/site tokens.
+   ───────────────────────────────────────────────────────────── */
+
 :host {
+  --bg:            #0a0c10;
+  --bg-elev-1:     #11141a;
+  --line:          rgba(255, 255, 255, 0.06);
+  --line-strong:   rgba(255, 255, 255, 0.10);
+  --fg:            #e6ecf3;
+  --fg-muted:      #97a1ad;
+  --fg-subtle:     #5b6370;
+  --accent:        #3178c6;
+  --accent-bright: #4189d6;
+  --accent-fg:     #9cc0eb;
+  --accent-soft:   rgba(49, 120, 198, 0.14);
+  --accent-line:   rgba(49, 120, 198, 0.42);
+
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+
+  --ease:     cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur:      220ms;
+
   display: inline-block;
+  color: var(--fg);
+  font-family:
+    "Geist", "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-:host button {
-  width: 50px;
-  height: 50px;
-  color: #FFF;
-  background-color: #000;
-  border: 0;
-  border-radius: 5px;
-  font-size: 20px;
-  outline: none;
+
+* {
+  box-sizing: border-box;
+}
+
+/* ── Card button ─────────────────────────────────────────── */
+
+.card {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  width: 320px;
+  padding: 22px 24px 22px;
+  margin: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(49, 120, 198, 0.07) 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-elev-1) 0%, #0f131b 100%);
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 22px 50px -28px rgba(0, 0, 0, 0.65),
+    0 8px 24px -12px rgba(0, 0, 0, 0.45);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+  animation: card-in 520ms var(--ease) both;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent-line) 30%,
+    var(--accent-bright) 50%,
+    var(--accent-line) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  transform: translateX(-30%);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur-slow, 420ms) var(--ease);
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.card:hover::before {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.card:focus-visible {
+  outline: none;
+  border-color: var(--accent-line);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 3px var(--accent-soft),
+    0 22px 50px -28px rgba(0, 0, 0, 0.65);
+}
+
+.card:active {
+  transform: translateY(1px);
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Kicker ──────────────────────────────────────────────── */
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg-muted);
+  font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-line);
+}
+
+/* ── Display ─────────────────────────────────────────────── */
+
+.display {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+  font-size: 76px;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.display-mute {
+  color: var(--fg-subtle);
+  opacity: 0.35;
+}
+
+.display-num {
+  color: var(--fg);
+  background: linear-gradient(180deg, var(--fg) 0%, #c8d3e0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Hint row ────────────────────────────────────────────── */
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--fg-muted);
+  font-size: 12px;
+  letter-spacing: -0.005em;
+}
+
+.hint-text {
+  color: var(--fg-muted);
+}
+
+.hint-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--accent-fg);
+  font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.card:hover .hint-chip {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.card:active .hint-chip {
+  transform: translateY(0);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+@media (max-width: 380px) {
+  .card { width: 100%; }
+  .display { font-size: 64px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before,
+  .hint-chip {
+    animation: none;
+    transition: none;
+  }
 }

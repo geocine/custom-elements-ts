@@ -1,45 +1,68 @@
-import { CustomElement, Watch, Prop, Listen, Dispatch, DispatchEmitter } from 'custom-elements-ts';
+import {
+  CustomElement,
+  Dispatch,
+  DispatchEmitter,
+  State,
+  TemplateResult,
+  Watch,
+  html,
+} from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-counter',
-  templateUrl: './counter.element.html',
-  styleUrl: './counter.element.scss'
+  styleUrl: './counter.element.scss',
 })
 export class CounterElement extends HTMLElement {
+  @State() count = 0;
 
-  constructor() {
-    super();
-  }
+  @Dispatch('counter.change') counterChange!: DispatchEmitter;
 
-  @Prop() count = '';
-  @Dispatch() ctsClick: DispatchEmitter;
-
-  connectedCallback() {
-    this.showCount();
-  }
-
-  @Listen('click')
-  incrementHandler() {
-    this.ctsClick.emit({
-      detail: { count: parseInt(this.count) + 1 }
+  @Watch('count')
+  handleCountChange(change: { new: number }) {
+    this.counterChange.emit({
+      bubbles: true,
+      composed: true,
+      detail: {
+        count: change.new,
+      },
     });
   }
 
-  @Listen('cts.click')
-  countIncrement(e: CustomEvent){
-    this.count = e.detail.count;
+  render(): TemplateResult {
+    const display = this.format(this.count);
+    return html`
+      <button class="card" type="button" @click=${this.increment}>
+        <span class="kicker">
+          <span class="kicker-dot"></span>
+          counter · @State()
+        </span>
+
+        <span class="display" aria-live="polite">
+          <span class="display-mute">${display.mute}</span
+          ><span class="display-num">${display.num}</span>
+        </span>
+
+        <span class="hint">
+          <span class="hint-text">tap anywhere to count</span>
+          <span class="hint-chip">+1</span>
+        </span>
+      </button>
+    `;
   }
 
-  @Watch('count')
-  changeCount(value: any) {
-    this.count = value.new;
-    this.showCount();
+  private increment() {
+    this.count++;
   }
 
-  showCount() {
-    const count = this.shadowRoot.querySelector('#count');
-    if (count) {
-      count.innerHTML = this.count;
-    }
+  // Pad to at least 4 digits and split into a muted lead and a bright tail
+  // so the number reads like a stopwatch — e.g. 0042, 0420, 4200, 42000.
+  private format(value: number): { mute: string; num: string } {
+    const raw = String(value);
+    const padded = raw.length >= 4 ? raw : `${'0000'.slice(raw.length)}${raw}`;
+    const tail = padded.length - raw.length;
+    return {
+      mute: padded.slice(0, tail),
+      num: padded.slice(tail),
+    };
   }
 }
