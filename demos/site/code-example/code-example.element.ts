@@ -10,32 +10,31 @@ export class CodeExampleElement extends HTMLElement {
   public code;
   constructor() {
     super();
-    const code = `
-// Typescript
-import { CustomElement, Prop, Listen } from 'custom-elements-ts';
+    const code = `import { CustomElement, Prop, Listen, Dispatch, DispatchEmitter } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-message',
-  template: '<h1></h1>'
-  style: '' // css styles here or can use styleUrl
+  template: '<button><slot></slot><span class="msg"></span></button>',
+  styleUrl: './message.element.scss'
 })
 export class MessageElement extends HTMLElement {
 
-  @Listen('click')
-  handleClick() {
-    alert('what are you waiting for?');
-  }
-
   @Prop() message: string;
 
-  connectedCallback(){
-    this.shadowRoot.querySelector('h1').innerHTML = this.message;
+  @Dispatch('message.click') onClick: DispatchEmitter;
+
+  @Listen('click', 'button')
+  handleClick() {
+    this.onClick.emit({ detail: { message: this.message } });
+  }
+
+  connectedCallback() {
+    this.shadowRoot.querySelector('.msg').textContent = this.message;
   }
 }
 
-// HTML
-<cts-message message="npm install custom-elements-ts"></cts-message>
-        `;
+// then, in any HTML — React, Vue, Svelte, plain — it just works:
+<cts-message message="npm install custom-elements-ts"></cts-message>`;
       this.code = Prism.highlight(code, Prism.languages.javascript);
   }
 

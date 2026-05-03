@@ -35,10 +35,11 @@ jobs:
       - name: Build demo site bundle
         run: npm run build site
 
-      - name: Prepare index.html for GitHub Pages
-        run: |
-          cp demos/site/index.html dist/index.html
-          node -e "const fs=require('fs');let s=fs.readFileSync('dist/index.html','utf8');s=s.replace('site.umd.js','/custom-elements-ts/site.umd.js');fs.writeFileSync('dist/index.html',s);"
+      # The build emits index.html, site.umd.js, and styles/* into dist/.
+      # All asset URLs in index.html are relative (no <base> tag), so they
+      # resolve correctly under the GitHub Pages project subpath
+      # (e.g. https://geocine.github.io/custom-elements-ts/) without any
+      # post-processing. No path rewriting is required here.
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'

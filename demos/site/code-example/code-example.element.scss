@@ -1,163 +1,168 @@
+/* Lives inside <article class="window">; the chrome owns background + radius. */
 
 :host {
-  font-size: 15px;
-  padding: 24px;
   display: block;
-  @media screen and (min-width: 1000px) {
-    font-size: 17px;
-    padding: 32px;
-  }
+  padding: 22px 26px 26px;
+  font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #d6dce5;
+  background: transparent;
   overflow-x: auto;
-  color: rgb(187,187,187);
-  max-height: 500px;
+  max-height: 520px;
+  -webkit-font-smoothing: antialiased;
+
+  @media (min-width: 980px) {
+    font-size: 14px;
+    padding: 28px 32px 32px;
+  }
+
+  /* Custom scrollbar so the code area doesn't ship a chunky default bar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.10) transparent;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-track { background: transparent; }
 }
 
-code[class*="language-"] {
-  color: #c5c8c6;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
-  font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
-  direction: ltr;
-  text-align: left;
-  white-space: pre;
-  word-spacing: normal;
-  word-break: normal;
-  line-height: 1.5;
-  -moz-tab-size: 4;
-  -o-tab-size: 4;
-  tab-size: 4;
-  -webkit-hyphens: none;
-  -moz-hyphens: none;
-  -ms-hyphens: none;
-  hyphens: none;
-}
-
-pre {
+pre,
+pre[class*="language-"] {
   margin: 0;
-}
-
-pre[class*="language-"] {
-  color: #c5c8c6;
-  text-shadow: 0 1px rgba(0, 0, 0, 0.3);
-  font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
-  direction: ltr;
-  text-align: left;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-shadow: none;
   white-space: pre;
   word-spacing: normal;
   word-break: normal;
-  line-height: 1.5;
-  -moz-tab-size: 4;
-  -o-tab-size: 4;
-  tab-size: 4;
-  -webkit-hyphens: none;
-  -moz-hyphens: none;
-  -ms-hyphens: none;
+  -moz-tab-size: 2;
+  -o-tab-size: 2;
+  tab-size: 2;
   hyphens: none;
-  padding: 1em;
-  overflow: auto;
-  border-radius: 0.3em;
+  overflow: visible;
 }
 
-/* Code blocks */
-
-:not(pre)>code[class*="language-"],
-pre[class*="language-"] {
-  background: #1d1f21;
+code,
+code[class*="language-"] {
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-shadow: none;
+  white-space: pre;
 }
 
-/* Inline code */
-
-:not(pre)>code[class*="language-"] {
-  padding: .1em;
-  border-radius: .3em;
-}
+/* ─── Prism token theme — VS Code "Dark Modern" inspired, TS blue led ─── */
 
 .token {
   &.comment,
   &.prolog,
   &.doctype,
   &.cdata {
-    color: #7C7C7C;
+    color: #6e7681;
+    font-style: italic;
   }
+
   &.punctuation {
-    color: #c5c8c6;
+    color: #c9d1d9;
   }
-}
 
-.namespace {
-  opacity: .7;
-}
-
-.token {
+  /* identifier-blue — properties, tags, attribute-name (e.g. tag:, template:) */
   &.property,
+  &.tag,
+  &.attr-name {
+    color: #9cdcfe;
+  }
+
+  /* TS-blue — keywords (import, export, class, extends, new) */
   &.keyword,
-  &.tag {
-    color: rgb(224, 108, 117);
+  &.boolean {
+    color: #4189d6;
   }
+
+  /* teal — class names, types */
   &.class-name {
-    color: #FFFFB6;
-    text-decoration: underline;
+    color: #4ec9b0;
   }
-  &.boolean,
-  &.constant {
-    color: #99CC99;
+
+  &.constant,
+  &.symbol {
+    color: #4189d6;
   }
-  &.symbol,
-  &.deleted {
-    color: #f92672;
-  }
+
+  /* light green — numbers */
   &.number {
-    color: #FF73FD;
+    color: #b5cea8;
   }
-  &.selector,
-  &.attr-name,
+
+  /* warm muted — strings (the only "warm" color, used sparingly) */
   &.string,
   &.char,
+  &.attr-value,
   &.builtin,
   &.inserted {
-    color: #A8FF60;
+    color: #ce9178;
   }
+
+  /* selectors stay muted */
+  &.selector {
+    color: #d7ba7d;
+  }
+
   &.variable {
-    color: #C6C5FE;
+    color: #d6dce5;
   }
-  &.operator {
-    color: #EDEDED;
-  }
+
+  &.operator,
   &.entity {
-    color: #FFFFB6;
-    /* text-decoration: underline; */
+    color: #d6dce5;
   }
+
   &.url {
-    color: #96CBFE;
+    color: #4189d6;
+    text-decoration: underline;
   }
+
+  &.atrule {
+    color: #c586c0;
+  }
+
+  /* function names — soft cream so they don't fight the blues */
+  &.function {
+    color: #dcdcaa;
+  }
+
+  &.regex {
+    color: #d16969;
+  }
+
+  &.important {
+    color: #f47067;
+    font-weight: 600;
+  }
+
+  &.bold { font-weight: 600; }
+  &.italic { font-style: italic; }
+  &.deleted { color: #f47067; }
 }
+
+.namespace { opacity: .65; }
 
 .language-css .token.string,
 .style .token.string {
-  color: #87C38A;
-}
-
-.token {
-  &.atrule,
-  &.attr-value {
-    color: #F9EE98;
-  }
-  &.function {
-    color: #DAD085;
-  }
-  &.regex {
-    color: #E9C062;
-  }
-  &.important {
-    color: #fd971f;
-    font-weight: bold;
-  }
-  &.bold {
-    font-weight: bold;
-  }
-  &.italic {
-    font-style: italic;
-  }
-  &.entity {
-    cursor: help;
-  }
+  color: #ce9178;
 }

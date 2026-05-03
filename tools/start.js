@@ -1,10 +1,16 @@
-const { join } = require('path');
+const path = require('path');
+const { join } = path;
 const express = require('express');
 const { existsSync, mkdirSync, copyFileSync, readFileSync, writeFileSync, watch } = require('fs');
 const rollup = require('rollup');
 const rimraf = require('rimraf');
 const glob = require('glob');
 const { config, ELEMENT_NAME } = require('./rollup-config');
+
+const STATIC_ASSET_EXTS = new Set([
+  '.css', '.svg', '.png', '.jpg', '.jpeg', '.gif',
+  '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf'
+]);
 
 const DEST_PATH = 'dist';
 const SRC_PATH = `demos/${ELEMENT_NAME}/**/*.ts`;
@@ -92,6 +98,19 @@ async function rollupGenerate(config) {
   await bundle.write(config.outputOptions);
 }
 
+function copyStaticAssets(srcDir, destDir) {
+  const files = glob.sync(`${srcDir}/**/*`, { nodir: true });
+  for (const file of files) {
+    const ext = path.extname(file).toLowerCase();
+    if (!STATIC_ASSET_EXTS.has(ext)) continue;
+    const rel = path.relative(srcDir, file);
+    const dest = path.join(destDir, rel);
+    const destSubDir = path.dirname(dest);
+    if (!existsSync(destSubDir)) mkdirSync(destSubDir, { recursive: true });
+    copyFileSync(file, dest);
+  }
+}
+
 const copy = () => {
   if (!existsSync(DEST_PATH)) {
     mkdirSync(DEST_PATH, { recursive: true });
@@ -121,7 +140,9 @@ const copy = () => {
   if (existsSync(customElementsSrc)) {
     copyFileSync(customElementsSrc, customElementsDest);
   }
-  
+
+  copyStaticAssets(`demos/${ELEMENT_NAME}`, DEST_PATH);
+
   return copyFileSync(`demos/${ELEMENT_NAME}/index.html`, join(DEST_PATH, 'index.html'));
 };
 
@@ -136,10 +157,18 @@ const fileWatcher = () => {
   });
   
   watch('demos', { recursive: true }, async (eventType, filename) => {
-    if (filename && filename.endsWith('.ts')) {
+    if (!filename) return;
+    const ext = path.extname(filename).toLowerCase();
+    if (ext === '.ts') {
       console.log(`File changed: ${filename}`);
       await inlineSources(SRC_PATH, SRC_TMP_PATH);
       await rollupGenerate(config);
+    } else if (ext === '.html') {
+      console.log(`HTML changed: ${filename}`);
+      copy();
+    } else if (STATIC_ASSET_EXTS.has(ext)) {
+      console.log(`Asset changed: ${filename}`);
+      copyStaticAssets(`demos/${ELEMENT_NAME}`, DEST_PATH);
     }
   });
 }

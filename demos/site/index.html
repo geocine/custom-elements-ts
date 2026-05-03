@@ -1,55 +1,218 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <base href="/">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Custom Elements TS</title>
-    <style>
-      html, body { margin: 0; background: #000; min-height: 100vh; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b0b0c">
+    <meta name="description" content="custom-elements-ts — author native Web Components in TypeScript with a small set of decorators and zero runtime dependencies.">
+    <meta property="og:title" content="custom-elements-ts">
+    <meta property="og:description" content="Author native Web Components in TypeScript with a small set of decorators. Zero dependencies. Framework-free.">
+    <meta property="og:type" content="website">
+    <title>custom-elements-ts — native Web Components in TypeScript</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="styles/site.css">
   </head>
-  <link rel="stylesheet" href="//unpkg.com/tailwindcss@0.6.0/dist/tailwind.min.css">
-  <body class="bg-black">
-    <section class="font-sans antialiased w-full min-h-screen bg-black py-8">
-      <div class="container mx-auto">
-        <div class="py-8 w-full mx-auto">
-          <h1 class="text-blue md:text-5xl text-center font-normal">Custom Elements TS</h1> 
-          <h2 class="text-white md:text-2xl text-center font-normal leading-normal px-12 my-5">Create native custom elements using Typescript without using any third party libraries</h2> 
-          <div class="my-16 flex flex-wrap md:items-center w-full">
-            <div class="shadow rounded w-full md:w-2/3 z-10" style="background-color: #1e1e1f;">
-              <cts-code-example></cts-code-example>
-            </div>
-            <div class="bg-white rounded shadow w-5/6 md:w-1/3 z-0 mx-auto -mt-1 md:-mt-0 md:-ml-1">
-              <div class="py-8 text-center text-green font-semibold uppercase">Get Started</div>
-              <hr class="py-0 my-0 border border-grey-lighter">
-              <cts-message message="npm install custom-elements-ts"></cts-message>
-              <div class="py-8">
-                <div class="mt-5 mx-auto w-2/3">
-                  <div class="flex items-center mb-4"><span class="inline-flex bg-green-lighter rounded-full mr-4 p-1 text-green text-xs"><i class="fas fa-check"></i></span>  <span class="text-grey-darker">zero dependencies</span>
-                  </div>
-                  <div class="flex items-center mb-4"><span class="inline-flex bg-green-lighter rounded-full mr-4 p-1 text-green text-xs"><i class="fas fa-check"></i></span>  <span class="text-grey-darker">framework agnostic</span>
-                  </div>
-                  <div class="flex items-center mb-4"><span class="inline-flex bg-green-lighter rounded-full mr-4 p-1 text-green text-xs"><i class="fas fa-check"></i></span>  <span class="text-grey-darker">small bundle size</span>
-                  </div>
-                </div>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- ─── Top navigation ──────────────────────────────────────── -->
+    <header class="nav">
+      <div class="container nav__inner">
+        <a class="brand" href="#">
+          <span class="brand__mark" aria-hidden="true">&lt;/&gt;</span>
+          <span class="brand__name">custom-elements<span class="dim">-ts</span></span>
+        </a>
+
+        <nav class="nav__links" aria-label="Primary">
+          <a class="nav__link" href="#showcase">Example</a>
+          <a class="nav__link" href="#api">Decorators</a>
+          <a class="nav__link" href="https://github.com/geocine/custom-elements-ts#readme">Docs</a>
+          <a class="nav__link" href="https://www.npmjs.com/package/custom-elements-ts">npm</a>
+        </nav>
+
+        <a class="nav__cta" href="https://github.com/geocine/custom-elements-ts" aria-label="View source on GitHub">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.81.06 1.24.83 1.24.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="main">
+
+      <!-- ─── Hero ────────────────────────────────────────────── -->
+      <section class="hero">
+        <div class="container">
+          <div class="hero__pill" role="status">
+            <span class="badge">v0.0.16</span>
+            <span>TypeScript&nbsp;5</span>
+            <span class="sep">·</span>
+            <span>MIT</span>
+            <span class="sep">·</span>
+            <span>0 deps</span>
+          </div>
+
+          <h1 class="hero__title">
+            Native Web Components, written in <em class="em">TypeScript</em>.
+          </h1>
+
+          <p class="hero__lede">
+            <strong>custom-elements-ts</strong> is a tiny set of decorators —
+            <code>@CustomElement</code>, <code>@Prop</code>, <code>@Watch</code>,
+            <code>@Listen</code>, <code>@Dispatch</code>, <code>@Toggle</code> —
+            that let you author standards-based custom elements without a framework
+            or a runtime, then ship them anywhere.
+          </p>
+
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#showcase">
+              See it in action
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+            <a class="btn btn--ghost" href="https://github.com/geocine/custom-elements-ts">
+              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" width="14" height="14"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.81.06 1.24.83 1.24.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              Source on GitHub
+            </a>
+          </div>
+
+          <div class="hero__meta">
+            <span><span class="ok">●</span>&nbsp; Works with any framework — or none</span>
+            <span><span class="ok">●</span>&nbsp; ~3 kB min+gzip runtime</span>
+            <span><span class="ok">●</span>&nbsp; Shadow DOM &amp; light DOM</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Showcase: code preview + install ────────────────── -->
+      <section class="showcase" id="showcase">
+        <div class="container">
+          <div class="showcase__grid">
+
+            <article class="window" aria-label="Example component source">
+              <header class="window__bar">
+                <span class="window__dots" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </span>
+                <span class="window__title">
+                  message.<span class="accent">element.ts</span>
+                </span>
+                <span class="window__copy">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  example
+                </span>
+              </header>
+              <div class="window__body">
+                <cts-code-example></cts-code-example>
               </div>
-              <a href="http://github.com/geocine/custom-elements-ts" class="no-underline">
-                <div class="py-8 bg-grey-lighter hover:bg-grey-light text-indigo-darker rounded rounded-t-none text-center uppercase font-bold flex items-center justify-center"><span>Go to github</span> 
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" class="icon fill-current w-4 h-4 ml-2">
-                    <path d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z" class="heroicon-ui"></path>
-                  </svg>
-                </div>
-              </a>
+            </article>
+
+            <aside class="side-card" aria-label="Install custom-elements-ts">
+              <div class="side-card__head">
+                <div class="side-card__kicker">Install</div>
+                <h2 class="side-card__title">One package. Zero baggage.</h2>
+              </div>
+
+              <cts-message message="npm install custom-elements-ts"></cts-message>
+
+              <ul class="checks">
+                <li>
+                  <span class="check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </span>
+                  <span><strong>Zero dependencies.</strong> Nothing hides under the hood.</span>
+                </li>
+                <li>
+                  <span class="check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </span>
+                  <span><strong>Framework-free.</strong> Drop the same element into React, Vue, Svelte, or plain HTML.</span>
+                </li>
+                <li>
+                  <span class="check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </span>
+                  <span><strong>Tiny surface area.</strong> Six decorators is the whole API.</span>
+                </li>
+              </ul>
+
+              <div class="side-card__foot">
+                <a href="https://github.com/geocine/custom-elements-ts#readme">
+                  Read the full guide
+                  <svg class="arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+            </aside>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── API at-a-glance ─────────────────────────────────── -->
+      <section class="api" id="api">
+        <div class="container">
+          <div class="api__head">
+            <div>
+              <span class="eyebrow"><span class="dot"></span> The API</span>
+              <h2 class="api__title">Six decorators. That's the whole library.</h2>
+            </div>
+            <p class="api__lede">
+              Every decorator maps directly onto a built-in browser primitive —
+              attributes, properties, events, MutationObserver. No magic, no virtual DOM,
+              no compiler required.
+            </p>
+          </div>
+
+          <div class="api__grid">
+            <div class="api-card">
+              <div class="api-card__name">@CustomElement<span class="target">class</span></div>
+              <p class="api-card__desc">Registers the class as a native custom element with a tag, template, and styles.</p>
+            </div>
+            <div class="api-card">
+              <div class="api-card__name">@Prop<span class="target">property</span></div>
+              <p class="api-card__desc">Reflects a primitive between attribute and property; passes objects and arrays through untouched.</p>
+            </div>
+            <div class="api-card">
+              <div class="api-card__name">@Toggle<span class="target">property</span></div>
+              <p class="api-card__desc">A boolean attribute that follows the W3C spec — present, "true", or "false".</p>
+            </div>
+            <div class="api-card">
+              <div class="api-card__name">@Watch<span class="target">method</span></div>
+              <p class="api-card__desc">Runs a method whenever a watched property changes — from either side of the bridge.</p>
+            </div>
+            <div class="api-card">
+              <div class="api-card__name">@Listen<span class="target">method</span></div>
+              <p class="api-card__desc">Wires up DOM events on the host or on any selector inside the shadow tree.</p>
+            </div>
+            <div class="api-card">
+              <div class="api-card__name">@Dispatch<span class="target">property</span></div>
+              <p class="api-card__desc">Declares a typed CustomEvent emitter — call <code>.emit()</code> to fire it with a payload.</p>
             </div>
           </div>
         </div>
+      </section>
+    </main>
+
+    <!-- ─── Footer ────────────────────────────────────────────── -->
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>MIT licensed · Maintained by Aivan Monceller &amp; contributors</span>
+        <span class="footer__links">
+          <a href="https://github.com/geocine/custom-elements-ts">GitHub</a>
+          <a href="https://www.npmjs.com/package/custom-elements-ts">npm</a>
+          <a href="https://github.com/geocine/custom-elements-ts/issues">Issues</a>
+          <a href="https://github.com/geocine/custom-elements-ts/blob/master/LICENSE">License</a>
+        </span>
       </div>
-    </section>
+    </footer>
+
+    <!-- Toast notifications (the element subscribes to `cts:toast` document events) -->
+    <cts-toast></cts-toast>
+
     <script src="//unpkg.com/prismjs@1.15.0/prism.js"></script>
     <script src="//unpkg.com/@webcomponents/custom-elements/src/native-shim.js"></script>
     <script src="//unpkg.com/@webcomponents/custom-elements/custom-elements.min.js"></script>
-    <script defer src="//use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
     <script src="site.umd.js"></script>
   </body>
 </html>

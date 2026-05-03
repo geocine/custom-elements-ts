@@ -1,5 +1,5 @@
 const { execSync } = require('child_process');
-const { existsSync, mkdirSync } = require('fs');
+const { existsSync, mkdirSync, copyFileSync } = require('fs');
 const path = require('path');
 const { config, ELEMENT_NAME } = require('./rollup-config');
 const rollup = require('rollup');
@@ -11,6 +11,33 @@ const { readFileSync, writeFileSync } = require('fs');
 const DEST_PATH = 'dist';
 const SRC_PATH = `demos/${ELEMENT_NAME}/**/*.ts`;
 const SRC_TMP_PATH = `.tmp`;
+
+const STATIC_ASSET_EXTS = new Set([
+  '.css', '.svg', '.png', '.jpg', '.jpeg', '.gif',
+  '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf'
+]);
+
+function copyStaticAssets(srcDir, destDir) {
+  const files = glob.sync(`${srcDir}/**/*`, { nodir: true });
+  for (const file of files) {
+    const ext = path.extname(file).toLowerCase();
+    if (!STATIC_ASSET_EXTS.has(ext)) continue;
+    const rel = path.relative(srcDir, file);
+    const dest = path.join(destDir, rel);
+    const destSubDir = path.dirname(dest);
+    if (!existsSync(destSubDir)) mkdirSync(destSubDir, { recursive: true });
+    copyFileSync(file, dest);
+  }
+}
+
+function copyDemoShell() {
+  if (!existsSync(DEST_PATH)) mkdirSync(DEST_PATH, { recursive: true });
+  const indexSrc = `demos/${ELEMENT_NAME}/index.html`;
+  if (existsSync(indexSrc)) {
+    copyFileSync(indexSrc, path.join(DEST_PATH, 'index.html'));
+  }
+  copyStaticAssets(`demos/${ELEMENT_NAME}`, DEST_PATH);
+}
 
 async function clean(dir) {
   return new Promise((resolve, reject) => {
@@ -83,6 +110,7 @@ async function rollupGenerate(config) {
 Promise.all([clean(DEST_PATH), clean(SRC_TMP_PATH)])
   .then(() => inlineSources(SRC_PATH, SRC_TMP_PATH))
   .then(() => rollupGenerate(config))
+  .then(() => copyDemoShell())
   .catch(err => {
     console.error('Build failed:', err);
     process.exit(1);
