@@ -1,0 +1,53 @@
+# custom-elements-ts
+
+> A tiny (~3 kB min+gzip), zero-dependency, framework-free TypeScript library for authoring native Web Components with a small set of decorators (`@CustomElement`, `@Prop`, `@State`, `@Watch`, `@Listen`, `@Dispatch`, `@Toggle`) and an optional `html` / `render()` runtime.
+
+Components built with custom-elements-ts are standards-compliant native Custom Elements: they work in plain HTML and inside any framework (React, Vue, Svelte, Angular, etc.). Two authoring styles compose freely:
+
+- **Plain HTML, imperative updates.** Declare a `template` (or `templateUrl`) and update the DOM yourself in `connectedCallback`, `@Watch()`, or `@Listen()` handlers. No `render()`, no reactive runtime, zero runtime cost beyond the decorators. Use this for mostly-static UI like buttons, badges, panels, copy pills.
+- **Reactive `render()` with the `html` helper.** Define `render()` returning an `html` tagged template. The runtime re-renders efficiently on `@Prop()` / `@State()` / `@Toggle()` changes, batching multiple synchronous mutations into one render. `render()` output is mounted into the shadow root by default; pass `shadow: false` to render into the host. State is deeply proxied — nested mutations (`this.user.name = '…'`, `this.items.push(…)`) schedule a render; only plain objects and arrays are proxied (functions, classes, DOM nodes, `Date`, `Map`, `Set`, `WeakMap`, `WeakSet` are left as-is).
+
+Install: `npm install custom-elements-ts`. License: MIT. Repository: https://github.com/geocine/custom-elements-ts. Live demo site: https://geocine.github.io/custom-elements-ts/.
+
+## Documentation
+
+- [README — full guide, decorators, examples](https://github.com/geocine/custom-elements-ts/blob/master/README.md): Quick start (plain HTML and reactive `render()`), template binding forms (`${expr}`, `${() => expr}`, `@event`, `.prop`, attribute, list rendering), every decorator (`@CustomElement`, `@Prop`, `@State`, `@Toggle`, `@Dispatch`, `@Watch`, `@Listen`), `@Toggle` boolean-attribute semantics table, project layout, and how to run / build the demos.
+- [DeepWiki — AI-powered docs and Q&A](https://deepwiki.com/geocine/custom-elements-ts): Searchable conceptual documentation generated from the source; useful for asking natural-language questions about the runtime.
+- [npm package page](https://www.npmjs.com/package/custom-elements-ts): Published artifacts (UMD + ESM with typings) and version history.
+- [MIT license](https://github.com/geocine/custom-elements-ts/blob/master/LICENSE): Full license text.
+
+## Decorators (cheat sheet)
+
+- `@CustomElement({ tag, template?, templateUrl?, style?, styleUrl?, shadow?: boolean })`: Registers the class as a native custom element. Defaults to shadow DOM.
+- `@Prop()`: Public attribute/property. Reflects primitives (string, number, boolean) between attribute and property; objects, arrays, functions, classes are property-only (not reflected to attributes).
+- `@State()`: Internal reactive state for `render()`-based components. Not reflected to attributes, not in `observedAttributes`. Plain objects and arrays are deeply proxied so nested mutations trigger a render.
+- `@Toggle()`: Boolean attribute/property following the W3C boolean-attribute spec, with the convention that the literal string `"false"` evaluates to `false` and an unrecognized non-empty string also evaluates to `false`.
+- `@Dispatch(eventName?)`: Declares a `DispatchEmitter` field. Call `.emit({ detail, bubbles?, composed?, cancelable? })` to fire a `CustomEvent`. Default event name is the property name with dots (`onChange` → `on.change`); pass an explicit name to override (e.g. `@Dispatch('counter.change')`). Use `bubbles: true, composed: true` to cross the shadow boundary.
+- `@Watch(propertyName)`: Method runs whenever `propertyName` changes (from either attribute or property side). Receives `{ old, new }`.
+- `@Listen(event, selector?)`: Wires up a DOM event on the host element, or on `selector` inside the shadow tree (any `querySelector`-compatible selector).
+
+## Source
+
+- [src/](https://github.com/geocine/custom-elements-ts/tree/master/src): Library source — decorators plus the `html` / `render()` runtime.
+- [src/index.ts](https://github.com/geocine/custom-elements-ts/blob/master/src/index.ts): Public entry point — every named export consumers can import.
+- [tests/](https://github.com/geocine/custom-elements-ts/tree/master/tests): Vitest specs covering the runtime and every decorator. Authoritative behavioural reference when the README is ambiguous.
+- [tests/templating-runtime.spec.ts](https://github.com/geocine/custom-elements-ts/blob/master/tests/templating-runtime.spec.ts): Most thorough spec for the `html` tagged template / `render()` runtime, covering binding forms, list rendering, attribute/property/event bindings, and disposal.
+
+## Demos
+
+- [demos/counter/counter.element.ts](https://github.com/geocine/custom-elements-ts/blob/master/demos/counter/counter.element.ts): Minimal `@State()` + `render()` + `@Watch()` + `@Dispatch()` example — single-button card that emits `counter.change` on increment.
+- [demos/todo-dashboard/todo-dashboard.element.ts](https://github.com/geocine/custom-elements-ts/blob/master/demos/todo-dashboard/todo-dashboard.element.ts): Parent dashboard owning the source of truth, composing child elements via bubbling `CustomEvent`s and deeply-proxied state.
+- [demos/todo-dashboard/todo-item.element.ts](https://github.com/geocine/custom-elements-ts/blob/master/demos/todo-dashboard/todo-item.element.ts): Child row component — `@Prop()` inputs, `@Listen()` handlers, `@Dispatch()` outputs.
+- [demos/todo-dashboard/todo-stats.element.ts](https://github.com/geocine/custom-elements-ts/blob/master/demos/todo-dashboard/todo-stats.element.ts): Sibling stats card driven entirely by `@Prop()` data passed down from the parent.
+- [demos/site/](https://github.com/geocine/custom-elements-ts/tree/master/demos/site): Source for the showcase landing page itself — `<cts-message>` (plain-HTML, imperative), `<cts-toast>`, `<cts-event-log>`, `<cts-code-example>`. Demonstrates that the same library is used to build its own marketing site.
+- [demos/site/message/message.element.ts](https://github.com/geocine/custom-elements-ts/blob/master/demos/site/message/message.element.ts): Canonical "no `render()` required" example — static `template` + imperative DOM updates in `connectedCallback`, `@Listen('click')`, and a bubbling+composed `@Dispatch('cts:toast')`.
+
+## Live site (this domain)
+
+- [Showcase landing page](https://geocine.github.io/custom-elements-ts/): Hero, install pill, live counter demo, live sprint-board demo, and an event-log panel that subscribes to bubbling `CustomEvent`s in real time. All demos on the page are the *real* compiled components, not screenshots.
+
+## Optional
+
+- [GitHub issues](https://github.com/geocine/custom-elements-ts/issues): Bug reports and feature requests.
+- [Coveralls — test coverage](https://coveralls.io/github/geocine/custom-elements-ts?branch=master): Current line coverage for the library.
+- [GitHub Actions — CI](https://github.com/geocine/custom-elements-ts/actions/workflows/ci.yml): Build, test, and GitHub Pages deploy pipeline.

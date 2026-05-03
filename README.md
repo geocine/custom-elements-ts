@@ -4,6 +4,7 @@
 ![CI](https://github.com/geocine/custom-elements-ts/actions/workflows/ci.yml/badge.svg)
 [![npm version](https://badge.fury.io/js/custom-elements-ts.svg)](https://www.npmjs.com/package/custom-elements-ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/geocine/custom-elements-ts)
 
 Author native Web Components in TypeScript with a small set of decorators
 (`@CustomElement`, `@Prop`, `@State`, `@Watch`, `@Listen`, `@Dispatch`,

@@ -16,7 +16,8 @@ const SRC_TMP_PATH = `.tmp`;
 
 const STATIC_ASSET_EXTS = new Set([
   '.css', '.svg', '.png', '.jpg', '.jpeg', '.gif',
-  '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf'
+  '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf',
+  '.txt'
 ]);
 
 function copyStaticAssets(srcDir, destDir) {
