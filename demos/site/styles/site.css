@@ -167,6 +167,7 @@ a:hover { color: var(--accent); }
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--fg);
+  white-space: nowrap;
 }
 .brand__name .dim { color: var(--fg-subtle); }
 
@@ -238,6 +239,7 @@ a:hover { color: var(--accent); }
   font-size: 12px;
   color: var(--fg-muted);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .hero__pill .badge {
   display: inline-flex;
@@ -410,21 +412,6 @@ a:hover { color: var(--accent); }
 }
 .window__title .accent { color: var(--accent-fg); }
 
-.window__copy {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--fg-muted);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xs);
-  background: var(--bg-elev-2);
-}
-.window__copy svg { width: 12px; height: 12px; }
-
 .window__body {
   background: #0b0e14;
 }
@@ -576,6 +563,13 @@ a:hover { color: var(--accent); }
   color: var(--accent-fg);
 }
 
+/* Keep inline code chips like `npm install` or `@State()` atomic so
+   prose wraps around them instead of breaking them mid-token. */
+:where(.hero__lede, .live__lede, .side-card__sub, .playground__title,
+       .playground__sub, .stage__caption, .api__lede) code {
+  white-space: nowrap;
+}
+
 .playground {
   position: relative;
   margin-top: 22px;
@@ -646,6 +640,71 @@ a:hover { color: var(--accent); }
   font-size: 12px;
   color: var(--accent-fg);
 }
+/* Two-button action group sitting in the playground header:
+   1) Source — toggles the inline <cts-source-viewer> below the playground.
+   2) GitHub — opens the actual file on GitHub. */
+.playground__actions {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.playground__btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease),
+              color var(--dur) var(--ease),
+              background var(--dur) var(--ease);
+}
+.playground__btn:hover {
+  color: var(--fg);
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+}
+.playground__btn:active {
+  transform: translateY(1px);
+}
+.playground__btn[aria-expanded="true"],
+.playground__btn.is-active {
+  color: var(--accent-fg);
+  border-color: var(--line-accent);
+  background: var(--accent-soft);
+}
+
+.playground__btn-caret {
+  margin-left: 2px;
+  opacity: 0.6;
+  transition: transform var(--dur) var(--ease), opacity var(--dur) var(--ease);
+}
+.playground__btn[aria-expanded="true"] .playground__btn-caret {
+  transform: rotate(180deg);
+  opacity: 0.9;
+}
+
+.playground__btn--ghost {
+  background: transparent;
+}
+.playground__btn--ghost:hover {
+  background: var(--bg-elev-2);
+}
+
+/* Backwards-compat selector kept in case any external embed still
+   targets the original anchor class. */
 .playground__source {
   flex: 0 0 auto;
   display: inline-flex;
@@ -686,8 +745,23 @@ a:hover { color: var(--accent); }
   }
 }
 
-/* Todo playground: dashboard on top, full-width log below.
-   The dashboard sets its own max width; we just center it. */
+/* Todo playground reuses the split layout. Same `1fr` + fixed-log column
+   pattern the counter uses, with identical log min/max widths so the two
+   logs line up vertically across the page. The breakpoint nudges up
+   because the dashboard's `compact` width (540px) plus the log needs
+   more room than the counter card to fit side-by-side. */
+.playground--todo .playground__body--split {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .playground--todo .playground__body--split {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+    align-items: stretch;
+  }
+}
+
+/* Legacy stack variant kept around in case any external embed still
+   uses it; the site demo no longer does. */
 .playground__body--stack {
   grid-template-columns: 1fr;
 }
@@ -722,6 +796,13 @@ a:hover { color: var(--accent); }
 .stage--todo {
   padding: 32px 18px;
 }
+/* `min-width: 0` lets the host shrink below its intrinsic min-content
+   on narrow phones, which otherwise inflates the grid column and
+   overflows the playground body. */
+.stage--todo cts-todo-dashboard {
+  width: min(540px, 100%);
+  min-width: 0;
+}
 
 .stage__caption {
   margin: 0;
@@ -750,6 +831,20 @@ a:hover { color: var(--accent); }
   width: 100%;
 }
 
+/* Inline source viewer sits flush against the bottom of each playground
+   article. The inner `:host { display: grid; grid-template-rows: 0fr }`
+   rule in source-viewer.element.scss owns the open/close transition.
+   We deliberately do NOT set `display` from the outside: light-DOM rules
+   targeting the host element override `:host` for the same property,
+   which would force `display: block` and break the grid-row animation. */
+cts-source-viewer:not(:defined) {
+  /* Keep the collapsed state during hydration so the article doesn't
+     visibly grow then shrink as the bundle finishes loading. */
+  display: block;
+  height: 0;
+  overflow: hidden;
+}
+
 /* Custom element loading skeletons for the live demos.
    Match the same hydration pattern used on the install pill above. */
 cts-counter,
@@ -767,7 +862,9 @@ cts-counter:not(:defined) {
 }
 
 cts-todo-dashboard:not(:defined) {
-  width: min(720px, calc(100vw - 80px));
+  /* Match the compact width the live element will hydrate into so the
+     stage doesn't visibly resize when the bundle finishes loading. */
+  width: min(540px, calc(100vw - 80px));
   height: 520px;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
@@ -1008,6 +1105,43 @@ cts-message:defined {
 @keyframes cts-hydrate {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+/* Mobile / narrow-viewport adjustments */
+@media (max-width: 720px) {
+  .playground__head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 20px 18px 16px;
+  }
+  .playground__actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .playground__title {
+    font-size: 19px;
+  }
+  .playground__sub {
+    font-size: 13.5px;
+  }
+
+  .playground__body {
+    padding: 18px 16px 22px;
+    gap: 18px;
+  }
+
+  .stage {
+    padding: 22px 14px;
+    min-height: 200px;
+  }
+  .stage--todo {
+    padding: 22px 10px;
+  }
+
+  cts-code-example {
+    font-size: 12px;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────

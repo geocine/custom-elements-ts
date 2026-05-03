@@ -1,0 +1,296 @@
+/* ─────────────────────────────────────────────────────────────
+   cts-source-viewer
+   Collapsible inline panel that shows the TypeScript source for
+   the playground it sits beneath. Animates open/close via the
+   `grid-template-rows: 0fr → 1fr` trick so closed instances cost
+   no layout, but expand smoothly when the [open] attribute lands.
+   ───────────────────────────────────────────────────────────── */
+
+:host {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular,
+               Menlo, Consolas, "Courier New", monospace;
+}
+
+:host([open]) {
+  grid-template-rows: 1fr;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.viewer {
+  overflow: hidden;
+  min-height: 0;
+  visibility: hidden;
+  pointer-events: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    radial-gradient(420px 200px at 0% 0%,
+                    rgba(49, 120, 198, 0.06) 0%,
+                    transparent 70%),
+    linear-gradient(180deg, #0d1118 0%, #0a0d13 100%);
+  transition: visibility 0s linear 360ms;
+}
+
+:host([open]) .viewer {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+/* ── Top bar: kicker + file tabs ─────────────────────────── */
+
+.bar {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg,
+              rgba(255, 255, 255, 0.02) 0%,
+              rgba(255, 255, 255, 0)    100%);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 4px;
+  margin-right: 4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  align-self: center;
+  height: 30px;
+}
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: #4189d6;
+  box-shadow: 0 0 8px rgba(65, 137, 214, 0.6);
+}
+
+.tabs {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.82);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #4189d6;
+    outline-offset: -2px;
+    border-radius: 2px;
+  }
+
+  &.is-active {
+    color: #9cc0eb;
+    border-bottom-color: #4189d6;
+    background: rgba(65, 137, 214, 0.04);
+  }
+}
+
+.single {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9cc0eb;
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  padding: 16px 22px;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+.empty code {
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.025);
+  color: #9cc0eb;
+}
+
+/* ── Code body ───────────────────────────────────────────── */
+
+.body {
+  margin: 0;
+  padding: 22px 26px 26px;
+  background: transparent;
+  color: #d6dce5;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.65;
+  overflow: auto;
+  max-height: 460px;
+  white-space: pre;
+  -webkit-font-smoothing: antialiased;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.10) transparent;
+
+  &::-webkit-scrollbar { width: 8px; height: 8px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-track { background: transparent; }
+
+  &:focus { outline: none; }
+  &:focus-visible {
+    outline: 2px solid #4189d6;
+    outline-offset: -2px;
+  }
+}
+
+.body code {
+  background: transparent;
+  font-family: inherit;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+@media (min-width: 980px) {
+  .body {
+    font-size: 13.5px;
+    padding: 26px 32px 30px;
+    max-height: 540px;
+  }
+}
+
+/* Narrow viewports — give the tab strip more room and hint at
+   off-screen tabs with a right-edge mask. */
+@media (max-width: 640px) {
+  .bar {
+    padding: 0 10px;
+    mask-image: linear-gradient(to right,
+                                black calc(100% - 22px),
+                                transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+                                        black calc(100% - 22px),
+                                        transparent 100%);
+  }
+  .kicker {
+    padding: 0 10px 0 4px;
+    margin-right: 2px;
+    font-size: 0; /* collapse text, keep the dot */
+  }
+  .tab,
+  .single {
+    padding: 10px 10px;
+    font-size: 11.5px;
+  }
+  .body {
+    padding: 18px 18px 22px;
+    font-size: 12.5px;
+    max-height: 380px;
+  }
+}
+
+/* ── Prism token theme — kept in sync with cts-code-example ── */
+
+.token {
+  &.comment,
+  &.prolog,
+  &.doctype,
+  &.cdata {
+    color: #6e7681;
+    font-style: italic;
+  }
+
+  &.punctuation { color: #c9d1d9; }
+
+  &.property,
+  &.tag,
+  &.attr-name { color: #9cdcfe; }
+
+  &.keyword,
+  &.boolean { color: #4189d6; }
+
+  &.class-name { color: #4ec9b0; }
+
+  &.constant,
+  &.symbol { color: #4189d6; }
+
+  &.number { color: #b5cea8; }
+
+  &.string,
+  &.char,
+  &.attr-value,
+  &.builtin,
+  &.inserted { color: #ce9178; }
+
+  &.selector { color: #d7ba7d; }
+
+  &.variable { color: #d6dce5; }
+
+  &.operator,
+  &.entity { color: #d6dce5; }
+
+  &.url {
+    color: #4189d6;
+    text-decoration: underline;
+  }
+
+  &.atrule { color: #c586c0; }
+
+  &.function { color: #dcdcaa; }
+
+  &.regex { color: #d16969; }
+
+  &.important {
+    color: #f47067;
+    font-weight: 600;
+  }
+
+  &.bold { font-weight: 600; }
+  &.italic { font-style: italic; }
+  &.deleted { color: #f47067; }
+}
+
+.namespace { opacity: .65; }
+
+.language-css .token.string,
+.style .token.string {
+  color: #ce9178;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host { transition: none; }
+}

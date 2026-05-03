@@ -7,6 +7,7 @@ const rimraf = require('rimraf');
 const { copyFile } = require('fs').promises;
 const glob = require('glob');
 const { readFileSync, writeFileSync } = require('fs');
+const { generateSources } = require('./generate-sources');
 
 const DEST_PATH = 'dist';
 // Inline every demo source so a demo (like `site`) can freely import sibling
@@ -112,6 +113,7 @@ async function rollupGenerate(config) {
 
 Promise.all([clean(DEST_PATH), clean(SRC_TMP_PATH)])
   .then(() => inlineSources(SRC_PATH, SRC_TMP_PATH))
+  .then(() => generateSources(SRC_TMP_PATH))
   .then(() => rollupGenerate(config))
   .then(() => copyDemoShell())
   .catch(err => {

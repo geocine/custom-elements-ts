@@ -13,7 +13,7 @@ const prodModeParams = ['--prod', '--prod=true', '--prod true'];
 const ELEMENT_PATH = `${ELEMENT_NAME}/index.ts`;
 const INPUT_PATH = path.join('.tmp', ELEMENT_PATH);
 
-if (ELEMENT_NAME == undefined) {
+if (ELEMENT_NAME === undefined) {
   console.log('specify which element to start');
   console.log(' ↳  eg. npm start element-name');
   process.exit();

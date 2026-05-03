@@ -47,7 +47,7 @@
   --dur-slow: 420ms;
 
   display: block;
-  width: min(720px, calc(100vw - 32px));
+  width: min(720px, 100%);
   color: var(--fg);
   font-family:
     'Geist',
@@ -86,7 +86,7 @@
 }
 
 .shell.compact {
-  width: min(540px, calc(100vw - 32px));
+  width: min(540px, 100%);
 }
 
 @keyframes shell-in {
@@ -310,6 +310,7 @@ cts-todo-item {
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .stat-tag {
@@ -329,6 +330,7 @@ cts-todo-item {
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .stat-tag::before {
@@ -1020,7 +1022,8 @@ input.task-label:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px 12px;
   padding: 14px 18px 14px 24px;
   border-top: 1px solid var(--line);
   background: rgba(0, 0, 0, 0.18);
@@ -1069,6 +1072,7 @@ input.task-label:focus {
 .footer-actions {
   display: flex;
   gap: 6px;
+  margin-left: auto;
 }
 
 .footer-actions button {
@@ -1078,6 +1082,7 @@ input.task-label:focus {
   background: transparent;
   border-color: transparent;
   color: var(--fg-muted);
+  white-space: nowrap;
 }
 
 .footer-actions button:hover {

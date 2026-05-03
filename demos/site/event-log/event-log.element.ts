@@ -1,11 +1,4 @@
-import {
-  CustomElement,
-  Prop,
-  State,
-  TemplateResult,
-  Watch,
-  html,
-} from 'custom-elements-ts';
+import { CustomElement, Prop, State, TemplateResult, Watch, html } from 'custom-elements-ts';
 
 interface LogEntry {
   id: number;
@@ -111,7 +104,7 @@ export class EventLogElement extends HTMLElement {
   }
 
   private formatDetail(detail: unknown): string {
-    if (detail == null) return '—';
+    if (detail === null || detail === undefined) return '—';
     if (typeof detail === 'string') return detail;
     if (typeof detail === 'number' || typeof detail === 'boolean') {
       return String(detail);

@@ -120,6 +120,7 @@ export class TodoDashboardElement extends HTMLElement {
           <div class="composer-field">
             <span class="composer-icon" aria-hidden="true">${this.iconPlus()}</span>
             <input
+              name="new-task"
               aria-label="New task"
               placeholder="Capture a task and press enter"
               .value=${this.draft}

@@ -120,17 +120,13 @@
         <div class="container">
           <div class="showcase__grid">
 
-            <article class="window" aria-label="Source for the install pill on the right">
+            <article class="window" aria-label="message.element.ts source">
               <header class="window__bar">
                 <span class="window__dots" aria-hidden="true">
                   <span></span><span></span><span></span>
                 </span>
                 <span class="window__title">
                   message.<span class="accent">element.ts</span>
-                </span>
-                <span class="window__copy">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  what runs the install pill →
                 </span>
               </header>
               <div class="window__body">
@@ -212,10 +208,21 @@
                   whenever its <code>@State()</code> changes.
                 </p>
               </div>
-              <a class="playground__source" href="https://github.com/geocine/custom-elements-ts/blob/master/demos/counter/counter.element.ts">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                View source
-              </a>
+              <div class="playground__actions">
+                <button class="playground__btn" type="button"
+                        data-source-toggle data-source-target="src-counter"
+                        aria-controls="src-counter" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <span>Source</span>
+                  <svg class="playground__btn-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <a class="playground__btn playground__btn--ghost"
+                   href="https://github.com/geocine/custom-elements-ts/blob/master/demos/counter/counter.element.ts"
+                   target="_blank" rel="noopener" aria-label="View counter source on GitHub">
+                  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" width="13" height="13"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.81.06 1.24.83 1.24.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                  <span>GitHub</span>
+                </a>
+              </div>
             </header>
 
             <div class="playground__body playground__body--split">
@@ -235,6 +242,8 @@
                 empty="Click the counter to dispatch counter.change events."
               ></cts-event-log>
             </div>
+
+            <cts-source-viewer id="src-counter" slug="counter"></cts-source-viewer>
           </article>
 
           <!-- Todo dashboard playground -->
@@ -250,24 +259,37 @@
                   parent re-renders.
                 </p>
               </div>
-              <a class="playground__source" href="https://github.com/geocine/custom-elements-ts/blob/master/demos/todo-dashboard/todo-dashboard.element.ts">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                View source
-              </a>
+              <div class="playground__actions">
+                <button class="playground__btn" type="button"
+                        data-source-toggle data-source-target="src-todo"
+                        aria-controls="src-todo" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="14" height="14"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <span>Source</span>
+                  <svg class="playground__btn-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <a class="playground__btn playground__btn--ghost"
+                   href="https://github.com/geocine/custom-elements-ts/tree/master/demos/todo-dashboard"
+                   target="_blank" rel="noopener" aria-label="View todo dashboard source on GitHub">
+                  <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" width="13" height="13"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.49-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.05-.49.05-.49.81.06 1.24.83 1.24.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+                  <span>GitHub</span>
+                </a>
+              </div>
             </header>
 
-            <div class="playground__body playground__body--stack">
+            <div class="playground__body playground__body--split">
               <div class="stage stage--todo">
-                <cts-todo-dashboard heading="Sprint board"></cts-todo-dashboard>
+                <cts-todo-dashboard heading="Sprint board" compact></cts-todo-dashboard>
               </div>
 
               <cts-event-log
-                class="playground__log playground__log--wide"
+                class="playground__log"
                 label="todo events"
                 events="todo.change,todo.toggle,todo.labelchange,todo.remove,filter.change,goal.change"
                 empty="Add, complete, edit, or remove a task to see events bubble up here."
               ></cts-event-log>
             </div>
+
+            <cts-source-viewer id="src-todo" slug="todo-dashboard"></cts-source-viewer>
           </article>
         </div>
       </section>

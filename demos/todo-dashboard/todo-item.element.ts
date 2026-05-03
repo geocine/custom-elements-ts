@@ -37,6 +37,7 @@ export class TodoItemElement extends HTMLElement {
           ? html`<span class="task-label is-done">${this.label}</span>`
           : html`<input
               class="task-label"
+              name=${`task-label-${this.todoId}`}
               aria-label="Task label"
               .value=${this.label}
               @change=${this.changeLabel}

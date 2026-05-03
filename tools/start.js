@@ -6,11 +6,15 @@ const rollup = require('rollup');
 const rimraf = require('rimraf');
 const glob = require('glob');
 const { config, ELEMENT_NAME } = require('./rollup-config');
+const { generateSources } = require('./generate-sources');
 
 const STATIC_ASSET_EXTS = new Set([
   '.css', '.svg', '.png', '.jpg', '.jpeg', '.gif',
-  '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf'
+  '.ico', '.webp', '.woff', '.woff2', '.ttf', '.otf',
+  '.txt'
 ]);
+
+const INLINE_SOURCE_EXTS = new Set(['.ts', '.scss']);
 
 const DEST_PATH = 'dist';
 // Inline every demo source so a demo (like `site`) can freely import sibling
@@ -151,9 +155,10 @@ const copy = () => {
 const fileWatcher = () => {
   // Watch src and demos directories
   watch('src', { recursive: true }, async (eventType, filename) => {
-    if (filename && filename.endsWith('.ts')) {
+    if (filename && INLINE_SOURCE_EXTS.has(path.extname(filename).toLowerCase())) {
       console.log(`File changed: ${filename}`);
       await inlineSources(SRC_PATH, SRC_TMP_PATH);
+      await generateSources(SRC_TMP_PATH);
       await rollupGenerate(config);
     }
   });
@@ -161,9 +166,10 @@ const fileWatcher = () => {
   watch('demos', { recursive: true }, async (eventType, filename) => {
     if (!filename) return;
     const ext = path.extname(filename).toLowerCase();
-    if (ext === '.ts') {
+    if (INLINE_SOURCE_EXTS.has(ext)) {
       console.log(`File changed: ${filename}`);
       await inlineSources(SRC_PATH, SRC_TMP_PATH);
+      await generateSources(SRC_TMP_PATH);
       await rollupGenerate(config);
     } else if (ext === '.html') {
       console.log(`HTML changed: ${filename}`);
@@ -177,6 +183,7 @@ const fileWatcher = () => {
 
 Promise.all([clean(DEST_PATH), clean(SRC_TMP_PATH)])
   .then(() => Promise.all([inlineSources(SRC_PATH, SRC_TMP_PATH), copy()]))
+  .then(() => generateSources(SRC_TMP_PATH))
   .then(() => {
     rollupGenerate(config);
     DevServer.start();
