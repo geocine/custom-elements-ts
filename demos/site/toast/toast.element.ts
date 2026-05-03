@@ -21,7 +21,7 @@ interface ToastDetail {
       </div>
     </div>
   `,
-  styleUrl: './toast.element.scss'
+  styleUrl: './toast.element.scss',
 })
 export class ToastElement extends HTMLElement {
   private timer: number | undefined;
@@ -50,10 +50,14 @@ export class ToastElement extends HTMLElement {
     // Re-trigger the entry transition cleanly
     delete toast.dataset.show;
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => { toast.dataset.show = ''; });
+      requestAnimationFrame(() => {
+        toast.dataset.show = '';
+      });
     });
 
     if (this.timer) window.clearTimeout(this.timer);
-    this.timer = window.setTimeout(() => { delete toast.dataset.show; }, 2800);
+    this.timer = window.setTimeout(() => {
+      delete toast.dataset.show;
+    }, 2800);
   }
 }

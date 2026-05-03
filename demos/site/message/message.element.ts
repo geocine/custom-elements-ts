@@ -1,10 +1,4 @@
-import {
-  CustomElement,
-  Prop,
-  Listen,
-  Dispatch,
-  DispatchEmitter,
-} from 'custom-elements-ts';
+import { CustomElement, Prop, Listen, Dispatch, DispatchEmitter } from 'custom-elements-ts';
 
 @CustomElement({
   tag: 'cts-message',
@@ -23,9 +17,9 @@ import {
   styleUrl: './message.element.scss',
 })
 export class MessageElement extends HTMLElement {
-  @Prop() message: string;
+  @Prop() message!: string;
 
-  @Dispatch('cts:toast') toast: DispatchEmitter;
+  @Dispatch('cts:toast') toast!: DispatchEmitter;
 
   @Listen('click')
   async handleClick() {
@@ -71,7 +65,11 @@ export class MessageElement extends HTMLElement {
     document.body.appendChild(ta);
     ta.select();
     let ok = false;
-    try { ok = document.execCommand('copy'); } catch { ok = false; }
+    try {
+      ok = document.execCommand('copy');
+    } catch {
+      ok = false;
+    }
     document.body.removeChild(ta);
     return ok;
   }
