@@ -6,7 +6,17 @@ export interface StateMetadata {
 
 const proxyToRaw = new WeakMap<object, object>();
 
-export const State = (): any => {
+export interface StateOptions {
+  /**
+   * When false, the value is stored as-is: no deep proxy is created and
+   * nested mutations do not schedule renders — reassign the property to
+   * re-render. Much cheaper for large arrays of objects. Defaults to true.
+   */
+  deep?: boolean;
+}
+
+export const State = (options?: StateOptions): any => {
+  const deep = options?.deep !== false;
   return (target: any, propName: string) => {
     if (!target.constructor.stateInit) {
       target.constructor.stateInit = {};
@@ -27,13 +37,15 @@ export const State = (): any => {
 
       const oldValue = this.__stateValues[propName];
       const proxyCache = (this.__stateProxyCaches[propName] ||= new WeakMap<object, unknown>());
-      const newValue = createStateProxy(value, proxyCache, () => {
-        this.__notifyPropertyChange?.(
-          propName,
-          this.__stateValues[propName],
-          this.__stateValues[propName]
-        );
-      });
+      const newValue = deep
+        ? createStateProxy(value, proxyCache, () => {
+            this.__notifyPropertyChange?.(
+              propName,
+              this.__stateValues[propName],
+              this.__stateValues[propName]
+            );
+          })
+        : value;
 
       if (Object.is(oldValue, newValue)) {
         return;
