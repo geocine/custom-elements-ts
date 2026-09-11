@@ -37,7 +37,14 @@ function copyDemoShell() {
   if (!existsSync(DEST_PATH)) mkdirSync(DEST_PATH, { recursive: true });
   const indexSrc = `demos/${ELEMENT_NAME}/index.html`;
   if (existsSync(indexSrc)) {
-    copyFileSync(indexSrc, path.join(DEST_PATH, 'index.html'));
+    const pkg = JSON.parse(readFileSync('package.json', 'utf-8'));
+    let html = readFileSync(indexSrc, 'utf-8');
+    // Keep the landing page's version badge in sync with package.json.
+    html = html.replace(
+      /<span class="badge">v[^<]*<\/span>/,
+      `<span class="badge">v${pkg.version}</span>`
+    );
+    writeFileSync(path.join(DEST_PATH, 'index.html'), html);
   }
   copyStaticAssets(`demos/${ELEMENT_NAME}`, DEST_PATH);
 }
