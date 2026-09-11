@@ -1,3 +1,5 @@
+import { Signal, isSignal, signalTargetCollected } from './signal';
+
 export type PrimitiveTemplateValue = string | number | boolean | null | undefined;
 export type TemplateEventHandler = (event: any) => void;
 
@@ -7,9 +9,55 @@ export type TemplateValue =
   | TemplateResult
   | TemplateValue[]
   | MappedTemplates<unknown>
+  | Signal<unknown>
   | (() => TemplateValue)
   | TemplateEventHandler
   | EventListenerObject;
+
+/** Minimal WeakRef typing so the library can keep targeting ES5 lib. */
+declare const WeakRef:
+  | (new <T extends object>(target: T) => { deref(): T | undefined })
+  | undefined;
+
+const createRef = <T extends object>(target: T): { deref(): T | undefined } =>
+  typeof WeakRef === 'function' ? new WeakRef(target) : { deref: () => target };
+
+/**
+ * Subscribes a DOM write to a signal and performs the initial write. The
+ * subscriber holds the node behind a WeakRef: once the node is garbage
+ * collected, the next notification unsubscribes it automatically (see
+ * signalTargetCollected), so wholesale-discarded subtrees never leak
+ * subscriptions.
+ */
+const bindSignal = <N extends object>(
+  sig: Signal<unknown>,
+  target: N,
+  write: (node: N, value: unknown) => void
+): (() => void) => {
+  write(target, sig.value);
+  const ref = createRef(target);
+  const observer = (value: unknown) => {
+    const node = ref.deref();
+    if (!node) {
+      throw signalTargetCollected;
+    }
+    write(node, value);
+  };
+  sig.subscribe(observer);
+  return () => sig.unsubscribe(observer);
+};
+
+const writeSignalText = (node: Text, value: unknown): void => {
+  node.nodeValue = value === null || value === undefined ? '' : String(value);
+};
+
+const applyAttribute = (element: Element, name: string, value: unknown): void => {
+  if (value === false || value === null || value === undefined) {
+    element.removeAttribute(name);
+  } else {
+    element.setAttribute(name, String(value));
+  }
+};
 
 /**
  * A lazily-mapped list, as returned by `map()`. Handing the list and the
@@ -317,6 +365,8 @@ class ChildPart implements Part {
   private arrayItems: Array<{ anchor: Comment; part: ChildPart }> = [];
   /** Items a map() list was last rendered from, aligned with arrayItems. */
   private lastItems: unknown[] | null = null;
+  private boundSignal?: Signal<unknown>;
+  private unbindSignal?: () => void;
 
   constructor(
     private anchor: Comment,
@@ -325,6 +375,17 @@ class ChildPart implements Part {
 
   update(value: TemplateValue): void {
     const resolved = resolveValue(value);
+    if (this.boundSignal) {
+      if (resolved === this.boundSignal) {
+        // Same signal as last render: the text node updates itself.
+        return;
+      }
+      this.detachSignal();
+    }
+    if (isSignal(resolved)) {
+      this.updateSignal(resolved);
+      return;
+    }
     if (resolved === null || resolved === undefined || resolved === false) {
       this.clear();
       return;
@@ -360,7 +421,24 @@ class ChildPart implements Part {
     this.clear();
   }
 
+  private updateSignal(sig: Signal<unknown>): void {
+    this.clear();
+    const text = document.createTextNode('');
+    insertAfter(this.anchor, [text]);
+    this.nodes = [text];
+    this.kind = 'text';
+    this.unbindSignal = bindSignal(sig, text, writeSignalText);
+    this.boundSignal = sig;
+  }
+
+  private detachSignal(): void {
+    this.unbindSignal?.();
+    this.unbindSignal = undefined;
+    this.boundSignal = undefined;
+  }
+
   private clear(): void {
+    this.detachSignal();
     this.lastItems = null;
     if (this.fastClear()) {
       // The subtree was discarded wholesale; just drop references. Event
@@ -462,6 +540,33 @@ class ChildPart implements Part {
     // Identity skips are only valid while lastItems mirrors arrayItems.
     const canSkip = last !== null && last.length === this.arrayItems.length;
 
+    // Pure contiguous removal: when identity shows the tail simply shifted
+    // left, detach just the removed rows' DOM and keep every other row
+    // untouched — instead of rewriting every row after the removal point.
+    if (canSkip && last!.length > length) {
+      let start = 0;
+      while (start < length && last![start] === items[start]) {
+        start++;
+      }
+      const removed = last!.length - length;
+      let isShift = true;
+      for (let i = start; i < length; i++) {
+        if (last![i + removed] !== items[i]) {
+          isShift = false;
+          break;
+        }
+      }
+      if (isShift) {
+        const dropped = this.arrayItems.splice(start, removed);
+        for (let i = 0; i < dropped.length; i++) {
+          dropped[i].part.dispose();
+          dropped[i].anchor.parentNode?.removeChild(dropped[i].anchor);
+        }
+        last!.splice(start, removed);
+        return;
+      }
+    }
+
     while (this.arrayItems.length > length) {
       const item = this.arrayItems.pop()!;
       item.part.dispose();
@@ -531,6 +636,7 @@ class ChildPart implements Part {
 
 class AttributePart implements Part {
   private currentValue: TemplateValue | typeof noValue = noValue;
+  private unbindSignal?: () => void;
 
   constructor(
     private element: Element,
@@ -542,15 +648,26 @@ class AttributePart implements Part {
     if (Object.is(this.currentValue, resolved)) {
       return;
     }
-    this.currentValue = resolved;
-    if (resolved === false || resolved === null || resolved === undefined) {
-      this.element.removeAttribute(this.name);
-    } else {
-      this.element.setAttribute(this.name, String(resolved));
+    if (this.unbindSignal) {
+      this.unbindSignal();
+      this.unbindSignal = undefined;
     }
+    this.currentValue = resolved;
+    if (isSignal(resolved)) {
+      const name = this.name;
+      this.unbindSignal = bindSignal(resolved, this.element, (el, v) =>
+        applyAttribute(el, name, v)
+      );
+      return;
+    }
+    applyAttribute(this.element, this.name, resolved);
   }
 
   dispose(): void {
+    if (this.unbindSignal) {
+      this.unbindSignal();
+      this.unbindSignal = undefined;
+    }
     this.currentValue = noValue;
     this.element.removeAttribute(this.name);
   }
@@ -558,6 +675,7 @@ class AttributePart implements Part {
 
 class PropertyPart implements Part {
   private currentValue: TemplateValue | typeof noValue = noValue;
+  private unbindSignal?: () => void;
 
   constructor(
     private element: Element,
@@ -569,11 +687,26 @@ class PropertyPart implements Part {
     if (Object.is(this.currentValue, resolved)) {
       return;
     }
+    if (this.unbindSignal) {
+      this.unbindSignal();
+      this.unbindSignal = undefined;
+    }
     this.currentValue = resolved;
+    if (isSignal(resolved)) {
+      const name = this.name;
+      this.unbindSignal = bindSignal(resolved, this.element, (el, v) => {
+        (el as any)[name] = v === null || v === undefined ? '' : v;
+      });
+      return;
+    }
     (this.element as any)[this.name] = resolved === null || resolved === undefined ? '' : resolved;
   }
 
   dispose(): void {
+    if (this.unbindSignal) {
+      this.unbindSignal();
+      this.unbindSignal = undefined;
+    }
     this.currentValue = noValue;
     (this.element as any)[this.name] = '';
   }

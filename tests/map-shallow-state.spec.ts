@@ -63,6 +63,43 @@ describe('map() identity-based list rendering', () => {
     expect(el.querySelectorAll('li')[0].textContent).toBe('one');
   });
 
+  it('detaches only the removed row on a contiguous middle removal', async () => {
+    const el = await mount();
+    const items = [
+      { id: 1, label: 'one' },
+      { id: 2, label: 'two' },
+      { id: 3, label: 'three' },
+      { id: 4, label: 'four' },
+    ];
+    el.items = items;
+    await nextMicrotask();
+    const before = Array.from(el.querySelectorAll('li'));
+    expect(before.length).toBe(4);
+
+    // Remove the second item: the surviving rows must keep their exact DOM
+    // nodes and the row function must not run at all.
+    rowSpy.mockClear();
+    el.items = [items[0], items[2], items[3]];
+    await nextMicrotask();
+
+    const after = Array.from(el.querySelectorAll('li'));
+    expect(after.length).toBe(3);
+    expect(rowSpy).not.toHaveBeenCalled();
+    expect(after[0]).toBe(before[0]);
+    expect(after[1]).toBe(before[2]);
+    expect(after[2]).toBe(before[3]);
+    expect(after.map((li) => li.textContent)).toEqual(['one', 'three', 'four']);
+
+    // A later unrelated update still works with the spliced bookkeeping.
+    el.items = [items[0], { id: 9, label: 'nine' }, items[3]];
+    await nextMicrotask();
+    expect(Array.from(el.querySelectorAll('li')).map((li) => li.textContent)).toEqual([
+      'one',
+      'nine',
+      'four',
+    ]);
+  });
+
   it('grows, shrinks, and fast-clears mapped lists', async () => {
     const el = await mount();
     const items = [
