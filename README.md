@@ -173,12 +173,43 @@ Attribute bindings remove the attribute when the value is `false`,
 render supplies a new handler and are cleaned up automatically when the
 rendered template is disposed.
 
+### Rendering helpers
+
+Two helpers make large or frequently-updating views fast — see
+[docs/rendering.md](docs/rendering.md) for the full guide:
+
+- **`map(items, fn)`** — identity-aware list rendering. Rows whose item
+  is the same object (`===`) as the previous render are skipped
+  entirely; removals detach only the removed rows' DOM.
+- **`signal(value)`** — a reactive value bound directly to its DOM
+  location. Assigning `.value` updates just that text node, attribute,
+  or property, with no component re-render and no diffing.
+
+```ts
+import { CustomElement, State, html, map, signal, Signal } from 'custom-elements-ts';
+
+@CustomElement({ tag: 'todo-list', shadow: false })
+export class TodoList extends HTMLElement {
+  @State({ deep: false }) items: { id: number; label: Signal<string> }[] = [];
+
+  render() {
+    return html`<ul>
+      ${map(this.items, (item) => html`<li>${item.label}</li>`)}
+    </ul>`;
+  }
+
+  rename(index: number, label: string) {
+    this.items[index].label.value = label; // one text write, no render
+  }
+}
+```
+
 ## Decorators
 
 | Decorator   | Target   | Parameters         | Description                                                                                                                                                                       |
 | ----------- | -------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | @Prop()     | property | -                  | custom attribute/properties; reflects primitive values (string, number, boolean) to attributes                                                                                    |
-| @State()    | property | -                  | private reactive state for render-based components; not reflected to attributes                                                                                                   |
+| @State()    | property | (options?)         | private reactive state for render-based components; not reflected to attributes. `{ deep: false }` skips deep proxying — only reassignment re-renders                              |
 | @Toggle()   | property | -                  | boolean attribute/properties based on the presence of the attribute; also accepts `"true"` and `"false"`                                                                          |
 | @Dispatch() | property | (event?)           | declares a `CustomEvent` you can fire via the `.emit` method of its `DispatchEmitter` type. The `event` parameter sets the `CustomEvent` name                                     |
 | @Watch()    | method   | (property)         | runs the method when `property` changes                                                                                                                                           |
@@ -273,6 +304,12 @@ assigned to state are deeply proxied, so nested mutations such as
 Only plain objects and arrays are proxied. Functions, class
 constructors, DOM nodes, `Date`, `Map`, `Set`, `WeakMap`, and `WeakSet`
 are left as-is — reassign those values to trigger a render.
+
+**Shallow state.** Deep proxying costs memory and time for large data
+structures. `@State({ deep: false })` stores the value as-is: nested
+mutations no longer schedule renders, and you reassign the property to
+re-render instead. It pairs well with `map()` and replace-on-change
+updates — see [docs/rendering.md](docs/rendering.md).
 
 ### @Toggle()
 
