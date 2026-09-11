@@ -209,7 +209,7 @@
     };
 
     const proxyToRaw = new WeakMap();
-    const State = () => {
+    const State = (options) => {
         return (target, propName) => {
             if (!target.constructor.stateInit) {
                 target.constructor.stateInit = {};
@@ -230,9 +230,10 @@
                 const oldValue = this.__stateValues[propName];
                 const proxyCache = ((_b = this.__stateProxyCaches)[propName] || (_b[propName] = new WeakMap()));
                 const newValue = createStateProxy(value, proxyCache, () => {
-                    var _a;
-                    (_a = this.__notifyPropertyChange) === null || _a === void 0 ? void 0 : _a.call(this, propName, this.__stateValues[propName], this.__stateValues[propName]);
-                });
+                        var _a;
+                        (_a = this.__notifyPropertyChange) === null || _a === void 0 ? void 0 : _a.call(this, propName, this.__stateValues[propName], this.__stateValues[propName]);
+                    })
+                    ;
                 if (Object.is(oldValue, newValue)) {
                     return;
                 }
@@ -307,6 +308,79 @@
         return Object.keys(stateInit).some((propName) => toKebabCase(propName) === attrName);
     };
 
+    const signalTargetCollected = Symbol('custom-elements-ts-signal-target-collected');
+    class Signal {
+        constructor(initialValue) {
+            this.currentValue = initialValue;
+        }
+        get value() {
+            return this.currentValue;
+        }
+        set value(newValue) {
+            if (newValue === this.currentValue) {
+                return;
+            }
+            this.currentValue = newValue;
+            const observers = this.observers;
+            if (!observers) {
+                return;
+            }
+            observers.forEach((observer) => {
+                try {
+                    observer(newValue);
+                }
+                catch (error) {
+                    if (error === signalTargetCollected) {
+                        observers.delete(observer);
+                        return;
+                    }
+                    throw error;
+                }
+            });
+        }
+        subscribe(observer) {
+            (this.observers || (this.observers = new Set())).add(observer);
+        }
+        unsubscribe(observer) {
+            var _a;
+            (_a = this.observers) === null || _a === void 0 ? void 0 : _a.delete(observer);
+        }
+        valueOf() {
+            return this.currentValue;
+        }
+    }
+    const isSignal = (value) => value instanceof Signal;
+
+    const createRef = (target) => typeof WeakRef === 'function' ? new WeakRef(target) : { deref: () => target };
+    const bindSignal = (sig, target, write) => {
+        write(target, sig.value);
+        const ref = createRef(target);
+        const observer = (value) => {
+            const node = ref.deref();
+            if (!node) {
+                throw signalTargetCollected;
+            }
+            write(node, value);
+        };
+        sig.subscribe(observer);
+        return () => sig.unsubscribe(observer);
+    };
+    const writeSignalText = (node, value) => {
+        node.nodeValue = value === null || value === undefined ? '' : String(value);
+    };
+    const applyAttribute = (element, name, value) => {
+        if (value === false || value === null || value === undefined) {
+            element.removeAttribute(name);
+        }
+        else {
+            element.setAttribute(name, String(value));
+        }
+    };
+    const isMappedTemplates = (value) => {
+        return Boolean(value &&
+            typeof value === 'object' &&
+            value.__customElementsTsMapped === true);
+    };
     const templateCache = new WeakMap();
     const html = (strings, ...values) => ({
         strings,
@@ -347,17 +421,50 @@
     };
     const createTemplateInstance = (result, host) => {
         const parsed = getParsedTemplate(result.strings);
-        const template = document.createElement('template');
-        template.innerHTML = parsed.html;
-        const fragment = document.importNode(template.content, true);
-        const parts = discoverParts(fragment, parsed.markers, host);
-        const nodes = Array.from(fragment.childNodes);
-        parts.forEach((part, index) => part.update(result.values[index]));
+        let root;
+        let nodes;
+        if (parsed.singleRoot) {
+            root = parsed.content.firstChild.cloneNode(true);
+            nodes = [root];
+        }
+        else {
+            root = parsed.content.cloneNode(true);
+            nodes = Array.from(root.childNodes);
+        }
+        const descriptors = parsed.parts;
+        const count = descriptors.length;
+        const parts = new Array(count);
+        for (let i = 0; i < count; i++) {
+            const d = descriptors[i];
+            let node = root;
+            const path = d.path;
+            for (let j = 0; j < path.length; j++) {
+                node = node.childNodes[path[j]];
+            }
+            if (d.kind === 'child') {
+                parts[i] = new ChildPart(node, host);
+            }
+            else if (d.kind === 'event') {
+                parts[i] = new EventPart(node, d.name, host);
+            }
+            else if (d.kind === 'prop') {
+                parts[i] = new PropertyPart(node, d.name);
+            }
+            else {
+                parts[i] = new AttributePart(node, d.name);
+            }
+        }
+        const values = result.values;
+        for (let i = 0; i < count; i++) {
+            parts[i].update(values[i]);
+        }
         return {
             strings: result.strings,
             nodes,
-            update(values) {
-                parts.forEach((part, index) => part.update(values[index]));
+            update(newValues) {
+                for (let i = 0; i < count; i++) {
+                    parts[i].update(newValues[i]);
+                }
             },
             dispose() {
                 parts.forEach((part) => part.dispose());
@@ -379,9 +486,81 @@
             parsedHtml += isAttributePosition(strings[index]) ? marker : `<!--${marker}-->`;
         }
         parsedHtml += strings[strings.length - 1];
-        const parsed = { html: parsedHtml, markers };
+        const template = document.createElement('template');
+        template.innerHTML = parsedHtml;
+        const content = template.content;
+        stripTableWhitespace(content);
+        const markerToIndex = new Map(markers.map((marker, index) => [marker, index]));
+        const descriptors = new Array(markers.length);
+        const walker = document.createTreeWalker(content, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT);
+        let current = walker.nextNode();
+        while (current) {
+            if (current.nodeType === Node.COMMENT_NODE) {
+                const index = markerToIndex.get(current.nodeValue || '');
+                if (index !== undefined) {
+                    current.textContent = '';
+                    descriptors[index] = { kind: 'child', name: '', path: getNodePath(current, content) };
+                }
+            }
+            else {
+                const element = current;
+                let elementPath;
+                Array.from(element.attributes).forEach((attribute) => {
+                    const index = markerToIndex.get(attribute.value);
+                    if (index === undefined) {
+                        return;
+                    }
+                    const name = attribute.name;
+                    element.removeAttribute(name);
+                    elementPath || (elementPath = getNodePath(element, content));
+                    const kind = name.startsWith('@')
+                        ? 'event'
+                        : name.startsWith('.')
+                            ? 'prop'
+                            : 'attr';
+                    descriptors[index] = {
+                        kind,
+                        name: kind === 'attr' ? name : name.slice(1),
+                        path: elementPath,
+                    };
+                });
+            }
+            current = walker.nextNode();
+        }
+        const singleRoot = content.childNodes.length === 1 && content.firstChild.nodeType === Node.ELEMENT_NODE;
+        if (singleRoot) {
+            for (const descriptor of descriptors) {
+                descriptor === null || descriptor === void 0 ? void 0 : descriptor.path.shift();
+            }
+        }
+        const parsed = { content, parts: descriptors, singleRoot };
         templateCache.set(strings, parsed);
         return parsed;
+    };
+    const getNodePath = (node, root) => {
+        const path = [];
+        let current = node;
+        while (current !== root) {
+            const parent = current.parentNode;
+            path.push(Array.prototype.indexOf.call(parent.childNodes, current));
+            current = parent;
+        }
+        return path.reverse();
+    };
+    const tableTags = ['TABLE', 'THEAD', 'TBODY', 'TFOOT', 'TR'];
+    const stripTableWhitespace = (el) => {
+        const isTable = el.nodeType === Node.ELEMENT_NODE && tableTags.indexOf(el.tagName) !== -1;
+        let child = el.firstChild;
+        while (child) {
+            const next = child.nextSibling;
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                stripTableWhitespace(child);
+            }
+            else if (isTable && child.nodeType === Node.TEXT_NODE && !child.nodeValue.trim()) {
+                child.remove();
+            }
+            child = next;
+        }
     };
     const isAttributePosition = (text) => {
         const lastOpen = text.lastIndexOf('<');
@@ -391,45 +570,6 @@
         }
         return /[^\s<>"'=/]+\s*=\s*["']?$/.test(text);
     };
-    const discoverParts = (fragment, markers, host) => {
-        const parts = new Array(markers.length);
-        const markerToIndex = new Map(markers.map((marker, index) => [marker, index]));
-        const walker = document.createTreeWalker(fragment, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT);
-        let current = walker.nextNode();
-        while (current) {
-            if (current.nodeType === Node.COMMENT_NODE) {
-                const marker = current.nodeValue || '';
-                const index = markerToIndex.get(marker);
-                if (index !== undefined) {
-                    parts[index] = new ChildPart(current, host);
-                }
-            }
-            else if (current.nodeType === Node.ELEMENT_NODE) {
-                discoverAttributeParts(current, markerToIndex, parts, host);
-            }
-            current = walker.nextNode();
-        }
-        return parts;
-    };
-    const discoverAttributeParts = (element, markerToIndex, parts, host) => {
-        Array.from(element.attributes).forEach((attribute) => {
-            const index = markerToIndex.get(attribute.value);
-            if (index === undefined) {
-                return;
-            }
-            const name = attribute.name;
-            element.removeAttribute(name);
-            if (name.startsWith('@')) {
-                parts[index] = new EventPart(element, name.slice(1), host);
-            }
-            else if (name.startsWith('.')) {
-                parts[index] = new PropertyPart(element, name.slice(1));
-            }
-            else {
-                parts[index] = new AttributePart(element, name);
-            }
-        });
-    };
     class ChildPart {
         constructor(anchor, host) {
             this.anchor = anchor;
@@ -437,14 +577,35 @@
             this.kind = 'empty';
             this.nodes = [];
             this.arrayItems = [];
+            this.lastItems = null;
         }
         update(value) {
             const resolved = resolveValue(value);
+            if (this.boundSignal) {
+                if (resolved === this.boundSignal) {
+                    return;
+                }
+                this.detachSignal();
+            }
+            if (isSignal(resolved)) {
+                this.updateSignal(resolved);
+                return;
+            }
             if (resolved === null || resolved === undefined || resolved === false) {
                 this.clear();
                 return;
             }
+            if (isMappedTemplates(resolved)) {
+                this.updateMapped(resolved);
+                return;
+            }
             if (Array.isArray(resolved)) {
+                this.lastItems = null;
+                if (resolved.length === 0) {
+                    this.clear();
+                    this.kind = 'array';
+                    return;
+                }
                 this.updateArray(resolved);
                 return;
             }
@@ -461,8 +622,32 @@
         dispose() {
             this.clear();
         }
+        updateSignal(sig) {
+            this.clear();
+            const text = document.createTextNode('');
+            insertAfter(this.anchor, [text]);
+            this.nodes = [text];
+            this.kind = 'text';
+            this.unbindSignal = bindSignal(sig, text, writeSignalText);
+            this.boundSignal = sig;
+        }
+        detachSignal() {
+            var _a;
+            (_a = this.unbindSignal) === null || _a === void 0 ? void 0 : _a.call(this);
+            this.unbindSignal = undefined;
+            this.boundSignal = undefined;
+        }
         clear() {
             var _a;
+            this.detachSignal();
+            this.lastItems = null;
+            if (this.fastClear()) {
+                this.templateInstance = undefined;
+                this.arrayItems = [];
+                this.nodes = [];
+                this.kind = 'empty';
+                return;
+            }
             (_a = this.templateInstance) === null || _a === void 0 ? void 0 : _a.dispose();
             this.templateInstance = undefined;
             this.arrayItems.forEach((item) => {
@@ -474,6 +659,22 @@
             this.nodes.forEach((node) => { var _a; return (_a = node.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(node); });
             this.nodes = [];
             this.kind = 'empty';
+        }
+        fastClear() {
+            if (this.kind === 'empty') {
+                return false;
+            }
+            const parent = this.anchor.parentNode;
+            if (!parent || this.anchor.previousSibling) {
+                return false;
+            }
+            const end = this.getEndNode();
+            if (end === this.anchor || end.nextSibling) {
+                return false;
+            }
+            parent.textContent = '';
+            parent.appendChild(this.anchor);
+            return true;
         }
         updateText(value) {
             var _a;
@@ -509,6 +710,73 @@
             insertAfter(this.anchor, this.templateInstance.nodes);
             this.nodes = this.templateInstance.nodes;
             this.kind = 'template';
+        }
+        updateMapped(mapped) {
+            var _a, _b;
+            const items = mapped.items;
+            const fn = mapped.fn;
+            const length = items.length;
+            if (length === 0) {
+                this.clear();
+                this.kind = 'array';
+                this.lastItems = [];
+                return;
+            }
+            if (this.kind !== 'array') {
+                this.clear();
+                this.kind = 'array';
+            }
+            const last = this.lastItems;
+            const canSkip = last !== null && last.length === this.arrayItems.length;
+            if (canSkip && last.length > length) {
+                let start = 0;
+                while (start < length && last[start] === items[start]) {
+                    start++;
+                }
+                const removed = last.length - length;
+                let isShift = true;
+                for (let i = start; i < length; i++) {
+                    if (last[i + removed] !== items[i]) {
+                        isShift = false;
+                        break;
+                    }
+                }
+                if (isShift) {
+                    const dropped = this.arrayItems.splice(start, removed);
+                    for (let i = 0; i < dropped.length; i++) {
+                        dropped[i].part.dispose();
+                        (_a = dropped[i].anchor.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(dropped[i].anchor);
+                    }
+                    last.splice(start, removed);
+                    return;
+                }
+            }
+            while (this.arrayItems.length > length) {
+                const item = this.arrayItems.pop();
+                item.part.dispose();
+                (_b = item.anchor.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(item.anchor);
+            }
+            for (let index = 0; index < length; index++) {
+                let entry = this.arrayItems[index];
+                if (!entry) {
+                    const itemAnchor = document.createComment('');
+                    insertAfter(this.getEndNode(), [itemAnchor]);
+                    entry = { anchor: itemAnchor, part: new ChildPart(itemAnchor, this.host) };
+                    this.arrayItems[index] = entry;
+                }
+                else if (canSkip && last[index] === items[index]) {
+                    continue;
+                }
+                entry.part.update(fn(items[index], index));
+            }
+            let copy = this.lastItems;
+            if (copy === null || copy.length !== length) {
+                copy = new Array(length);
+                this.lastItems = copy;
+            }
+            for (let index = 0; index < length; index++) {
+                copy[index] = items[index];
+            }
         }
         updateArray(values) {
             var _a;
@@ -554,15 +822,23 @@
             if (Object.is(this.currentValue, resolved)) {
                 return;
             }
+            if (this.unbindSignal) {
+                this.unbindSignal();
+                this.unbindSignal = undefined;
+            }
             this.currentValue = resolved;
-            if (resolved === false || resolved === null || resolved === undefined) {
-                this.element.removeAttribute(this.name);
+            if (isSignal(resolved)) {
+                const name = this.name;
+                this.unbindSignal = bindSignal(resolved, this.element, (el, v) => applyAttribute(el, name, v));
+                return;
             }
-            else {
-                this.element.setAttribute(this.name, String(resolved));
-            }
+            applyAttribute(this.element, this.name, resolved);
         }
         dispose() {
+            if (this.unbindSignal) {
+                this.unbindSignal();
+                this.unbindSignal = undefined;
+            }
             this.currentValue = noValue;
             this.element.removeAttribute(this.name);
         }
@@ -578,10 +854,25 @@
             if (Object.is(this.currentValue, resolved)) {
                 return;
             }
+            if (this.unbindSignal) {
+                this.unbindSignal();
+                this.unbindSignal = undefined;
+            }
             this.currentValue = resolved;
+            if (isSignal(resolved)) {
+                const name = this.name;
+                this.unbindSignal = bindSignal(resolved, this.element, (el, v) => {
+                    el[name] = v === null || v === undefined ? '' : v;
+                });
+                return;
+            }
             this.element[this.name] = resolved === null || resolved === undefined ? '' : resolved;
         }
         dispose() {
+            if (this.unbindSignal) {
+                this.unbindSignal();
+                this.unbindSignal = undefined;
+            }
             this.currentValue = noValue;
             this.element[this.name] = '';
         }
