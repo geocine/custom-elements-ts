@@ -320,7 +320,7 @@
             </div>
             <div class="api-card">
               <div class="api-card__name">@State<span class="target">property</span></div>
-              <p class="api-card__desc">Internal reactive state for <code>render()</code> components. Deeply proxied — mutate nested arrays and objects.</p>
+              <p class="api-card__desc">Internal reactive state for <code>render()</code> components. Deeply proxied — mutate nested arrays and objects. Pass <code>{ deep: false }</code> to re-render on reassignment only.</p>
             </div>
             <div class="api-card">
               <div class="api-card__name">@Toggle<span class="target">property</span></div>
@@ -339,6 +339,14 @@
               <p class="api-card__desc">Declares a typed CustomEvent emitter — call <code>.emit()</code> to fire it with a payload.</p>
             </div>
           </div>
+
+          <p class="api__lede">
+            Rendering components also get two template helpers — <code>signal()</code> for
+            fine-grained DOM updates without re-rendering, and <code>map()</code> for
+            identity-aware list rendering. Read the
+            <a href="https://github.com/geocine/custom-elements-ts/blob/master/docs/rendering.md">rendering guide</a>
+            for details.
+          </p>
         </div>
       </section>
     </main>
